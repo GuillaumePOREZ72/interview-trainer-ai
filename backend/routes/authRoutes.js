@@ -5,6 +5,7 @@ const {
   getUserProfile,
 } = require("../controllers/authController");
 const { protect } = require("../middlewares/authMiddleware");
+const upload = require("../middlewares/uploadMiddleware");
 
 const router = express.Router();
 
