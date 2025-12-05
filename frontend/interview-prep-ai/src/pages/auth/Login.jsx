@@ -25,6 +25,7 @@ const Login = ({ setCurrentPage }) => {
 
     setError("");
 
+    // Login API call
     try {
       
     } catch (error) {
