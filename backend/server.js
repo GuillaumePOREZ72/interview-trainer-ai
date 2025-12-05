@@ -4,10 +4,12 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
+import { protect } from "./middlewares/authMiddleware.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import sessionRoutes from "./routes/sessionRoutes.js";
 import questionRoutes from "./routes/questionRoutes.js";
+import { generateConceptExplanation, generateInterviewQuestions } from "./controllers/aiController.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
