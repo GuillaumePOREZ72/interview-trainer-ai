@@ -7,6 +7,7 @@ import {
 // Generate interview questions and answers using Gemini
 const generateInterviewQuestions = async (req, res) => {
   try {
+    console.log("API Key chargée:", process.env.GEMINI_API_KEY ? "OUI" : "NON");
     const { role, experience, topicsToFocus, numberOfQuestions } = req.body;
 
     if (!role || !experience || !topicsToFocus || !numberOfQuestions) {
@@ -39,6 +40,9 @@ const generateInterviewQuestions = async (req, res) => {
 
     res.status(200).json(data);
   } catch (error) {
+    console.log("=== ERREUR GEMINI ===");
+    console.log("Message:", error.message);
+    console.log("Erreur complète:", error);
     res
       .status(500)
       .json({ message: "Failed to generate questions", error: error.message });
@@ -75,6 +79,9 @@ const generateConceptExplanation = async (req, res) => {
 
     res.status(200).json(data);
   } catch (error) {
+    console.log("=== ERREUR GEMINI ===");
+    console.log("Message:", error.message);
+    console.log("Erreur complète:", error);
     res
       .status(500)
       .json({ message: "Failed to generate questions", error: error.message });
