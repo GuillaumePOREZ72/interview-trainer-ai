@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import moment from "moment";
-import { AnimatePresence, motion, number } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { LuCircleAlert, LuListCollapse } from "react-icons/lu";
 import SpinnerLoader from "../../../components/loader/SpinnerLoader";
 import { toast } from "react-hot-toast";
@@ -77,7 +77,6 @@ const InterviewPrep = () => {
       const response = await axiosInstance.post(
         API_PATHS.QUESTION.PIN(questionId)
       );
-      console.log(response);
 
       if (response.data && response.data.question) {
         toast.success("Question pin status updated");

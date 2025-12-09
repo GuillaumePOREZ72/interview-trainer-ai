@@ -45,7 +45,7 @@ const SummaryCard = ({
           className="hidden group-hover:flex items-center gap-2 text-xs text-rose-500 font-medium bg-rose-50 px-3 py-1 rounded text-nowrap border border-rose-100 hover:border-rose-200 cursor-pointer absolute top-7 right-10"
           onClick={(e) => {
             e.stopPropagation();
-            onDelete;
+            onDelete();
           }}
         >
           <LuTrash2 className="h-5" />
