@@ -1,13 +1,12 @@
-import { GoogleGenAI } from "@google/genai";
 import {
   conceptExplainPrompt,
   questionAnswerPrompt,
 } from "../utils/prompts.js";
 
-// Generate interview questions and answers using Gemini
+// Generate interview questions and answers using Groq
 const generateInterviewQuestions = async (req, res) => {
   try {
-    console.log("API Key chargée:", process.env.GEMINI_API_KEY ? "OUI" : "NON");
+    console.log("API Key chargée:", process.env.GROQ_API_KEY ? "OUI" : "NON");
     const { role, experience, topicsToFocus, numberOfQuestions } = req.body;
 
     if (!role || !experience || !topicsToFocus || !numberOfQuestions) {
@@ -21,28 +20,47 @@ const generateInterviewQuestions = async (req, res) => {
       numberOfQuestions
     );
 
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-    const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash-lite",
-      contents: prompt,
-    });
+    const response = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            {
+              role: "user",
+              content: prompt.replace(/\n/g, " ").trim(),
+            },
+          ],
+          temperature: 0.7,
+        }),
+      }
+    );
 
-    let rawText = response.text;
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || "Groq API error");
+    }
+
+    let rawText = data.choices[0].message.content;
 
     // Clean the text: Remove ```json and ``` from beginning and end
     const cleanedText = rawText
-      .replace(/^```json\s*/, "") // remove starting ```json
-      .replace(/```$/, "") // remove ending ```
-      .trim(); // remove extra spaces
+      .replace(/^```json\s*/, "")
+      .replace(/```$/, "")
+      .trim();
 
-    // After that, it's safe to parse
-    const data = JSON.parse(cleanedText);
+    const parsedData = JSON.parse(cleanedText);
 
-    res.status(200).json(data);
+    res.status(200).json(parsedData);
   } catch (error) {
-    console.log("=== ERREUR GEMINI ===");
+    console.log("=== ERREUR GROQ ===");
     console.log("Message:", error.message);
-    console.log("Erreur complète:", error);
     res
       .status(500)
       .json({ message: "Failed to generate questions", error: error.message });
@@ -60,28 +78,47 @@ const generateConceptExplanation = async (req, res) => {
 
     const prompt = conceptExplainPrompt(question);
 
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-    const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash-lite",
-      contents: prompt,
-    });
+    const response = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            {
+              role: "user",
+              content: prompt.replace(/\n/g, " ").trim(),
+            },
+          ],
+          temperature: 0.7,
+        }),
+      }
+    );
 
-    let rawText = response.text;
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || "Groq API error");
+    }
+
+    let rawText = data.choices[0].message.content;
 
     // Clean the text: Remove ```json and ``` from beginning and end
     const cleanedText = rawText
-      .replace(/^```json\s*/, "") // remove starting ```json
-      .replace(/```$/, "") // remove ending ```
-      .trim(); // remove extra spaces
+      .replace(/^```json\s*/, "")
+      .replace(/```$/, "")
+      .trim();
 
-    // After that, it's safe to parse
-    const data = JSON.parse(cleanedText);
+    const parsedData = JSON.parse(cleanedText);
 
-    res.status(200).json(data);
+    res.status(200).json(parsedData);
   } catch (error) {
-    console.log("=== ERREUR GEMINI ===");
+    console.log("=== ERREUR GROQ ===");
     console.log("Message:", error.message);
-    console.log("Erreur complète:", error);
     res
       .status(500)
       .json({ message: "Failed to generate questions", error: error.message });
