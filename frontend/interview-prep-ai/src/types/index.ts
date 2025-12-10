@@ -4,4 +4,6 @@ export type {
   Session,
   CreateSessionFormData,
   CreateSessionResponse,
+  ExplanationResponse,
+  SessionResponse,
 } from "./session";

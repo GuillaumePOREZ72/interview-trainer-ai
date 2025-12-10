@@ -27,3 +27,12 @@ export interface CreateSessionFormData {
 export interface CreateSessionResponse {
   session: Session;
 }
+
+export interface ExplanationResponse {
+  title: string;
+  explanation: string;
+}
+
+export interface SessionResponse {
+  session: Session;
+}
