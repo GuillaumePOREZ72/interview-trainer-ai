@@ -14,6 +14,7 @@ import helmet from "helmet";
  * Custom modules
  */
 import connectDB from "./config/db";
+import limiter from "./config/rateLimiter";
 import authRoutes from "./routes/authRoutes";
 import sessionRoutes from "./routes/sessionRoutes";
 import questionRoutes from "./routes/questionRoutes";
@@ -74,6 +75,9 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
   contentSecurityPolicy: NODE_ENV === "production" ? undefined : false,
 }));
+
+// Apply rate limiting middleware to all routes
+app.use(limiter);
 
 // Health check endpoint
 app.get("/", (req, res) => {
