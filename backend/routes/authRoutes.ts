@@ -3,9 +3,9 @@ import {
   registerUser,
   loginUser,
   getUserProfile,
-} from "../controllers/authController.js";
-import { protect } from "../middlewares/authMiddleware.js";
-import upload from "../middlewares/uploadMiddleware.js";
+} from "../controllers/authController";
+import { protect } from "../middlewares/authMiddleware";
+import upload from "../middlewares/uploadMiddleware";
 
 const router: Router = express.Router();
 
