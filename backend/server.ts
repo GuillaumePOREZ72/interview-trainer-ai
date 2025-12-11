@@ -14,6 +14,7 @@ import helmet from "helmet";
  * Custom modules
  */
 import connectDB from "./config/db";
+import { logger } from "./config/logger";
 import limiter from "./config/rateLimiter";
 import authRoutes from "./routes/authRoutes";
 import sessionRoutes from "./routes/sessionRoutes";
@@ -43,12 +44,12 @@ const corsOptions: cors.CorsOptions = {
     if (NODE_ENV === "development" || !origin) {
       callback(null, true);
     } else {
-      const whitelist = process.env.WHITELISTED_ORIGINS?.split(",") || [];
+      const whitelist = process.env.WHITELIST_ORIGINS?.split(",") || [];
       if (whitelist.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error(`CORS error: ${origin} is not allowed by CORS`));
-        console.warn(`CORS error: ${origin} is not allowed by CORS`);
+        logger.warn(`CORS error: ${origin} is not allowed by CORS`);
       }
     }
   },
@@ -106,21 +107,21 @@ const startServer = async () => {
   try {
     // Conect to database
     await connectDB();
-    console.log("✅ Database connected successfully");
+    logger.info("✅ Database connected successfully");
 
     // Start server
     app.listen(PORT, () => {
-      console.log(
+      logger.info(
         `🚀 Server running in ${NODE_ENV} mode on http://localhost:${PORT}`
       );
     });
   } catch (error) {
-    console.error("❌ Error starting server:", error);
+    logger.error("❌ Error starting server:", error);
 
     if (NODE_ENV === "production") {
       process.exit(1);
+      }
     }
-  }
 };
 
 /**
@@ -128,15 +129,15 @@ const startServer = async () => {
  */
 const handleServerShutdown = async () => {
   try {
-    console.log("\n⚠️  Shutting down server gracefully...");
+    logger.warn("\n⚠️  Shutting down server gracefully...");
     // Disconnect from database
     const mongoose = await import("mongoose");
     await mongoose.default.disconnect();
-    console.log("✅ Database disconnected");
-    console.log("👋 Server shutdown complete");
+    logger.info("✅ Database disconnected");
+    logger.info("👋 Server shutdown complete");
     process.exit(0);
   } catch (error) {
-    console.error("❌ Error during server shutdown:", error);
+    logger.error("❌ Error during server shutdown:", error);
     process.exit(1);
   }
 };

@@ -2,6 +2,7 @@ import User, { IUser } from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
+import { logger } from "../config/logger.js";
 
 // Generate JWT Token
 const generateToken = (userId: string): string => {
@@ -15,6 +16,7 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
 
     const userExists = await User.findOne({ email });
     if (userExists) {
+      logger.warn(`Registration attempt with existing email: ${email}`);
       res.status(400).json({ message: "User already exists" });
       return;
     }
@@ -29,6 +31,8 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
       profileImageUrl,
     });
 
+    logger.info(`✅ New user registered: ${email}`);
+
     res.status(201).json({
       _id: user._id,
       name: user.name,
@@ -39,6 +43,7 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Server error";
+    logger.error(`Registration error: ${errorMessage}`);
     res.status(500).json({
       message: "Server error",
       error: errorMessage,
@@ -53,15 +58,19 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
 
     const user = await User.findOne({ email });
     if (!user) {
+      logger.warn(`Login attempt with invalid email: ${email}`);
       res.status(500).json({ message: "Invalid email or password" });
       return;
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      logger.warn(`Login attempt with incorrect password for email: ${email}`);
       res.status(500).json({ message: "Invalid email or password" });
       return;
     }
+
+    logger.info(`✅ User logged in: ${email}`);
 
     res.json({
       _id: user._id,
@@ -73,6 +82,7 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Server error";
+    logger.error(`Login error: ${errorMessage}`);
     res.status(500).json({
       message: "Server error",
       error: errorMessage,

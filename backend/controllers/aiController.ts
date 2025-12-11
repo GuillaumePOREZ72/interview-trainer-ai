@@ -1,9 +1,7 @@
-import {
-  conceptExplainPrompt,
-  questionAnswerPrompt,
-} from "../utils/prompts.js";
-import { cleanAndParseJSON } from "../utils/helper.js";
+import { conceptExplainPrompt, questionAnswerPrompt } from "../utils/prompts";
+import { cleanAndParseJSON } from "../utils/helper";
 import { Request, Response } from "express";
+import { logger } from "../config/logger";
 
 interface GenerateQuestionsRequest extends Request {
   body: {
@@ -29,9 +27,14 @@ const generateInterviewQuestions = async (
     const { role, experience, topicsToFocus, numberOfQuestions } = req.body;
 
     if (!role || !experience || !topicsToFocus || !numberOfQuestions) {
+      logger.warn(`AI generation - Missing fields - User: ${req.user?._id}`);
       res.status(400).json({ message: "Missing required fields." });
       return;
     }
+
+    logger.info(
+      `🤖 Generating ${numberOfQuestions} questions - Role: ${role} - Experience: ${experience} - User: ${req.user?._id}`
+    );
 
     const prompt = questionAnswerPrompt(
       role,
@@ -61,17 +64,30 @@ const generateInterviewQuestions = async (
       }
     );
 
-    const data = await response.json() as { choices: Array<{ message: { content: string } }>, error?: { message: string } };
+    const data = (await response.json()) as {
+      choices: Array<{ message: { content: string } }>;
+      error?: { message: string };
+    };
 
     if (!response.ok) {
-      throw new Error(data.error?.message || "Groq API error");
+      const errorMsg = data.error?.message || "Groq API error";
+      logger.error(`Groq API error: ${errorMsg} - User: ${req.user?._id}`);
+      throw new Error(errorMsg);
     }
 
     const parsedData = cleanAndParseJSON(data.choices[0].message.content);
 
+    logger.info(
+      `✅ Questions generated successfully - User: ${req.user?._id} - Count: ${numberOfQuestions}`
+    );
+
     res.status(200).json(parsedData);
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Failed to generate questions";
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to generate questions";
+    logger.error(
+      `AI generation error: ${errorMessage} - User: ${req.user?._id}`
+    );
     res
       .status(500)
       .json({ message: "Failed to generate questions", error: errorMessage });
@@ -87,9 +103,17 @@ const generateConceptExplanation = async (
     const { question } = req.body;
 
     if (!question) {
+      logger.warn(`AI explanation - Missing question - User: ${req.user?._id}`);
       res.status(400).json({ message: "Missing required fields." });
       return;
     }
+
+    logger.info(
+      `🤖 Generating explanation - Question: "${question.substring(
+        0,
+        50
+      )}..." - User: ${req.user?._id}`
+    );
 
     const prompt = conceptExplainPrompt(question);
 
@@ -114,17 +138,32 @@ const generateConceptExplanation = async (
       }
     );
 
-    const data = await response.json() as { choices: Array<{ message: { content: string } }>, error?: { message: string } };
+    const data = (await response.json()) as {
+      choices: Array<{ message: { content: string } }>;
+      error?: { message: string };
+    };
 
     if (!response.ok) {
-      throw new Error(data.error?.message || "Groq API error");
+      const errorMsg = data.error?.message || "Groq API error";
+      logger.error(
+        `Groq API error (explanation): ${errorMsg} - User: ${req.user?._id}`
+      );
+      throw new Error(errorMsg);
     }
 
     const parsedData = cleanAndParseJSON(data.choices[0].message.content);
 
+    logger.info(
+      `✅ Explanation generated successfully - User: ${req.user?._id}`
+    );
+
     res.status(200).json(parsedData);
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Failed to generate explanation";
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to generate explanation";
+    logger.error(
+      `AI explanation error: ${errorMessage} - User: ${req.user?._id}`
+    );
     res
       .status(500)
       .json({ message: "Failed to generate explanation", error: errorMessage });

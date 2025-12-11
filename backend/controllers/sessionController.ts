@@ -1,6 +1,7 @@
-import Session from "../models/Session.js";
-import Question from "../models/Question.js";
+import Session from "../models/Session";
+import Question from "../models/Question";
 import { Request, Response } from "express";
+import { logger } from "../config/logger";
 
 interface CreateSessionRequest extends Request {
   body: {
@@ -44,8 +45,15 @@ export const createSession = async (
     session.questions = questionDocs;
     await session.save();
 
+    logger.info(
+      `✅ Session created: ${session._id} - Role: ${role} - User: ${userId} - Questions: ${questions.length}`
+    );
+
     res.status(201).json({ success: true, session });
   } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Server Error";
+    logger.error(`Session creation error: ${errorMessage}`);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
@@ -61,8 +69,14 @@ export const getMySessions = async (
         createdAt: -1,
       })
       .populate("questions");
+
+    logger.info(`📋 User ${req.user?._id} fetched ${sessions.length} sessions`);
+
     res.status(200).json(sessions);
   } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Server Error";
+    logger.error(`Get sessions error: ${errorMessage}`);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
@@ -81,15 +95,21 @@ export const getSessionById = async (
       .exec();
 
     if (!session) {
+      logger.warn(`Session not found: ${req.params.id}`);
       res.status(404).json({ success: false, message: "Session not found" });
       return;
     }
+
+    logger.info(`📖 Session fetched: ${session._id} - User: ${req.user?._id}`);
 
     res.status(200).json({
       success: true,
       session,
     });
   } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Server Error";
+    logger.error(`Get session by ID error: ${errorMessage}`);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
@@ -103,6 +123,7 @@ export const deleteSession = async (
     const session = await Session.findById(req.params.id);
 
     if (!session) {
+      logger.warn(`Delete attempt - Session not found: ${req.params.id}`);
       res.status(404).json({
         message: "Session not found",
       });
@@ -111,6 +132,9 @@ export const deleteSession = async (
 
     // Check if the logged-in user owns this session
     if (session.user.toString() !== req.user?._id?.toString()) {
+      logger.warn(
+        `Unauthorized delete attempt - Session: ${req.params.id} - User: ${req.user?._id}`
+      );
       res
         .status(401)
         .json({ message: "Not authorized to delete this session" });
@@ -123,8 +147,15 @@ export const deleteSession = async (
     // Then, delete the session
     await Session.deleteOne({ _id: req.params.id });
 
+    logger.info(
+      `🗑️ Session deleted: ${req.params.id} - User: ${req.user?._id}`
+    );
+
     res.status(200).json({ message: "Session deleted successfully" });
   } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Server Error";
+    logger.error(`Delete session error: ${errorMessage}`);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
