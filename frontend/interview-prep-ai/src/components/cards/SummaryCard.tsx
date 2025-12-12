@@ -28,9 +28,9 @@ const SummaryCard = ({
       onClick={onSelect}
     >
       {/* Header with gradient */}
-      <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-cyan-50 p-5 relative">
+      <div className="bg-linear-to-br from-indigo-50 via-purple-50 to-cyan-50 p-5 relative">
         <div className="flex items-start gap-4">
-          <div className="shrink-0 w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
+          <div className="shrink-0 w-12 h-12 bg-linear-to-br from-primary to-secondary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
             <span className="text-lg font-bold text-white">
               {getInitials(role)}
             </span>
@@ -48,14 +48,13 @@ const SummaryCard = ({
 
         {/* Delete button */}
         <button
-          className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1.5 text-xs text-red-600 font-medium bg-red-50 px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-100 hover:border-red-300"
+          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1.5 text-xs text-red-600 font-medium bg-red-50 px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-100 hover:border-red-300"
           onClick={(e) => {
             e.stopPropagation();
             onDelete();
           }}
         >
           <LuTrash2 className="w-3.5 h-3.5" />
-          Delete
         </button>
       </div>
 
