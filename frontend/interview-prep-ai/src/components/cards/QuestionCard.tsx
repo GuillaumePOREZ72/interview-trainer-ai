@@ -35,50 +35,63 @@ const QuestionCard = ({
   };
 
   return (
-    <div className="bg-white rounded-lg mb-4 overflow-hidden py-4 px-5 shadow-xl shadow-gray-100/70 border border-gray-100/60 group">
+    <div className="bg-white/80 backdrop-blur-sm rounded-xl mb-4 overflow-hidden py-4 px-5 shadow-lg hover:shadow-xl border border-slate-200/50 transition-all duration-300 group">
       <div className="flex items-start justify-between cursor-pointer">
-        <div className="flex items-center gap-3.5">
-          <span className="text-xs md:text-[15px] font-semibold text-gray-400 leading-[18px]">
-            Q
-          </span>
+        <div className="flex items-center gap-3 flex-1" onClick={toggleExpand}>
+          <div className="shrink-0 w-8 h-8 bg-linear-to-br from-indigo-100 to-purple-100 rounded-lg flex items-center justify-center mt-0.5">
+            <span className="text-sm font-bold text-primary">Q</span>
+          </div>
           <h3
-            className="text-xs md:text-[14px] font-medium text-gray-800 mr-0 md:mr-20"
+            className="text-sm md:text-base font-medium text-slate-800 leading-relaxed flex-1"
             onClick={toggleExpand}
           >
             {question}
           </h3>
         </div>
-        <div className="flex items-center justify-end ml-4 relative">
+
+        <div className="flex items-center gap-2 ml-4 shrink-0">
+          {/* Actions */}
           <div
-            className={`flex ${
-              isExpanded ? "md:flex" : "md:hidden group-hover:flex"
+            className={`flex items-center gap-2 ${
+              isExpanded ? "flex" : "hidden group-hover:flex"
             }`}
           >
+            {/* Pin Button */}
             <button
-              className="flex items-center gap-2 text-xs text-indigo-800 font-medium bg-indigo-50 px-3 py-1 mr-2 rounded text-nowrap border border-indigo-50 hover:border-indigo-200 cursor-pointer "
-              onClick={onTogglePin}
+              className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer ${
+                isPinned
+                  ? "bg-primary text-white shadow-md shadow-primary/30"
+                  : "bg-slate-100"
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onTogglePin();
+              }}
             >
               {isPinned ? (
-                <LuPinOff className="text-xs" />
+                <LuPinOff className="w-3.5 h-3.5" />
               ) : (
-                <LuPin className="text-xs" />
+                <LuPin className="w-3.5 h-3.5" />
               )}
             </button>
 
+            {/* Learn More Button */}
             <button
-              className="flex items-center gap-2 text-xs text-cyan-800 font-medium bg-cyan-50 px-3 py-1 mr-2 rounded text-nowrap border border-cyan-50 hover:border-cyan-200 cursor-pointer"
-              onClick={() => {
+              className="flex items-center gap-1.5 text-xs text-white font-medium bg-linear-to-r from-accent to-cyan-600 px-3 py-1.5 mr-2 rounded-lg hover:shadow-lg hover:shadow-accent/30 transition-all duration-200 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
                 setIsExpanded(true);
                 onLearnMore();
               }}
             >
-              <LuSparkles />
-              <span className="hidden md:block">Learn More</span>
+              <LuSparkles className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Learn More</span>
             </button>
           </div>
 
+          {/* Expand/Collapse Button */}
           <button
-            className="text-gray-400 hover:text-gray-500 cursor-pointer"
+            className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
             onClick={toggleExpand}
           >
             <LuChevronDown
@@ -91,13 +104,14 @@ const QuestionCard = ({
         </div>
       </div>
 
+      {/* Answer Content */}
       <div
         className="overflow-hidden transition-all duration-300 ease-in-out"
         style={{ maxHeight: `${height}px` }}
       >
         <div
           ref={contentRef}
-          className="text-gray-700 bg-gray-50 px-5 py-3 mt-4 rounded-lg"
+          className="bg-linear-to-br from-slate-50 to-indigo-50/30 px-5 py-4 mt-4 rounded-xl border border-slate-800"
         >
           <AIResponsePreview content={answer} />
         </div>
