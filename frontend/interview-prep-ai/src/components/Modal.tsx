@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { LuX, Lux } from "react-icons/lu";
+import { LuX} from "react-icons/lu";
 
 interface ModalProps {
   children: ReactNode;
