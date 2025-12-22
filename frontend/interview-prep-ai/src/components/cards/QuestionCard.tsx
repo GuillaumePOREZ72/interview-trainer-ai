@@ -42,7 +42,7 @@ const QuestionCard = ({
             <span className="text-sm font-bold text-primary">Q</span>
           </div>
           <h3
-            className="text-sm md:text-base font-medium text-text-primary leading-relaxed flex-1"
+            className="text-sm md:text-base font-medium text-text-primary dark:text-text-tertiary leading-relaxed flex-1"
             onClick={toggleExpand}
           >
             {question}
