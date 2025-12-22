@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import { getInitials } from "../../utils/helper";
 import { LuLogOut, LuUser } from "react-icons/lu";
-import { div } from "framer-motion/client";
 
 const ProfileInfoCard = () => {
   const { user, clearUser } = useUser();

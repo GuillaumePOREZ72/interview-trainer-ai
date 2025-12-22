@@ -1,11 +1,5 @@
+import { Question } from './question';
 // src/types/session.ts
-export interface Question {
-  _id?: string;
-  question: string;
-  answer: string;
-  isPinned?: boolean;
-}
-
 export interface Session {
   _id: string;
   role: string;

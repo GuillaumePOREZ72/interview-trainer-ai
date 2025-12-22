@@ -14,6 +14,17 @@ const SkeletonLoader = () => {
 
       {/* Bloc de code simulé */}
       <div className="mt-4 h-20 bg-gray-100 rounded border border-gray-200"></div>
+
+      {/* Paragraphes simulés */}
+      <div className="space-y-2">
+        <div className="h-3 bg-gray-200 rounded w-full"></div>
+        <div className="h-3 bg-gray-200 rounded w-11/12"></div>
+        <div className="h-3 bg-gray-200 rounded w-4/5"></div>
+        <div className="h-3 bg-gray-200 rounded w-full"></div>
+      </div>
+
+      {/* Bloc de code simulé */}
+      <div className="mt-4 h-20 bg-gray-100 rounded border border-gray-200"></div>
     </div>
   );
 };

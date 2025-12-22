@@ -1,12 +1,12 @@
 // Helper function to clean and parse JSON from AI response
 export const cleanAndParseJSON = (rawText: string): unknown => {
-  // 1. Remove markdown code blocks
+  // Remove markdown code blocks
   let cleaned = rawText
     .replace(/^```json\s*/, "")
     .replace(/```$/, "")
     .trim();
 
-  // 2. Fix common JSON issues: unescaped newlines inside strings
+  // Fix common JSON issues: unescaped newlines inside strings
   // This regex finds strings in JSON and escapes control characters inside them
   cleaned = cleaned.replace(/"(?:[^\\"]|\\.)*"/g, (match: string) => {
     return (
