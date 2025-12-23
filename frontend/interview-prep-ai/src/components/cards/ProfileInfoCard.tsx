@@ -1,14 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import { getInitials } from "../../utils/helper";
-import { LuLogOut, LuUser } from "react-icons/lu";
+import { LuLogOut } from "react-icons/lu";
 
 const ProfileInfoCard = () => {
   const { user, clearUser } = useUser();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.clear();
     clearUser();
     navigate("/");
   };

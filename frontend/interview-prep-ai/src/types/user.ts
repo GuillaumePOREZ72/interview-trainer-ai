@@ -4,14 +4,15 @@ export interface User {
   name: string;
   email: string;
   profileImageUrl?: string | null;
-  createdAt?: string; 
-  updatedAt?: string; 
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Type pour la réponse de login/signup
 export interface AuthResponse {
   user: User;
   token: string;
+  refreshToken: string;
 }
 
 // Type pour le UserContext

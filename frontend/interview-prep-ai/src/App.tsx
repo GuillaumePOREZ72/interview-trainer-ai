@@ -34,7 +34,7 @@ const ProtectedRoutes = ({ children }: ProtectedRoutesProps) => {
 
 const App = () => {
   return (
-    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="system" storageKey="theme">
       <UserProvider>
         <Router>
           <Routes>

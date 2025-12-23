@@ -1,9 +1,11 @@
 import { createContext, useState, useEffect, ReactNode } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import { API_PATHS } from "../utils/apiPaths";
-import {User, UserContextType, AuthResponse} from "../types";
+import { User, UserContextType, AuthResponse } from "../types";
 
-export const UserContext = createContext<UserContextType | undefined>(undefined);
+export const UserContext = createContext<UserContextType | undefined>(
+  undefined
+);
 
 interface UserProviderProps {
   children: ReactNode;
@@ -24,7 +26,9 @@ const UserProvider = ({ children }: UserProviderProps) => {
 
     const fetchUser = async () => {
       try {
-        const response = await axiosInstance.get<User>(API_PATHS.AUTH.GET_PROFILE);
+        const response = await axiosInstance.get<User>(
+          API_PATHS.AUTH.GET_PROFILE
+        );
         setUser(response.data);
       } catch (error) {
         clearUser();
@@ -37,13 +41,15 @@ const UserProvider = ({ children }: UserProviderProps) => {
 
   const updateUser = (userData: AuthResponse) => {
     setUser(userData.user);
-    localStorage.setItem("token", userData.token); // Save token
+    localStorage.setItem("token", userData.token);
+    localStorage.setItem("refreshToken", userData.refreshToken);
     setLoading(false);
   };
 
   const clearUser = () => {
     setUser(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
   };
 
   return (

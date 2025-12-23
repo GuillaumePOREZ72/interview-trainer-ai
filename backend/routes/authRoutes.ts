@@ -3,6 +3,7 @@ import {
   registerUser,
   loginUser,
   getUserProfile,
+  refreshAccessToken,
 } from "../controllers/authController";
 import { protect } from "../middlewares/authMiddleware";
 import upload from "../middlewares/uploadMiddleware";
@@ -12,6 +13,7 @@ const router: Router = express.Router();
 // Auth Routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+router.post("/refresh-token", refreshAccessToken);
 router.get("/profile", protect, getUserProfile);
 
 router.post(

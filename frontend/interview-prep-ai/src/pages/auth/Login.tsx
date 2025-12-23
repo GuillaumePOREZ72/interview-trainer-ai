@@ -49,7 +49,6 @@ const Login = ({ setCurrentPage }: LoginProps) => {
       const { token } = response.data;
 
       if (token) {
-        localStorage.setItem("token", token);
         updateUser(response.data);
         navigate("/dashboard");
       }
@@ -93,7 +92,11 @@ const Login = ({ setCurrentPage }: LoginProps) => {
           type="password"
         />
 
-        {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{error}</div>}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
 
         <button type="submit" className="btn-primary mt-6">
           Sign In
