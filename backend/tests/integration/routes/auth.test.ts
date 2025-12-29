@@ -10,7 +10,6 @@ import {
   generateExpiredToken,
   generateInvalidToken,
 } from "../../helpers/testUtils.js";
-import User from "../../../models/User.js";
 
 const app = createApp();
 
