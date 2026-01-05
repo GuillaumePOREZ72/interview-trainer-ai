@@ -58,6 +58,8 @@ jobs:
 
       - name: Run tests
         run: cd frontend/interview-prep-ai && npm test
+        env:
+          VITE_API_URL: ${{secrets.VITE_API_URL || 'http://localhost:8000' }}
 
       - name: Build frontend
         run: cd frontend/interview-prep-ai && npm run build

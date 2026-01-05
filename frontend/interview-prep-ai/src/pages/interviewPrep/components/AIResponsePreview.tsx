@@ -9,7 +9,6 @@ import {
 import { useState } from "react";
 import type { Components } from "react-markdown";
 import { useTheme } from "../../../hooks/useTheme";
-import { a } from "framer-motion/client";
 
 interface AIResponsePreviewProps {
   content: string;
