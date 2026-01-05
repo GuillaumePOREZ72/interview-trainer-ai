@@ -44,8 +44,8 @@ describe("axiosInstance", () => {
   });
 
   describe("API Paths", () => {
-    it("should have correct refresh token path", () => {
-      const { API_PATHS } = require("../../../utils/apiPaths");
+    it("should have correct refresh token path", async () => {
+      const { API_PATHS } = await import("../../../utils/apiPaths");
       expect(API_PATHS.AUTH.REFRESH_TOKEN).toBe("/api/auth/refresh-token");
     });
   });

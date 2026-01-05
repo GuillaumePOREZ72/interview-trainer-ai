@@ -70,7 +70,7 @@ module.exports = {
   // Ignore patterns
   testPathIgnorePatterns: ["/node_modules/", "/dist/"],
   transformIgnorePatterns: [
-    "/node_modules/(?!(axios|react-hot-toast|framer-motion)/)",
+    "/node_modules/(?!(axios|react-hot-toast|framer-motion|react-syntax-highlighter|react-markdown|remark-gfm|vfile|vfile-message|unist-util-.*|unified|bail|is-plain-obj|trough|decode-named-character-reference|character-entities|mdast-util-.*|micromark.*|decode-named-character-reference|character-entities|property-information|hast-util-whitespace|space-separated-tokens|comma-separated-tokens|hast-to-hyperscript)/)",
   ],
 
   // Clear mocks between tests
