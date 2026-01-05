@@ -15,7 +15,7 @@ import {
 } from "@jest/globals";
 import { TextEncoder, TextDecoder } from "util";
 
-// Injection des globales pour le mode ESM
+// 1. Injection des globales pour le mode ESM (Règle "jest is not defined")
 // @ts-ignore
 globalThis.jest = jest;
 // @ts-ignore
@@ -33,15 +33,18 @@ globalThis.beforeEach = beforeEach;
 // @ts-ignore
 globalThis.afterEach = afterEach;
 
-// Polyfills
+// 2. Polyfills indispensables
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder as typeof global.TextDecoder;
 
-// Mock i18next (indispensable pour formatDate.test.ts)
+// 3. Mock i18next (Règle les erreurs dans formatDate.test.ts)
 jest.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string) => key,
-    i18n: { changeLanguage: jest.fn().mockResolvedValue({}) },
+    i18n: {
+      changeLanguage: jest.fn().mockResolvedValue({}),
+      language: "en",
+    },
   }),
   initReactI18next: { type: "3rdParty", init: jest.fn() },
 }));
@@ -53,13 +56,13 @@ jest.mock("i18next", () => ({
   language: "en",
 }));
 
-// Mock react-syntax-highlighter (Règle l'erreur "torn down")
+// 4. Mock react-syntax-highlighter (Règle l'erreur "torn down environment")
 jest.mock("react-syntax-highlighter", () => ({
   Prism: ({ children }: any) => React.createElement("pre", null, children),
   Light: ({ children }: any) => React.createElement("pre", null, children),
 }));
 
-// Mock framer-motion (souvent problématique en test)
+// 5. Mock framer-motion
 jest.mock("framer-motion", () => ({
   motion: {
     div: ({ children, ...props }: any) =>
@@ -72,7 +75,7 @@ jest.mock("framer-motion", () => ({
   AnimatePresence: ({ children }: any) => children,
 }));
 
-// Mocks standards (localStorage, etc.)
+// 6. Mocks standards
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
@@ -92,17 +95,10 @@ const localStorageMock = (() => {
 Object.defineProperty(window, "localStorage", { value: localStorageMock });
 window.scrollTo = jest.fn();
 
-// ============================================================================
-// CLEANUP AFTER EACH TEST
-// ============================================================================
-beforeEach(() => {
-  // Clear localStorage before each test
-  localStorageMock.clear();
-  jest.clearAllMocks();
-});
-
+// Cleanup global
 afterEach(() => {
-  // Cleanup after each test
+  jest.clearAllMocks();
+  localStorageMock.clear();
 });
 
 // ============================================================================

@@ -14,36 +14,15 @@ module.exports = {
   // Setup files to run after jest is initialized
   setupFilesAfterEnv: ["<rootDir>/src/tests/setup.tsx"],
 
-  // Transform TypeScript files
-  transform: {
-    "^.+\\.(ts|tsx)$": [
-      "ts-jest",
-      {
-        useESM: true,
-        tsconfig: {
-          jsx: "react-jsx",
-          esModuleInterop: true,
-          allowSyntheticDefaultImports: true,
-          module: "ESNext",
-          moduleResolution: "bundler",
-          strict: true,
-          skipLibCheck: true,
-        },
-      },
-    ],
-  },
-
-  // Module name mappings for imports
   moduleNameMapper: {
-    // Handle CSS imports (with CSS modules)
     "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
-    // Handle CSS imports (without CSS modules)
     "^.+\\.(css|sass|scss)$": "identity-obj-proxy",
-    // Handle image imports
     "^.+\\.(jpg|jpeg|png|gif|webp|svg)$":
       "<rootDir>/src/tests/__mocks__/fileMock.cjs",
-    // Handle path aliases (if any)
     "^@/(.*)$": "<rootDir>/src/$1",
+    // On redirige TOUS les imports de styles de syntax-highlighter vers le mock
+    "^react-syntax-highlighter/dist/esm/styles/prism/.*$":
+      "<rootDir>/src/tests/__mocks__/fileMock.cjs",
     "^react-syntax-highlighter/dist/esm/styles/prism$":
       "<rootDir>/src/tests/__mocks__/fileMock.cjs",
   },
