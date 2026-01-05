@@ -154,4 +154,19 @@ afterAll(() => {
   console.error = originalError;
 });
 
+// Mock i18next
+jest.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: { changeLanguage: jest.fn() },
+  }),
+  initReactI18next: { type: "3rdParty", init: jest.fn() },
+}));
+
+// Mock react-syntax-highlighter
+jest.mock("react-syntax-highlighter", () => ({
+  Prism: ({ children }: any) => <pre>{children}</pre>,
+  Light: ({ children }: any) => <pre>{children}</pre>,
+}));
+
 export { localStorageMock };

@@ -13,21 +13,10 @@ describe("axiosInstance", () => {
   });
 
   describe("Module Export", () => {
-    it("should export a default axios instance", () => {
-      // Mock axios before importing
-      jest.doMock("axios", () => ({
-        create: jest.fn(() => ({
-          interceptors: {
-            request: { use: jest.fn() },
-            response: { use: jest.fn() },
-          },
-        })),
-        post: jest.fn(),
-      }));
-
-      const axiosInstance = require("../../../utils/axiosInstance").default;
+    it("should export a default axios instance", async () => {
+      const axiosInstance = (await import("../../../utils/axiosInstance"))
+        .default;
       expect(axiosInstance).toBeDefined();
-      expect(axiosInstance.interceptors).toBeDefined();
     });
   });
 

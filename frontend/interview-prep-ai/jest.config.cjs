@@ -40,10 +40,14 @@ module.exports = {
     // Handle CSS imports (without CSS modules)
     "^.+\\.(css|sass|scss)$": "identity-obj-proxy",
     // Handle image imports
-    "^.+\\.(jpg|jpeg|png|gif|webp|svg)$": "<rootDir>/src/tests/__mocks__/fileMock.cjs",
+    "^.+\\.(jpg|jpeg|png|gif|webp|svg)$":
+      "<rootDir>/src/tests/__mocks__/fileMock.cjs",
     // Handle path aliases (if any)
     "^@/(.*)$": "<rootDir>/src/$1",
+    "^react-syntax-highlighter/dist/esm/styles/prism$":
+      "<rootDir>/src/tests/__mocks__/fileMock.cjs",
   },
+  moduleDirectories: ["node_modules", "src"],
 
   // Files to collect coverage from
   collectCoverageFrom: [
@@ -81,4 +85,3 @@ module.exports = {
   // ESM support
   extensionsToTreatAsEsm: [".ts", ".tsx"],
 };
-
