@@ -1,13 +1,36 @@
 /**
  * Jest Setup File for React Testing Library
- *
- * This file runs before each test file and sets up:
- * - Jest-DOM matchers (toBeInTheDocument, toHaveClass, etc.)
- * - Global mocks (localStorage, matchMedia, window.location)
- * - Cleanup after each test
  */
 import "@testing-library/jest-dom";
+import {
+  jest,
+  expect,
+  describe,
+  it,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+} from "@jest/globals";
 import { TextEncoder, TextDecoder } from "util";
+
+// Injection manuelle des globales pour le mode ESM
+// @ts-ignore
+globalThis.jest = jest;
+// @ts-ignore
+globalThis.expect = expect;
+// @ts-ignore
+globalThis.describe = describe;
+// @ts-ignore
+globalThis.it = it;
+// @ts-ignore
+globalThis.beforeAll = beforeAll;
+// @ts-ignore
+globalThis.afterAll = afterAll;
+// @ts-ignore
+globalThis.beforeEach = beforeEach;
+// @ts-ignore
+globalThis.afterEach = afterEach;
 
 // ============================================================================
 // TEXTENCODER/TEXTDECODER POLYFILL (required for react-router-dom)
