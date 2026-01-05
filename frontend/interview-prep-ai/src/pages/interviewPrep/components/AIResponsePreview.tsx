@@ -30,10 +30,7 @@ const AIResponsePreview = ({ content }: AIResponsePreviewProps) => {
       const match = /language-(\w+)/.exec(className || "");
       const language = match ? match[1] : "";
 
-      const hasNewLines = String(children).includes("\n");
-      const isInline = !className && !hasNewLines;
-
-      return !isInline ? (
+      return match ? (
         <CodeBlock
           code={String(children).replace(/\n$/, "")}
           language={language}

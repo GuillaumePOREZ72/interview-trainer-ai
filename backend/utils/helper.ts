@@ -1,13 +1,53 @@
 import { logger } from "../config/logger.js";
 
 /**
+ * Normalize markdown code blocks to ensure they are on their own lines
+ * This fixes cases where the AI puts code blocks inline with text
+ */
+export const normalizeCodeBlocks = (text: string): string => {
+  // Match complete code blocks: ```language\ncode\n``` and ensure proper spacing
+  // This regex captures: opening ```, optional language, code content, closing ```
+  let normalized = text.replace(/(```(\w*)\n[\s\S]*?```)/g, (match) => {
+    return "\n\n" + match + "\n\n";
+  });
+
+  // Clean up excessive newlines (more than 2)
+  normalized = normalized.replace(/\n{3,}/g, "\n\n");
+
+  // Trim leading/trailing whitespace
+  normalized = normalized.trim();
+
+  return normalized;
+};
+
+/**
+ * Recursively normalize code blocks in all string values of parsed JSON
+ */
+const normalizeCodeBlocksInObject = (obj: unknown): unknown => {
+  if (typeof obj === "string") {
+    return normalizeCodeBlocks(obj);
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(normalizeCodeBlocksInObject);
+  }
+  if (obj && typeof obj === "object") {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      result[key] = normalizeCodeBlocksInObject(value);
+    }
+    return result;
+  }
+  return obj;
+};
+
+/**
  * Robustly clean and parse JSON from AI response
  * Handles common issues: markdown blocks, unescaped quotes, control characters
  */
 export const cleanAndParseJSON = (rawText: string): unknown => {
   let cleaned = rawText;
 
-  // Step 2: Extract JSON structure (find first [ or { to last ] or })
+  // Step 1: Extract JSON structure (find first [ or { to last ] or })
   const arrayStart = cleaned.indexOf("[");
   const objectStart = cleaned.indexOf("{");
   const start =
@@ -23,33 +63,36 @@ export const cleanAndParseJSON = (rawText: string): unknown => {
     cleaned = cleaned.substring(start, end + 1);
   }
 
-  // Step 3: Try parsing as-is first (fastest path for well-formed JSON)
+  // Step 2: Try parsing as-is first (fastest path for well-formed JSON)
   try {
-    return JSON.parse(cleaned);
+    const parsed = JSON.parse(cleaned);
+    return normalizeCodeBlocksInObject(parsed);
   } catch {
     // Continue with sanitization
     logger.debug("Initial JSON parse failed, attempting sanitization...");
   }
 
-  // Step 4: Fix trailing commas before ] or }
+  // Step 3: Fix trailing commas before ] or }
   cleaned = cleaned.replace(/,(\s*[}\]])/g, "$1");
 
-  // Step 5: Fix control characters inside strings
+  // Step 4: Fix control characters inside strings
   cleaned = fixControlCharactersInStrings(cleaned);
 
-  // Step 6: Try parsing again
+  // Step 5: Try parsing again
   try {
-    return JSON.parse(cleaned);
+    const parsed = JSON.parse(cleaned);
+    return normalizeCodeBlocksInObject(parsed);
   } catch {
     logger.debug("Second JSON parse failed, attempting quote fix...");
   }
 
-  // Step 7: Last resort - try to fix unescaped quotes in string values
+  // Step 6: Last resort - try to fix unescaped quotes in string values
   cleaned = fixUnescapedQuotesInValues(cleaned);
 
-  // Step 8: Final attempt
+  // Step 7: Final attempt
   try {
-    return JSON.parse(cleaned);
+    const parsed = JSON.parse(cleaned);
+    return normalizeCodeBlocksInObject(parsed);
   } catch (finalError) {
     // Log the problematic content for debugging (first 500 chars)
     logger.error(
@@ -97,13 +140,17 @@ function fixControlCharactersInStrings(json: string): string {
 
     if (inString) {
       // Replace control characters with escaped versions
-      if (char === "\n") {
+      const charCode = char.charCodeAt(0);
+      if (charCode === 10) {
+        // Literal newline character (LF)
         result += "\\n";
-      } else if (char === "\r") {
+      } else if (charCode === 13) {
+        // Literal carriage return (CR)
         result += "\\r";
-      } else if (char === "\t") {
+      } else if (charCode === 9) {
+        // Literal tab character
         result += "\\t";
-      } else if (char.charCodeAt(0) < 32) {
+      } else if (charCode < 32) {
         // Skip other control characters
         continue;
       } else {

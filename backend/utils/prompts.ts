@@ -20,7 +20,15 @@ const questionAnswerPrompt = (
   - Focus Topics: ${topicsToFocus}
   - Write ${numberOfQuestions} interviews questions
   - For each question, generate a detailed but beginner-friendly answer.
-  - If the answer needs a code example, use Markdown code blocks with the appropriate language tag (e.g., \`\`\`javascript ... \`\`\`).
+  - IMPORTANT: If the answer includes code, you MUST put code blocks on their own lines with a blank line before and after. Example:
+    
+    Some explanation text.
+    
+    \`\`\`javascript
+    const example = true;
+    \`\`\`
+    
+    More text after.
   - Keep formatting very clean.
   - Return a pure JSON array like:
   [
