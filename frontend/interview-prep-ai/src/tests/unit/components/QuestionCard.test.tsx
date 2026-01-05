@@ -43,14 +43,16 @@ describe("QuestionCard Component", () => {
     it("should render the Q badge", () => {
       render(<QuestionCard {...defaultProps} />);
 
-      expect(screen.getByText("Q")).toBeInTheDocument();
+      // With mock i18next, translation keys are returned as-is
+      expect(screen.getByText("question.badge")).toBeInTheDocument();
     });
 
     it("should not show answer content initially (collapsed)", () => {
       render(<QuestionCard {...defaultProps} />);
 
       // The answer container should have height 0
-      const answerContainer = screen.getByTestId("ai-response-preview").parentElement?.parentElement;
+      const answerContainer = screen.getByTestId("ai-response-preview")
+        .parentElement?.parentElement;
       expect(answerContainer?.parentElement).toHaveStyle({ height: "0px" });
     });
   });
@@ -65,8 +67,11 @@ describe("QuestionCard Component", () => {
 
       // Wait for expansion animation
       await waitFor(() => {
-        const answerContainer = screen.getByTestId("ai-response-preview").parentElement?.parentElement;
-        expect(answerContainer?.parentElement).not.toHaveStyle({ height: "0px" });
+        const answerContainer = screen.getByTestId("ai-response-preview")
+          .parentElement?.parentElement;
+        expect(answerContainer?.parentElement).not.toHaveStyle({
+          height: "0px",
+        });
       });
     });
 
@@ -81,7 +86,8 @@ describe("QuestionCard Component", () => {
       await user.click(screen.getByText("What is React?"));
 
       await waitFor(() => {
-        const answerContainer = screen.getByTestId("ai-response-preview").parentElement?.parentElement;
+        const answerContainer = screen.getByTestId("ai-response-preview")
+          .parentElement?.parentElement;
         expect(answerContainer?.parentElement).toHaveStyle({ height: "0px" });
       });
     });
@@ -136,8 +142,8 @@ describe("QuestionCard Component", () => {
       // First expand to see the button
       await user.click(screen.getByText("What is React?"));
 
-      // Find and click Learn More button
-      const learnMoreButton = screen.getByText("Learn More");
+      // Find and click Learn More button (using translation key)
+      const learnMoreButton = screen.getByText("question.learnMore");
       await user.click(learnMoreButton);
 
       expect(defaultProps.onLearnMore).toHaveBeenCalled();
@@ -151,12 +157,11 @@ describe("QuestionCard Component", () => {
       // Expand first
       await user.click(screen.getByText("What is React?"));
 
-      // Click Learn More
-      await user.click(screen.getByText("Learn More"));
+      // Click Learn More (using translation key)
+      await user.click(screen.getByText("question.learnMore"));
 
       // onLearnMore should be called, but the card should stay expanded
       expect(defaultProps.onLearnMore).toHaveBeenCalledTimes(1);
     });
   });
 });
-

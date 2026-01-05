@@ -55,13 +55,20 @@ describe("CreateSessionForm Component", () => {
     it("should render all form fields", () => {
       renderForm();
 
-      expect(screen.getByText("Create New Session")).toBeInTheDocument();
-      expect(screen.getByText(/Target Role/)).toBeInTheDocument();
-      expect(screen.getByText(/Years of Experience/)).toBeInTheDocument();
-      expect(screen.getByText(/Topics to Focus On/)).toBeInTheDocument();
-      expect(screen.getByText(/Description/)).toBeInTheDocument();
+      // With i18n mock, translation keys are returned as-is
+      expect(screen.getByText("createSession.title")).toBeInTheDocument();
+      expect(screen.getByText(/createSession.role.label/)).toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: /Generate Interview Session/i })
+        screen.getByText(/createSession.experience.label/)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/createSession.topics.label/)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/createSession.description.label/)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /createSession.submit/i })
       ).toBeInTheDocument();
     });
 
@@ -79,29 +86,27 @@ describe("CreateSessionForm Component", () => {
       const user = userEvent.setup();
 
       await user.click(
-        screen.getByRole("button", { name: /Generate Interview Session/i })
+        screen.getByRole("button", { name: /createSession.submit/i })
       );
 
-      expect(
-        screen.getByText("Please fill all the required fields")
-      ).toBeInTheDocument();
+      // Error message uses translation key
+      expect(screen.getByText("validation.requiredFields")).toBeInTheDocument();
     });
 
     it("should show error when only role is filled", async () => {
       renderForm();
       const user = userEvent.setup();
 
+      // Use translation key for placeholder
       await user.type(
-        screen.getByPlaceholderText(/Frontend Developer/i),
+        screen.getByPlaceholderText(/createSession.role.placeholder/i),
         "Software Engineer"
       );
       await user.click(
-        screen.getByRole("button", { name: /Generate Interview Session/i })
+        screen.getByRole("button", { name: /createSession.submit/i })
       );
 
-      expect(
-        screen.getByText("Please fill all the required fields")
-      ).toBeInTheDocument();
+      expect(screen.getByText("validation.requiredFields")).toBeInTheDocument();
     });
   });
 
@@ -120,19 +125,19 @@ describe("CreateSessionForm Component", () => {
       const user = userEvent.setup();
 
       await user.type(
-        screen.getByPlaceholderText(/Frontend Developer/i),
+        screen.getByPlaceholderText(/createSession.role.placeholder/i),
         "Software Engineer"
       );
       await user.type(
-        screen.getByPlaceholderText(/1 year, 3 years/i),
+        screen.getByPlaceholderText(/createSession.experience.placeholder/i),
         "3 years"
       );
       await user.type(
-        screen.getByPlaceholderText(/React, Node.js/i),
+        screen.getByPlaceholderText(/createSession.topics.placeholder/i),
         "React, TypeScript"
       );
       await user.click(
-        screen.getByRole("button", { name: /Generate Interview Session/i })
+        screen.getByRole("button", { name: /createSession.submit/i })
       );
 
       await waitFor(() => {
@@ -153,22 +158,22 @@ describe("CreateSessionForm Component", () => {
       const user = userEvent.setup();
 
       await user.type(
-        screen.getByPlaceholderText(/Frontend Developer/i),
+        screen.getByPlaceholderText(/createSession.role.placeholder/i),
         "Software Engineer"
       );
       await user.type(
-        screen.getByPlaceholderText(/1 year, 3 years/i),
+        screen.getByPlaceholderText(/createSession.experience.placeholder/i),
         "3 years"
       );
       await user.type(
-        screen.getByPlaceholderText(/React, Node.js/i),
+        screen.getByPlaceholderText(/createSession.topics.placeholder/i),
         "React, TypeScript"
       );
       await user.click(
-        screen.getByRole("button", { name: /Generate Interview Session/i })
+        screen.getByRole("button", { name: /createSession.submit/i })
       );
 
-      expect(screen.getByText(/Generating Questions/i)).toBeInTheDocument();
+      expect(screen.getByText(/createSession.generating/i)).toBeInTheDocument();
     });
   });
 });

@@ -63,17 +63,18 @@ describe("Login Component", () => {
     it("should render the login form with all elements", () => {
       renderLogin();
 
-      expect(screen.getByText("Welcome Back")).toBeInTheDocument();
+      // With i18n mock, translation keys are returned as-is
+      expect(screen.getByText("auth.login.title")).toBeInTheDocument();
       expect(
-        screen.getByPlaceholderText("johndoe@example.com")
+        screen.getByPlaceholderText("auth.login.emailPlaceholder")
       ).toBeInTheDocument();
       expect(
-        screen.getByPlaceholderText("Enter your password (min 8 characters)")
+        screen.getByPlaceholderText("auth.login.passwordPlaceholder")
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: "Sign In" })
+        screen.getByRole("button", { name: "auth.login.submit" })
       ).toBeInTheDocument();
-      expect(screen.getByText("Signup for free")).toBeInTheDocument();
+      expect(screen.getByText("auth.login.signupLink")).toBeInTheDocument();
     });
   });
 
@@ -82,9 +83,11 @@ describe("Login Component", () => {
       renderLogin();
       const user = userEvent.setup();
 
-      const emailInput = screen.getByPlaceholderText("johndoe@example.com");
+      const emailInput = screen.getByPlaceholderText(
+        "auth.login.emailPlaceholder"
+      );
       const passwordInput = screen.getByPlaceholderText(
-        "Enter your password (min 8 characters)"
+        "auth.login.passwordPlaceholder"
       );
 
       // Clear any default value and type invalid email without @ symbol
@@ -99,9 +102,7 @@ describe("Login Component", () => {
       }
 
       await waitFor(() => {
-        expect(
-          screen.getByText("Please enter a valid email address.")
-        ).toBeInTheDocument();
+        expect(screen.getByText("validation.invalidEmail")).toBeInTheDocument();
       });
     });
 
@@ -109,13 +110,19 @@ describe("Login Component", () => {
       renderLogin();
       const user = userEvent.setup();
 
-      const emailInput = screen.getByPlaceholderText("johndoe@example.com");
-      const submitButton = screen.getByRole("button", { name: "Sign In" });
+      const emailInput = screen.getByPlaceholderText(
+        "auth.login.emailPlaceholder"
+      );
+      const submitButton = screen.getByRole("button", {
+        name: "auth.login.submit",
+      });
 
       await user.type(emailInput, "test@example.com");
       await user.click(submitButton);
 
-      expect(screen.getByText("Please enter the password")).toBeInTheDocument();
+      expect(
+        screen.getByText("validation.passwordRequired")
+      ).toBeInTheDocument();
     });
   });
 
@@ -127,11 +134,15 @@ describe("Login Component", () => {
       renderLogin();
       const user = userEvent.setup();
 
-      const emailInput = screen.getByPlaceholderText("johndoe@example.com");
-      const passwordInput = screen.getByPlaceholderText(
-        "Enter your password (min 8 characters)"
+      const emailInput = screen.getByPlaceholderText(
+        "auth.login.emailPlaceholder"
       );
-      const submitButton = screen.getByRole("button", { name: "Sign In" });
+      const passwordInput = screen.getByPlaceholderText(
+        "auth.login.passwordPlaceholder"
+      );
+      const submitButton = screen.getByRole("button", {
+        name: "auth.login.submit",
+      });
 
       await user.type(emailInput, "test@example.com");
       await user.type(passwordInput, "password123");
@@ -153,14 +164,16 @@ describe("Login Component", () => {
       const user = userEvent.setup();
 
       await user.type(
-        screen.getByPlaceholderText("johndoe@example.com"),
+        screen.getByPlaceholderText("auth.login.emailPlaceholder"),
         "test@example.com"
       );
       await user.type(
-        screen.getByPlaceholderText("Enter your password (min 8 characters)"),
+        screen.getByPlaceholderText("auth.login.passwordPlaceholder"),
         "wrongpassword"
       );
-      await user.click(screen.getByRole("button", { name: "Sign In" }));
+      await user.click(
+        screen.getByRole("button", { name: "auth.login.submit" })
+      );
 
       await waitFor(() => {
         expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
@@ -174,19 +187,19 @@ describe("Login Component", () => {
       const user = userEvent.setup();
 
       await user.type(
-        screen.getByPlaceholderText("johndoe@example.com"),
+        screen.getByPlaceholderText("auth.login.emailPlaceholder"),
         "test@example.com"
       );
       await user.type(
-        screen.getByPlaceholderText("Enter your password (min 8 characters)"),
+        screen.getByPlaceholderText("auth.login.passwordPlaceholder"),
         "password123"
       );
-      await user.click(screen.getByRole("button", { name: "Sign In" }));
+      await user.click(
+        screen.getByRole("button", { name: "auth.login.submit" })
+      );
 
       await waitFor(() => {
-        expect(
-          screen.getByText("Something went wrong. Please try again.")
-        ).toBeInTheDocument();
+        expect(screen.getByText("errors.generic")).toBeInTheDocument();
       });
     });
   });
@@ -197,7 +210,7 @@ describe("Login Component", () => {
       renderLogin(mockSetCurrentPage);
       const user = userEvent.setup();
 
-      await user.click(screen.getByText("Signup for free"));
+      await user.click(screen.getByText("auth.login.signupLink"));
 
       expect(mockSetCurrentPage).toHaveBeenCalledWith("signup");
     });
