@@ -2,6 +2,7 @@
  * Jest Setup File for React Testing Library
  */
 import "@testing-library/jest-dom";
+import React from "react";
 import {
   jest,
   expect,
@@ -165,8 +166,14 @@ jest.mock("react-i18next", () => ({
 
 // Mock react-syntax-highlighter
 jest.mock("react-syntax-highlighter", () => ({
-  Prism: ({ children }: any) => <pre>{children}</pre>,
-  Light: ({ children }: any) => <pre>{children}</pre>,
+  Prism: ({ children }: any) => React.createElement("pre", null, children),
+  Light: ({ children }: any) => React.createElement("pre", null, children),
+}));
+
+// Mock des styles
+jest.mock("react-syntax-highlighter/dist/esm/styles/prism", () => ({
+  oneLight: {},
+  vscDarkPlus: {},
 }));
 
 export { localStorageMock };

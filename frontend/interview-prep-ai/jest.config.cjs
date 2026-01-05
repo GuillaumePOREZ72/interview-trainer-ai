@@ -12,7 +12,7 @@ module.exports = {
   testEnvironment: "jsdom",
 
   // Setup files to run after jest is initialized
-  setupFilesAfterEnv: ["<rootDir>/src/tests/setup.ts"],
+  setupFilesAfterEnv: ["<rootDir>/src/tests/setup.tsx"],
 
   // Transform TypeScript files
   transform: {
