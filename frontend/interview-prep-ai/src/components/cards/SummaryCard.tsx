@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { LuTrash2, LuCalendar, LuMessageSquare } from "react-icons/lu";
 import { getInitials } from "../../utils/helper";
-import {formatDate} from "../../utils/formatDate";
+import { formatDate } from "../../utils/formatDate";
 
 interface SummaryCardProps {
   role: string;
@@ -9,6 +9,7 @@ interface SummaryCardProps {
   experience: number;
   questions: number;
   description: string;
+  language?: string;
   lastUpdated?: string | null;
   onSelect: () => void;
   onDelete: () => void;
@@ -20,6 +21,7 @@ const SummaryCard = ({
   experience,
   questions,
   description,
+  language = "en",
   lastUpdated,
   onSelect,
   onDelete,
@@ -50,6 +52,11 @@ const SummaryCard = ({
               {topicsToFocus}
             </p>
           </div>
+
+          {/* Language badge */}
+          <span className="shrink-0 text-xs font-medium px-2 py-1 rounded-md bg-bg-tertiary border border-border-primary text-text-secondary mt-6">
+            {language === "fr" ? "🇫🇷 FR" : "🇬🇧 EN"}
+          </span>
         </div>
 
         {/* Delete button */}

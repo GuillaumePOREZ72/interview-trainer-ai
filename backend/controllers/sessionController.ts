@@ -22,6 +22,11 @@ export const createSession = async (
     const { role, experience, topicsToFocus, description, questions } =
       req.body;
     const userId = req.user?._id;
+    const language = req.headers["accept-language"]
+      ?.split(",")[0]
+      ?.startsWith("fr")
+      ? "fr"
+      : "en";
 
     const session = await Session.create({
       user: userId,
@@ -29,6 +34,7 @@ export const createSession = async (
       experience,
       topicsToFocus,
       description,
+      language,
     });
 
     const questionDocs = await Promise.all(

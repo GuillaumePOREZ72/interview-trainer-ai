@@ -32,15 +32,18 @@ const generateInterviewQuestions = async (
       return;
     }
 
+    const language = req.headers["accept-language"]?.split(",")[0] || "en";
+
     logger.info(
-      `🤖 Generating ${numberOfQuestions} questions - Role: ${role} - Experience: ${experience} - User: ${req.user?._id}`
+      `🤖 Generating ${numberOfQuestions} questions - Role: ${role} - Experience: ${experience} - Language: ${language} - User: ${req.user?._id}`
     );
 
     const prompt = questionAnswerPrompt(
       role,
       experience,
       topicsToFocus,
-      numberOfQuestions
+      numberOfQuestions,
+      language
     );
 
     const response = await fetch(
@@ -108,14 +111,16 @@ const generateConceptExplanation = async (
       return;
     }
 
+    const language = req.headers["accept-language"]?.split(",")[0] || "en";
+
     logger.info(
       `🤖 Generating explanation - Question: "${question.substring(
         0,
         50
-      )}..." - User: ${req.user?._id}`
+      )}..." - Language: ${language} - User: ${req.user?._id}`
     );
 
-    const prompt = conceptExplainPrompt(question);
+    const prompt = conceptExplainPrompt(question, language);
 
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",

@@ -7,14 +7,6 @@ import { logger } from "../config/logger.js";
 export const cleanAndParseJSON = (rawText: string): unknown => {
   let cleaned = rawText;
 
-  // Step 1: Remove markdown code blocks (multiple patterns)
-  cleaned = cleaned
-    .replace(/```json\s*/gi, "")
-    .replace(/```javascript\s*/gi, "")
-    .replace(/```typescript\s*/gi, "")
-    .replace(/```\s*/g, "")
-    .trim();
-
   // Step 2: Extract JSON structure (find first [ or { to last ] or })
   const arrayStart = cleaned.indexOf("[");
   const objectStart = cleaned.indexOf("{");

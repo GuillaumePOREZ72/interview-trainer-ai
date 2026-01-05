@@ -1,4 +1,4 @@
-import { Question } from './question';
+import { Question } from "./question";
 // src/types/session.ts
 export interface Session {
   _id: string;
@@ -6,6 +6,7 @@ export interface Session {
   experience: number;
   topicsToFocus: string;
   description: string;
+  language?: string;
   questions: Question[];
   createdAt?: string;
   updatedAt?: string;
