@@ -27,11 +27,11 @@ const Navbar = () => {
           <LanguageSwitcher />
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-full hover:bg-bg-secondary text-text-secondary hover:text-primary transition-all cursor-pointer"
+            className="p-2 rounded-full hover:bg-bg-secondary text-text-secondary hover:text-primary dark:text-text-tertiary transition-all cursor-pointer"
             aria-label="Toggle theme"
           >
             {theme === "dark" ? (
-              <LuSun className="text-xl text-text-tertiary" />
+              <LuSun className="text-xl" />
             ) : (
               <LuMoon className="text-xl" />
             )}
