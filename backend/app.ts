@@ -35,6 +35,11 @@ const NODE_ENV = process.env.NODE_ENV || "development";
 export const createApp = (): Express => {
   const app: Express = express();
 
+  // Trust proxy for rate limiting in production (o2switch/reverse proxies)
+  if (NODE_ENV === "production") {
+    app.set("trust proxy", 1);
+  }
+
   // CORS configuration
   const corsOptions: cors.CorsOptions = {
     origin(origin, callback) {
@@ -106,4 +111,3 @@ export const createApp = (): Express => {
 // Export a default instance for backward compatibility
 const app = createApp();
 export default app;
-

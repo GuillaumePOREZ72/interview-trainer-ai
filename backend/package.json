@@ -2,9 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "API interview preparation platform",
-  "main": "sever.js",
+  "main": "dist/server.js",
   "scripts": {
-    "start": "node --loader ts-node/esm server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
     "dev": "nodemon --exec tsx server.ts",
     "test": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:watch": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",

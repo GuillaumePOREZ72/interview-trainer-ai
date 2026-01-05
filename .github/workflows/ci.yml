@@ -1,0 +1,109 @@
+name: CI/CD - Test, Build & Deploy
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: cd backend && npm ci
+
+      - name: Run tests
+        run: cd backend && npm test
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET || 'test-secret' }}
+          REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET || 'test-refresh-secret' }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || 'test-key' }}
+
+      - name: Build backend
+        run: cd backend && npm run build
+
+      - name: Upload Backend Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist
+          path: |
+            backend/dist
+            backend/package.json
+            backend/package-lock.json
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/interview-prep-ai/package-lock.json
+
+      - name: Install dependencies
+        run: cd frontend/interview-prep-ai && npm ci
+
+      - name: Run tests
+        run: cd frontend/interview-prep-ai && npm test
+
+      - name: Build frontend
+        run: cd frontend/interview-prep-ai && npm run build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+
+      - name: Upload Frontend Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/interview-prep-ai/dist
+
+  deploy:
+    name: Deploy to o2switch
+    needs: [backend-tests, frontend-tests]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Backend Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist
+          path: deploy-backend
+
+      - name: Download Frontend Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: deploy-frontend
+
+      - name: Deploy Backend via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./deploy-backend/
+          server-dir: ${{ secrets.FTP_BACKEND_PATH }} # e.g., /api.monsite.com/
+          state-name: .backend-ftp-deploy-sync-state.json
+
+      - name: Deploy Frontend via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./deploy-frontend/
+          server-dir: ${{ secrets.FTP_FRONTEND_PATH }} # e.g., /public_html/
+          state-name: .frontend-ftp-deploy-sync-state.json
