@@ -6,8 +6,6 @@ const config = {
   // Test environment
   testEnvironment: "node",
 
-  // ESM support
-  extensionsToTreatAsEsm: [".ts"],
 
   // Module name mapper for ESM imports with .js extension
   moduleNameMapper: {
