@@ -3,9 +3,11 @@
  * Uses app configuration from app.ts
  */
 import "dotenv/config";
-import app from "./app.js";
-import connectDB from "./config/db.js";
-import { logger } from "./config/logger.js";
+import { createApp } from "./app";
+import connectDB from "./config/db";
+import { logger } from "./config/logger";
+
+const app = createApp();
 
 /**
  * Constants

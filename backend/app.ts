@@ -6,27 +6,24 @@ import "dotenv/config";
 import express, { Express } from "express";
 import cors from "cors";
 import path from "path";
-import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
 import compression from "compression";
 import helmet from "helmet";
 
-import { logger } from "./config/logger.js";
-import limiter from "./config/rateLimiter.js";
-import authRoutes from "./routes/authRoutes.js";
-import sessionRoutes from "./routes/sessionRoutes.js";
-import questionRoutes from "./routes/questionRoutes.js";
-import { protect } from "./middlewares/authMiddleware.js";
+import { logger } from "./config/logger";
+import limiter from "./config/rateLimiter";
+import authRoutes from "./routes/authRoutes";
+import sessionRoutes from "./routes/sessionRoutes";
+import questionRoutes from "./routes/questionRoutes";
+import { protect } from "./middlewares/authMiddleware";
 import {
   generateConceptExplanation,
   generateInterviewQuestions,
-} from "./controllers/aiController.js";
+} from "./controllers/aiController";
 
 /**
  * Constants
  */
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 const NODE_ENV = process.env.NODE_ENV || "development";
 
 /**
