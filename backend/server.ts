@@ -4,6 +4,7 @@
  */
 import * as dotenv from "dotenv";
 dotenv.config();
+
 import { createApp } from "./app";
 import connectDB from "./config/db";
 import { logger } from "./config/logger";
