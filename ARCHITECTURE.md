@@ -1,8 +1,8 @@
 # 🏛️ InterviewPrep AI - Architectural Masterplan
 
 > **Status:** Active Development
-> **Version:** 1.2.0
-> **Date:** December 29, 2025
+> **Version:** 1.3.0
+> **Date:** January 08, 2026
 
 ## 1. 🔭 Vision & Core Philosophy
 
@@ -18,6 +18,7 @@
 - **Routing:** React Router 7
 - **Styling:** Tailwind CSS v4 + Framer Motion (for "Avant-Garde" micro-interactions)
 - **State:** React Context API (Theme, User) + Local State
+- **Internationalization:** i18next + react-i18next (English/French)
 - **HTTP Client:** Axios (Singleton instance)
 
 ### **Backend (Server)**
@@ -26,6 +27,7 @@
 - **Framework:** Express v5 (Modern routing)
 - **Database:** MongoDB + Mongoose v9
 - **AI Engine:** **Groq** (LPU Inference) via OpenAI-compatible API
+- **File Storage:** Multer (Local uploads)
 - **Security:** Helmet, RateLimit, CORS, JWT (HttpOnly Cookies)
 
 ---
@@ -66,6 +68,7 @@ The backend is organized into distinct domains. While currently implementing a "
 
 - **`aiController`**: Orchestrates the prompt engineering and communication with Groq. It handles the non-deterministic nature of LLMs and enforces JSON structure.
 - **`sessionController`**: Manages the lifecycle of an interview (Creation -> Question Generation -> Storage).
+- **`questionController`**: Handles interaction with specific questions, including **Pinning** questions for review and adding personal **Notes**.
 - **`authController`**: Handles JWT issuance, hashing (Bcrypt), and cookie management.
 
 ### **4.2 The AI Pipeline (Groq Integration)**
@@ -128,6 +131,14 @@ The UI is built on **Atomic Design** principles but adapted for speed.
 - **Global Server State:** Managed via `useUser` hook (User profile, Auth status).
 - **Theme State:** `ThemeContext` for Dark/Light mode toggling.
 - **Ephemeral UI State:** Local `useState` for form inputs and modal visibility.
+
+### **5.3 Internationalization Strategy**
+
+We use `i18next` for robust bilingual support (FR/EN).
+
+- **Detection:** `i18next-browser-languagedetector` for auto-detecting user preference.
+- **Localization:** JSON resource files in `locales/{lang}/common.json`.
+- **Date Sync:** `moment.locale` is synchronized with `i18n.language` changes for consistent date formatting.
 
 ---
 
@@ -198,7 +209,8 @@ sequenceDiagram
 
 ## 7. 📂 Project Structure Map
 
-```text
+```textploads/ # 🖼️ Local storage for profile images
+│   ├── u
 interviewprepai/
 ├── backend/                      # 🧠 The Brain
 │   ├── config/                   # DB, Logger, RateLimiters
@@ -229,6 +241,7 @@ interviewprepai/
     │   ├── components/           # UI Building Blocks
     │   ├── context/              # Global State (Theme, User)
     │   ├── hooks/                # Custom Logic (useUser)
+    │   ├── locales/              # 🌍 Translation files (en/fr)
     │   ├── pages/                # Route Views
     │   ├── utils/                # API Clients (axiosInstance) & Helpers
     │   │
