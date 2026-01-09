@@ -97,14 +97,12 @@ export const createApp = (): Express => {
   // Serve uploads folder
   app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-  // API Routes
-
-  const apiPrefix = NODE_ENV === "production" ? "" : "/api";
-  app.use(`${apiPrefix}/auth`, authRoutes);
-  app.use(`${apiPrefix}/sessions`, sessionRoutes);
-  app.use(`${apiPrefix}/questions`, questionRoutes);
-  app.use(`${apiPrefix}/ai/generate-questions`, protect, generateInterviewQuestions);
-  app.use(`${apiPrefix}/ai/generate-explanation`, protect, generateConceptExplanation);
+  // API Routes (keeping /api prefix for consistency with frontend)
+  app.use("/api/auth", authRoutes);
+  app.use("/api/sessions", sessionRoutes);
+  app.use("/api/questions", questionRoutes);
+  app.use("/api/ai/generate-questions", protect, generateInterviewQuestions);
+  app.use("/api/ai/generate-explanation", protect, generateConceptExplanation);
 
   return app;
 };
