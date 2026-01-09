@@ -34,16 +34,16 @@ jobs:
 
       - name: Prepare Backend Deployment
         run: |
-          mkdir deploy_temp
-          cp -r backend/dist deploy_temp/
-          cp backend/package.json deploy_temp/
-          cp backend/package-lock.json deploy_temp/
+          mkdir -p deploy-backend
+          cp -r backend/dist deploy-backend/
+          cp backend/package.json deploy-backend/
+          cp backend/package-lock.json deploy-backend/
 
       - name: Upload Backend Artifact
         uses: actions/upload-artifact@v4
         with:
           name: backend-dist
-          path: deploy_temp/
+          path: deploy-backend/
 
   frontend-tests:
     runs-on: ubuntu-latest
