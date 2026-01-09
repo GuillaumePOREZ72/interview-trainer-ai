@@ -99,12 +99,20 @@ export const createApp = (): Express => {
 
   // API Routes
 
-  const apiPrefix = NODE_ENV === "production" ? "" : "/api";
+  const apiPrefix = "/api";
   app.use(`${apiPrefix}/auth`, authRoutes);
   app.use(`${apiPrefix}/sessions`, sessionRoutes);
   app.use(`${apiPrefix}/questions`, questionRoutes);
-  app.use(`${apiPrefix}/ai/generate-questions`, protect, generateInterviewQuestions);
-  app.use(`${apiPrefix}/ai/generate-explanation`, protect, generateConceptExplanation);
+  app.use(
+    `${apiPrefix}/ai/generate-questions`,
+    protect,
+    generateInterviewQuestions
+  );
+  app.use(
+    `${apiPrefix}/ai/generate-explanation`,
+    protect,
+    generateConceptExplanation
+  );
 
   return app;
 };
