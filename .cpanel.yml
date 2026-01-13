@@ -1,5 +1,5 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home2/kuwa6817/interview-trainer-ai
-    - /usr/bin/rsync -av --delete --exclude='node_modules' --exclude='.env' --exclude='uploads' --exclude='logs' backend/ $DEPLOYPATH/
+    - /usr/bin/rsync -av --delete --exclude='node_modules' --exclude='.env' --exclude='uploads' --exclude='logs' backend/ $DEPLOYPATH/backend/
     - /usr/bin/rsync -av --delete frontend/interview-prep-ai/dist/ /home2/kuwa6817/public_html/interview-trainer-ai/
