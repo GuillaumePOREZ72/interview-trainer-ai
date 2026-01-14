@@ -38,7 +38,7 @@ const LandingPage = () => {
 
   return (
     <>
-      <div className="w-full min-h-full bg-linear-to-br from-bg-primary via-indigo-50/30 to-purple-50/30 dark:from-bg-primary dark:via-indigo-950/30 dark:to-purple-950/30">
+      <div className="w-full min-h-full bg-linear-to-br from-bg-primary via-indigo-50/30 to-purple-50/30 dark:from-bg-primary dark:via-indigo-950/30 dark:to-purple-950/30 relative overflow-hidden">
         {/* Animated gradient blobs */}
         <div className="w-[500px] h-[500px] bg-linear-to-br from-indigo-200/30 to-purple-200/30 dark:from-indigo-900/30 dark:to-purple-900/30 blur-[80px] absolute top-0 left-0 animate-blob1" />
         <div className="w-[400px] h-[400px] bg-linear-to-br from-purple-200/30 to-cyan-200/30 dark:from-purple-900/30 dark:to-cyan-900/30 blur-[80px] absolute top-20 right-0 animate-blob2" />
