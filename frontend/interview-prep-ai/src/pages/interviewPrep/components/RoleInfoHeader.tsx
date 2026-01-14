@@ -39,7 +39,7 @@ const RoleInfoHeader = ({
         <div className="absolute bottom-[-10%] right-[10%] w-[250px] h-[250px] bg-accent rounded-full blur-[80px] mix-blend-multiply dark:mix-blend-screen animate-pulse-slow delay-2000" />
       </div>
 
-      <div className="container mx-auto px-4 md:px-0 py-8 relative z-10">
+      <div className="container mx-auto px-4 md:px-8 py-8 relative z-10">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           {/* Left side - Role Info */}
           <div className="flex-1">

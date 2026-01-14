@@ -61,7 +61,7 @@ const Dashboard = () => {
   return (
     <DashboardLayout>
       <div className="min-h-screen bg-bg-primary transition-colors duration-300">
-        <div className="container mx-auto pt-8 pb-24 px-4">
+        <div className="container mx-auto pt-8 pb-24 px-4 md:px-8">
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-3">

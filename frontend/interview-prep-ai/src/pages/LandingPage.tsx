@@ -43,11 +43,17 @@ const LandingPage = () => {
         <div className="w-[500px] h-[500px] bg-linear-to-br from-indigo-200/30 to-purple-200/30 dark:from-indigo-900/30 dark:to-purple-900/30 blur-[80px] absolute top-0 left-0 animate-blob1" />
         <div className="w-[400px] h-[400px] bg-linear-to-br from-purple-200/30 to-cyan-200/30 dark:from-purple-900/30 dark:to-cyan-900/30 blur-[80px] absolute top-20 right-0 animate-blob2" />
 
-        <div className="container mx-auto px-4 pt-6 pb-[200px] relative z-10">
+        <div className="container mx-auto px-4 md:px-8 pt-6 pb-[200px] relative z-10">
           {/* Header */}
           <header className="flex justify-between items-center mb-16">
-            <div className="text-xl text-text-primary font-bold">
-              {t("app.name")}
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-linear-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                <LuSparkles className="text-white text-lg" />
+              </div>
+              <h2 className="text-lg md:text-xl font-bold text-text-primary leading-5">
+                Interview Trainer{" "}
+                <span className="gradient-text-purple">AI</span>
+              </h2>
             </div>
             <div className="flex items-center gap-4">
               <LanguageSwitcher />
