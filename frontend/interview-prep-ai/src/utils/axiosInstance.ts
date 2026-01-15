@@ -45,6 +45,12 @@ axiosInstance.interceptors.request.use(
     }
     const language = localStorage.getItem("i18nextLng") || "en";
     (config.headers as any)["Accept-Language"] = language;
+
+    // Let the browser set Content-Type automatically for FormData (multipart/form-data with boundary)
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+    }
+
     return config;
   },
   (error) => {
