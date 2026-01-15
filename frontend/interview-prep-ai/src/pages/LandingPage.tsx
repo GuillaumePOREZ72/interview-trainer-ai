@@ -56,7 +56,7 @@ const LandingPage = () => {
               </h2>
             </div>
             <div className="flex items-center gap-4">
-              <LanguageSwitcher />
+              <LanguageSwitcher className="text-text-secondary" />
               <button
                 onClick={toggleTheme}
                 className="p-2 rounded-full hover:bg-bg-secondary text-text-secondary hover:text-primary transition-all cursor-pointer"
