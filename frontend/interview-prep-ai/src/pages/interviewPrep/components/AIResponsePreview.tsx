@@ -2,13 +2,9 @@ import { LuCopy, LuCheck, LuCode } from "react-icons/lu";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import {
-  oneLight,
-  vscDarkPlus,
-} from "react-syntax-highlighter/dist/esm/styles/prism";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { useState } from "react";
 import type { Components } from "react-markdown";
-import { useTheme } from "../../../hooks/useTheme";
 
 interface AIResponsePreviewProps {
   content: string;
@@ -177,7 +173,6 @@ const AIResponsePreview = ({ content }: AIResponsePreviewProps) => {
 
 const CodeBlock = ({ code, language }: CodeBlockProps) => {
   const [isCopied, setIsCopied] = useState<boolean>(false);
-  const { theme } = useTheme();
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(code);
@@ -215,10 +210,10 @@ const CodeBlock = ({ code, language }: CodeBlockProps) => {
       </div>
 
       {/* Code */}
-      <div className="text-sm bg-[#fafafa] dark:bg-[#1e1e1e]">
+      <div className="text-sm bg-[#1e1e1e]">
         <SyntaxHighlighter
           language={language || "text"}
-          style={theme === "dark" ? vscDarkPlus : oneLight}
+          style={vscDarkPlus}
           customStyle={{
             fontSize: "0.8rem",
             margin: 0,
