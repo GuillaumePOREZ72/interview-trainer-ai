@@ -94,8 +94,8 @@ export const createApp = (): Express => {
     });
   });
 
-  // Serve uploads folder
-  app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+  // Serve uploads folder (use process.cwd() for consistency with uploadMiddleware)
+  app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
   // API Routes (keeping /api prefix for consistency with frontend)
   app.use("/api/auth", authRoutes);

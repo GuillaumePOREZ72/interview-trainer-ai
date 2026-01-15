@@ -2,14 +2,10 @@ import multer, { FileFilterCallback } from "multer";
 import { Request } from "express";
 import path from "path";
 import fs from "fs";
-import { fileURLToPath } from "url";
 
-// Get __dirname equivalent in ESM
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Ensure uploads directory exists (relative to project root, not middlewares folder)
-const uploadDir = path.join(__dirname, "..", "uploads");
+// Use process.cwd() to get project root (works in both dev and production)
+// This ensures uploads go to /backend/uploads regardless of where the compiled code runs
+const uploadDir = path.join(process.cwd(), "uploads");
 console.log("Upload directory:", uploadDir);
 
 if (!fs.existsSync(uploadDir)) {
