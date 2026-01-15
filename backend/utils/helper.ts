@@ -1,42 +1,29 @@
 import { logger } from "../config/logger.js";
 
 /**
- * Normalize markdown code blocks to ensure they are on their own lines
- * This fixes cases where the AI puts code blocks inline with text
+ * Normalize markdown code blocks to ensure they are properly formatted
+ * Fixes cases where AI puts language on separate line or text after closing ```
  */
 export const normalizeCodeBlocks = (text: string): string => {
   let normalized = text;
 
-  // Find all code blocks and ensure proper formatting
-  // This regex matches: ```language (optional), then content, then ```
+  // Step 1: Fix case where language is on a separate line after ```
+  // e.g., "```\ntypescript\ncode" -> "```typescript\ncode"
   normalized = normalized.replace(
-    /```(\w*)\n?([\s\S]*?)```([^\n])?/g,
-    (match, lang, code, charAfter) => {
-      // Clean up the code content - remove trailing whitespace but keep structure
-      const cleanCode = code.replace(/\s+$/, "");
-
-      // Build properly formatted code block
-      let result = "```" + (lang || "") + "\n" + cleanCode + "\n```";
-
-      // If there's a character immediately after ```, add newlines before it
-      if (charAfter && charAfter.trim()) {
-        result += "\n\n" + charAfter;
-      }
-
-      return result;
-    }
+    /```\s*\n(javascript|typescript|python|java|csharp|cpp|c|go|rust|ruby|php|swift|kotlin|html|css|scss|sass|sql|bash|shell|json|xml|yaml|markdown|text)\n/gi,
+    (match, lang) => "```" + lang.toLowerCase() + "\n"
   );
 
-  // Ensure blank line before code blocks (if preceded by text)
+  // Step 2: Ensure blank line before code blocks (if preceded by text)
   normalized = normalized.replace(/([^\n])\n(```\w*\n)/g, "$1\n\n$2");
 
-  // Ensure blank line after code blocks (if followed by text)
+  // Step 3: Ensure blank line after code blocks (if followed by text)
   normalized = normalized.replace(/(```)\n([^\n`])/g, "$1\n\n$2");
 
-  // Clean up excessive newlines (more than 2)
+  // Step 4: Clean up excessive newlines (more than 2)
   normalized = normalized.replace(/\n{3,}/g, "\n\n");
 
-  // Trim leading/trailing whitespace
+  // Step 5: Trim leading/trailing whitespace
   normalized = normalized.trim();
 
   return normalized;
