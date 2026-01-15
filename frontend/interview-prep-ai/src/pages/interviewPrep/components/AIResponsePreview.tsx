@@ -15,32 +15,13 @@ interface CodeBlockProps {
   language: string;
 }
 
-/**
- * Pre-process markdown to ensure code blocks are properly formatted
- * Fixes cases where AI puts text right after closing ```
- */
-const preprocessMarkdown = (text: string): string => {
-  // Ensure closing ``` is followed by two newlines before any text
-  // This regex finds ``` followed by any non-newline character
-  let processed = text.replace(/```\s*\n?([A-Za-zÀ-ÿ])/g, "```\n\n$1");
-
-  // Ensure there's a newline before opening ```
-  processed = processed.replace(/([^\n])(\n```)/g, "$1\n$2");
-
-  return processed;
-};
-
 const AIResponsePreview = ({ content }: AIResponsePreviewProps) => {
   if (!content) {
     return null;
   }
 
-  // Pre-process content to fix code block formatting
-  const processedContent = preprocessMarkdown(content);
-
   const components: Components = {
     pre({ children }) {
-      // Simply return children - the code component will handle the actual rendering
       return <>{children}</>;
     },
     code({ node, className, children, ...props }) {
@@ -48,13 +29,14 @@ const AIResponsePreview = ({ content }: AIResponsePreviewProps) => {
       const language = match ? match[1] : "";
       const codeString = String(children).replace(/\n$/, "");
 
-      // Check if this is a code block (has language) or inline code
-      // Also check if the code contains newlines (multi-line = block)
-      const isCodeBlock = match || codeString.includes("\n");
+      // Only treat as code block if it has a language class (from ```)
+      // Inline code won't have className
+      if (match) {
+        return <CodeBlock code={codeString} language={language} />;
+      }
 
-      return isCodeBlock ? (
-        <CodeBlock code={codeString} language={language || "text"} />
-      ) : (
+      // Inline code
+      return (
         <code
           className="px-1.5 py-0.5 bg-bg-tertiary text-text-primary rounded text-sm font-mono"
           {...props}
@@ -189,7 +171,7 @@ const AIResponsePreview = ({ content }: AIResponsePreviewProps) => {
   return (
     <div className="prose prose-slate dark:prose-invert max-w-none">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-        {processedContent}
+        {content}
       </ReactMarkdown>
     </div>
   );
