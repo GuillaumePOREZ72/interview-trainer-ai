@@ -10,20 +10,28 @@ export const normalizeCodeBlocks = (text: string): string => {
   // Step 1: Fix case where language is on a separate line after ```
   // e.g., "```\ntypescript\ncode" -> "```typescript\ncode"
   normalized = normalized.replace(
-    /```\s*\n(javascript|typescript|python|java|csharp|cpp|c|go|rust|ruby|php|swift|kotlin|html|css|scss|sass|sql|bash|shell|json|xml|yaml|markdown|text)\n/gi,
+    /```\s*\n(javascript|typescript|python|java|csharp|cpp|c|go|rust|ruby|php|swift|kotlin|html|css|scss|sass|sql|bash|shell|json|xml|yaml|markdown|text|jsx|tsx)\s*\n/gi,
     (match, lang) => "```" + lang.toLowerCase() + "\n"
   );
 
-  // Step 2: Ensure blank line before code blocks (if preceded by text)
+  // Step 2: Fix case where text is directly after closing ``` without newline
+  // e.g., "```This allows" -> "```\n\nThis allows"
+  normalized = normalized.replace(/```([A-Z])/g, "```\n\n$1");
+
+  // Step 3: Fix case where text is on same line as closing ``` with space
+  // e.g., "``` This allows" -> "```\n\nThis allows"
+  normalized = normalized.replace(/```\s+([A-Za-z])/g, "```\n\n$1");
+
+  // Step 4: Ensure blank line before code blocks (if preceded by text)
   normalized = normalized.replace(/([^\n])\n(```\w*\n)/g, "$1\n\n$2");
 
-  // Step 3: Ensure blank line after code blocks (if followed by text)
+  // Step 5: Ensure blank line after code blocks (if followed by text on next line)
   normalized = normalized.replace(/(```)\n([^\n`])/g, "$1\n\n$2");
 
-  // Step 4: Clean up excessive newlines (more than 2)
+  // Step 6: Clean up excessive newlines (more than 2)
   normalized = normalized.replace(/\n{3,}/g, "\n\n");
 
-  // Step 5: Trim leading/trailing whitespace
+  // Step 7: Trim leading/trailing whitespace
   normalized = normalized.trim();
 
   return normalized;

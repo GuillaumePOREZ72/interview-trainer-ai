@@ -45,10 +45,41 @@ const KNOWN_LANGUAGES = [
   "tsx",
 ];
 
+/**
+ * Normalize markdown code blocks before passing to ReactMarkdown
+ * Fixes common AI output issues with code block formatting
+ */
+const normalizeMarkdown = (text: string): string => {
+  let normalized = text;
+
+  // Fix: language on separate line after ```
+  // e.g., "```\njavascript\ncode" -> "```javascript\ncode"
+  const langPattern = KNOWN_LANGUAGES.join("|");
+  const langRegex = new RegExp("```\\s*\\n(" + langPattern + ")\\s*\\n", "gi");
+  normalized = normalized.replace(
+    langRegex,
+    (_, lang) => "```" + lang.toLowerCase() + "\n"
+  );
+
+  // Fix: text directly after closing ``` (e.g., "```This allows")
+  normalized = normalized.replace(/```([A-Z])/g, "```\n\n$1");
+
+  // Fix: text on same line as closing ``` with space
+  normalized = normalized.replace(/```\s+([A-Za-z])/g, "```\n\n$1");
+
+  // Ensure blank line after code blocks if followed by text
+  normalized = normalized.replace(/(```)\n([^\n`])/g, "$1\n\n$2");
+
+  return normalized;
+};
+
 const AIResponsePreview = ({ content }: AIResponsePreviewProps) => {
   if (!content) {
     return null;
   }
+
+  // Normalize the content before rendering
+  const normalizedContent = normalizeMarkdown(content);
 
   const components: Components = {
     pre({ children }) {
@@ -212,7 +243,7 @@ const AIResponsePreview = ({ content }: AIResponsePreviewProps) => {
   return (
     <div className="prose prose-slate dark:prose-invert max-w-none">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-        {content}
+        {normalizedContent}
       </ReactMarkdown>
     </div>
   );
