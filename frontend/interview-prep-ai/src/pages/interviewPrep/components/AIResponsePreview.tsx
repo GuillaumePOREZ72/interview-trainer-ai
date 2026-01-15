@@ -15,10 +15,28 @@ interface CodeBlockProps {
   language: string;
 }
 
+/**
+ * Pre-process markdown to ensure code blocks are properly formatted
+ * Fixes cases where AI puts text right after closing ```
+ */
+const preprocessMarkdown = (text: string): string => {
+  // Ensure closing ``` is followed by two newlines before any text
+  // This regex finds ``` followed by any non-newline character
+  let processed = text.replace(/```\s*\n?([A-Za-zÀ-ÿ])/g, "```\n\n$1");
+
+  // Ensure there's a newline before opening ```
+  processed = processed.replace(/([^\n])(\n```)/g, "$1\n$2");
+
+  return processed;
+};
+
 const AIResponsePreview = ({ content }: AIResponsePreviewProps) => {
   if (!content) {
     return null;
   }
+
+  // Pre-process content to fix code block formatting
+  const processedContent = preprocessMarkdown(content);
 
   const components: Components = {
     pre({ children }) {
@@ -171,7 +189,7 @@ const AIResponsePreview = ({ content }: AIResponsePreviewProps) => {
   return (
     <div className="prose prose-slate dark:prose-invert max-w-none">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-        {content}
+        {processedContent}
       </ReactMarkdown>
     </div>
   );
