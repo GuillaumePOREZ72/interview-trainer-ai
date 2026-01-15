@@ -5,16 +5,27 @@ import { logger } from "../config/logger.js";
  * This fixes cases where the AI puts code blocks inline with text
  */
 export const normalizeCodeBlocks = (text: string): string => {
-  // Match complete code blocks: ```language\ncode\n``` and ensure proper spacing
-  // This regex captures: opening ```, optional language, code content, closing ```
-  let normalized = text.replace(/(```(\w*)\n[\s\S]*?```)/g, (match) => {
-    return "\n\n" + match + "\n\n";
-  });
+  let normalized = text;
 
-  // Clean up excessive newlines (more than 2)
+  // Step 1: Ensure opening ``` is preceded by newlines (not inline with text)
+  // Match text immediately before ``` that isn't a newline
+  normalized = normalized.replace(/([^\n])(```)/g, "$1\n\n$2");
+
+  // Step 2: Ensure closing ``` is followed by newlines (text after should be separate)
+  // Match ``` followed by text that isn't a newline
+  normalized = normalized.replace(/(```)\n?([^\n`])/g, "$1\n\n$2");
+
+  // Step 3: Handle cases where text is on the same line as closing ```
+  // e.g., "code\n```Some text" -> "code\n```\n\nSome text"
+  normalized = normalized.replace(
+    /(```\w*)\s*\n([\s\S]*?)(```)\s*([A-Za-zÀ-ÿ])/g,
+    "$1\n$2$3\n\n$4"
+  );
+
+  // Step 4: Clean up excessive newlines (more than 2)
   normalized = normalized.replace(/\n{3,}/g, "\n\n");
 
-  // Trim leading/trailing whitespace
+  // Step 5: Trim leading/trailing whitespace
   normalized = normalized.trim();
 
   return normalized;

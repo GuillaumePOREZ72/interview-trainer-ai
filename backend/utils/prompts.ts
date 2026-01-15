@@ -21,23 +21,24 @@ const questionAnswerPrompt = (
   - Write ${numberOfQuestions} interviews questions
   - For each question, generate a detailed but beginner-friendly answer.
 
-  CRITICAL MARKDOWN FORMATTING RULES:
-  1. Code blocks MUST be on their own lines, with a blank line before AND after.
-  2. Code blocks MUST start with \`\`\` followed by the language name (e.g., \`\`\`javascript).
-  3. Code blocks MUST end with \`\`\` on its own line.
-  4. NEVER use inline code (\`code\`) for multi-line code. Always use fenced code blocks.
-  5. DO NOT include explanatory text inside code blocks. Text goes OUTSIDE, code goes INSIDE.
-  6. Use inline code (\`code\`) ONLY for short references like variable names, function names, or keywords (e.g., \`useState\`, \`async\`).
+  CRITICAL MARKDOWN FORMATTING RULES FOR CODE:
+  1. Code blocks MUST have a blank line BEFORE the opening \`\`\`
+  2. Code blocks MUST have a blank line AFTER the closing \`\`\`
+  3. NEVER put any text on the same line as \`\`\` (before or after)
+  4. The closing \`\`\` must be ALONE on its line, with NO text after it
+  5. Any explanatory text must come AFTER the code block, separated by a blank line
   
-  Example of CORRECT formatting:
-  
-  We use the useState hook to manage state.
-  
+  WRONG (text after closing):
   \`\`\`javascript
-  const [count, setCount] = useState(0);
-  \`\`\`
+  const x = 1;
+  \`\`\`This text is wrong here.
   
-  This creates a state variable called count.
+  CORRECT (blank line, then text):
+  \`\`\`javascript
+  const x = 1;
+  \`\`\`
+
+  This text is correct here.
 
   - Return a pure JSON array like:
   [
@@ -61,26 +62,24 @@ const conceptExplainPrompt = (
   - Question: "${question}"
   - After the explanation, provide a short and clear title that summarizes the concept for the article or page header.
 
-  CRITICAL MARKDOWN FORMATTING RULES:
-  1. Code blocks MUST be on their own lines, with a blank line before AND after.
-  2. Code blocks MUST start with \`\`\` followed by the language name (e.g., \`\`\`javascript).
-  3. Code blocks MUST end with \`\`\` on its own line.
-  4. NEVER use inline code (\`code\`) for multi-line code. Always use fenced code blocks.
-  5. DO NOT include explanatory text inside code blocks. Text goes OUTSIDE, code goes INSIDE.
-  6. Use inline code (\`code\`) ONLY for short references like variable names, function names, or keywords.
+  CRITICAL MARKDOWN FORMATTING RULES FOR CODE:
+  1. Code blocks MUST have a blank line BEFORE the opening \`\`\`
+  2. Code blocks MUST have a blank line AFTER the closing \`\`\`
+  3. NEVER put any text on the same line as \`\`\` (before or after)
+  4. The closing \`\`\` must be ALONE on its line, with NO text after it
+  5. Any explanatory text must come AFTER the code block, separated by a blank line
   
-  Example of CORRECT formatting:
-  
-  We define a function to fetch data.
-  
+  WRONG (text after closing):
   \`\`\`typescript
-  async function fetchData() {
-    const response = await fetch('/api/data');
-    return response.json();
-  }
-  \`\`\`
+  const x = 1;
+  \`\`\`This text is wrong.
   
-  This function returns a Promise.
+  CORRECT (blank line, then text):
+  \`\`\`typescript
+  const x = 1;
+  \`\`\`
+
+  This text is correct.
 
   - Return the result as a valid JSON object in the following format:
 
