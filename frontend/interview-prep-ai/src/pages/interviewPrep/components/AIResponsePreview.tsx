@@ -15,6 +15,36 @@ interface CodeBlockProps {
   language: string;
 }
 
+const KNOWN_LANGUAGES = [
+  "javascript",
+  "typescript",
+  "python",
+  "java",
+  "csharp",
+  "cpp",
+  "c",
+  "go",
+  "rust",
+  "ruby",
+  "php",
+  "swift",
+  "kotlin",
+  "html",
+  "css",
+  "scss",
+  "sass",
+  "sql",
+  "bash",
+  "shell",
+  "json",
+  "xml",
+  "yaml",
+  "markdown",
+  "text",
+  "jsx",
+  "tsx",
+];
+
 const AIResponsePreview = ({ content }: AIResponsePreviewProps) => {
   if (!content) {
     return null;
@@ -26,13 +56,24 @@ const AIResponsePreview = ({ content }: AIResponsePreviewProps) => {
     },
     code({ node, className, children, ...props }) {
       const match = /language-(\w+)/.exec(className || "");
-      const language = match ? match[1] : "";
-      const codeString = String(children).replace(/\n$/, "");
+      let language = match ? match[1] : "";
+      let codeString = String(children).replace(/\n$/, "");
 
-      // Only treat as code block if it has a language class (from ```)
-      // Inline code won't have className
-      if (match) {
-        return <CodeBlock code={codeString} language={language} />;
+      // If no language detected from className, check if first line is a language name
+      if (!language) {
+        const lines = codeString.split("\n");
+        const firstLine = lines[0]?.trim().toLowerCase();
+        if (firstLine && KNOWN_LANGUAGES.includes(firstLine)) {
+          language = firstLine;
+          codeString = lines.slice(1).join("\n"); // Remove first line from code
+        }
+      }
+
+      // Treat as code block if it has language OR contains newlines (multi-line)
+      const isCodeBlock = language || codeString.includes("\n");
+
+      if (isCodeBlock) {
+        return <CodeBlock code={codeString} language={language || "text"} />;
       }
 
       // Inline code
