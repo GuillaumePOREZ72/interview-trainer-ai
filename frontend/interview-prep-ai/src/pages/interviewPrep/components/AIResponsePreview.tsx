@@ -21,15 +21,21 @@ const AIResponsePreview = ({ content }: AIResponsePreviewProps) => {
   }
 
   const components: Components = {
+    pre({ children }) {
+      // Simply return children - the code component will handle the actual rendering
+      return <>{children}</>;
+    },
     code({ node, className, children, ...props }) {
       const match = /language-(\w+)/.exec(className || "");
       const language = match ? match[1] : "";
+      const codeString = String(children).replace(/\n$/, "");
 
-      return match ? (
-        <CodeBlock
-          code={String(children).replace(/\n$/, "")}
-          language={language}
-        />
+      // Check if this is a code block (has language) or inline code
+      // Also check if the code contains newlines (multi-line = block)
+      const isCodeBlock = match || codeString.includes("\n");
+
+      return isCodeBlock ? (
+        <CodeBlock code={codeString} language={language || "text"} />
       ) : (
         <code
           className="px-1.5 py-0.5 bg-bg-tertiary text-text-primary rounded text-sm font-mono"
