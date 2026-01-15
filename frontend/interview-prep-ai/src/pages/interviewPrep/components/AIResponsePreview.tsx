@@ -215,7 +215,7 @@ const CodeBlock = ({ code, language }: CodeBlockProps) => {
       </div>
 
       {/* Code */}
-      <div className="text-sm dark:bg-[#1e1e1e]">
+      <div className="text-sm bg-[#fafafa] dark:bg-[#1e1e1e]">
         <SyntaxHighlighter
           language={language || "text"}
           style={theme === "dark" ? vscDarkPlus : oneLight}
