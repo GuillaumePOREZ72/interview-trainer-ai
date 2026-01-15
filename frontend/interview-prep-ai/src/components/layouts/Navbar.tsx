@@ -18,7 +18,7 @@ const Navbar = () => {
           <div className="w-8 h-8 bg-linear-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
             <LuSparkles className="text-white text-lg" />
           </div>
-          <h2 className="text-lg md:text-xl font-bold text-text-primary leading-5">
+          <h2 className="text-lg md:text-xl font-bold text-black leading-5">
             Interview Trainer <span className="gradient-text-purple">AI</span>
           </h2>
         </Link>
