@@ -7,25 +7,36 @@ import { logger } from "../config/logger.js";
 export const normalizeCodeBlocks = (text: string): string => {
   let normalized = text;
 
-  // Step 1: Ensure opening ``` is preceded by newlines (not inline with text)
-  // Match text immediately before ``` that isn't a newline
-  normalized = normalized.replace(/([^\n])(```)/g, "$1\n\n$2");
-
-  // Step 2: Ensure closing ``` is followed by newlines (text after should be separate)
-  // Match ``` followed by text that isn't a newline
-  normalized = normalized.replace(/(```)\n?([^\n`])/g, "$1\n\n$2");
-
-  // Step 3: Handle cases where text is on the same line as closing ```
-  // e.g., "code\n```Some text" -> "code\n```\n\nSome text"
+  // Find all code blocks and ensure proper formatting
+  // This regex matches: ```language (optional), then content, then ```
   normalized = normalized.replace(
-    /(```\w*)\s*\n([\s\S]*?)(```)\s*([A-Za-zÀ-ÿ])/g,
-    "$1\n$2$3\n\n$4"
+    /```(\w*)\n?([\s\S]*?)```([^\n])?/g,
+    (match, lang, code, charAfter) => {
+      // Clean up the code content - remove trailing whitespace but keep structure
+      const cleanCode = code.replace(/\s+$/, "");
+
+      // Build properly formatted code block
+      let result = "```" + (lang || "") + "\n" + cleanCode + "\n```";
+
+      // If there's a character immediately after ```, add newlines before it
+      if (charAfter && charAfter.trim()) {
+        result += "\n\n" + charAfter;
+      }
+
+      return result;
+    }
   );
 
-  // Step 4: Clean up excessive newlines (more than 2)
+  // Ensure blank line before code blocks (if preceded by text)
+  normalized = normalized.replace(/([^\n])\n(```\w*\n)/g, "$1\n\n$2");
+
+  // Ensure blank line after code blocks (if followed by text)
+  normalized = normalized.replace(/(```)\n([^\n`])/g, "$1\n\n$2");
+
+  // Clean up excessive newlines (more than 2)
   normalized = normalized.replace(/\n{3,}/g, "\n\n");
 
-  // Step 5: Trim leading/trailing whitespace
+  // Trim leading/trailing whitespace
   normalized = normalized.trim();
 
   return normalized;
