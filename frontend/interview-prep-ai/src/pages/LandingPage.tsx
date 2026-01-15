@@ -72,7 +72,7 @@ const LandingPage = () => {
                 <ProfileInfoCard />
               ) : (
                 <button
-                  className="bg-linear-to-r from-primary to-secondary text-sm font-semibold text-white px-7 py-2.5 rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] border border-indigo-400/30 transition-all duration-200 cursor-pointer"
+                  className="bg-linear-to-r from-primary to-secondary text-xs md:text-sm font-semibold text-white px-5 py-2 md:px-7 md:py-2.5 rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] border border-indigo-400/30 transition-all duration-200 cursor-pointer whitespace-nowrap"
                   onClick={() => setOpenAuthModal(true)}
                 >
                   {t("nav.login")}
