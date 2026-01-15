@@ -104,6 +104,40 @@ export const createApp = (): Express => {
   app.use("/api/ai/generate-questions", protect, generateInterviewQuestions);
   app.use("/api/ai/generate-explanation", protect, generateConceptExplanation);
 
+  // Global error handler (MUST be after all routes)
+  app.use(
+    (
+      err: Error,
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      logger.error("❌ Unhandled error", {
+        error: err.message,
+        stack: err.stack,
+        url: req.url,
+        method: req.method,
+        body: req.body,
+        query: req.query,
+        params: req.params,
+      });
+
+      res.status(500).json({
+        message: "Internal server error",
+        error: NODE_ENV === "development" ? err.message : undefined,
+      });
+    }
+  );
+
+  // 404 handler (MUST be after all routes and error handler)
+  app.use((req: express.Request, res: express.Response) => {
+    logger.warn("⚠️  Route not found", {
+      url: req.url,
+      method: req.method,
+    });
+    res.status(404).json({ message: "Route not found" });
+  });
+
   return app;
 };
 
