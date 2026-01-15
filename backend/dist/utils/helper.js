@@ -3,18 +3,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.cleanAndParseJSON = exports.normalizeCodeBlocks = void 0;
 const logger_js_1 = require("../config/logger.js");
 /**
- * Normalize markdown code blocks to ensure they are on their own lines
- * This fixes cases where the AI puts code blocks inline with text
+ * Normalize markdown code blocks to ensure they are properly formatted
+ * Fixes cases where AI puts language on separate line or text after closing ```
  */
 const normalizeCodeBlocks = (text) => {
-    // Match complete code blocks: ```language\ncode\n``` and ensure proper spacing
-    // This regex captures: opening ```, optional language, code content, closing ```
-    let normalized = text.replace(/(```(\w*)\n[\s\S]*?```)/g, (match) => {
-        return "\n\n" + match + "\n\n";
-    });
-    // Clean up excessive newlines (more than 2)
+    let normalized = text;
+    // Step 1: Fix case where language is on a separate line after ```
+    // e.g., "```\ntypescript\ncode" -> "```typescript\ncode"
+    normalized = normalized.replace(/```\s*\n(javascript|typescript|python|java|csharp|cpp|c|go|rust|ruby|php|swift|kotlin|html|css|scss|sass|sql|bash|shell|json|xml|yaml|markdown|text|jsx|tsx)\s*\n/gi, (match, lang) => "```" + lang.toLowerCase() + "\n");
+    // Step 2: Fix case where text is directly after closing ``` without newline
+    // e.g., "```This allows" -> "```\n\nThis allows"
+    normalized = normalized.replace(/```([A-Z])/g, "```\n\n$1");
+    // Step 3: Fix case where text is on same line as closing ``` with space
+    // e.g., "``` This allows" -> "```\n\nThis allows"
+    normalized = normalized.replace(/```\s+([A-Za-z])/g, "```\n\n$1");
+    // Step 4: Ensure blank line before code blocks (if preceded by text)
+    normalized = normalized.replace(/([^\n])\n(```\w*\n)/g, "$1\n\n$2");
+    // Step 5: Ensure blank line after code blocks (if followed by text on next line)
+    normalized = normalized.replace(/(```)\n([^\n`])/g, "$1\n\n$2");
+    // Step 6: Clean up excessive newlines (more than 2)
     normalized = normalized.replace(/\n{3,}/g, "\n\n");
-    // Trim leading/trailing whitespace
+    // Step 7: Trim leading/trailing whitespace
     normalized = normalized.trim();
     return normalized;
 };

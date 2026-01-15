@@ -116,14 +116,38 @@ const createApp = () => {
             status: "healthy",
         });
     });
-    // Serve uploads folder
-    app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "uploads")));
+    // Serve uploads folder (use process.cwd() for consistency with uploadMiddleware)
+    app.use("/uploads", express_1.default.static(path_1.default.join(process.cwd(), "uploads")));
     // API Routes (keeping /api prefix for consistency with frontend)
     app.use("/api/auth", authRoutes_1.default);
     app.use("/api/sessions", sessionRoutes_1.default);
     app.use("/api/questions", questionRoutes_1.default);
     app.use("/api/ai/generate-questions", authMiddleware_1.protect, aiController_1.generateInterviewQuestions);
     app.use("/api/ai/generate-explanation", authMiddleware_1.protect, aiController_1.generateConceptExplanation);
+    // Global error handler (MUST be after all routes)
+    app.use((err, req, res, next) => {
+        logger_1.logger.error("❌ Unhandled error", {
+            error: err.message,
+            stack: err.stack,
+            url: req.url,
+            method: req.method,
+            body: req.body,
+            query: req.query,
+            params: req.params,
+        });
+        res.status(500).json({
+            message: "Internal server error",
+            error: NODE_ENV === "development" ? err.message : undefined,
+        });
+    });
+    // 404 handler (MUST be after all routes and error handler)
+    app.use((req, res) => {
+        logger_1.logger.warn("⚠️  Route not found", {
+            url: req.url,
+            method: req.method,
+        });
+        res.status(404).json({ message: "Route not found" });
+    });
     return app;
 };
 exports.createApp = createApp;

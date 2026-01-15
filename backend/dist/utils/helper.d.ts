@@ -1,6 +1,6 @@
 /**
- * Normalize markdown code blocks to ensure they are on their own lines
- * This fixes cases where the AI puts code blocks inline with text
+ * Normalize markdown code blocks to ensure they are properly formatted
+ * Fixes cases where AI puts language on separate line or text after closing ```
  */
 export declare const normalizeCodeBlocks: (text: string) => string;
 /**
