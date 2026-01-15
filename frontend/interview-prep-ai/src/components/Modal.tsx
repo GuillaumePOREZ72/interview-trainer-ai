@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { LuX} from "react-icons/lu";
+import { ReactNode, useEffect } from "react";
+import { LuX } from "react-icons/lu";
 
 interface ModalProps {
   children: ReactNode;
@@ -16,6 +16,18 @@ const Modal = ({
   title,
   hideHeader = false,
 }: ModalProps) => {
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
