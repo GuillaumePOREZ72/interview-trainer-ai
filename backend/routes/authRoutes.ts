@@ -1,4 +1,4 @@
-import express, { Router, Request, Response } from "express";
+import express, { Router, Request, Response, NextFunction } from "express";
 import {
   registerUser,
   loginUser,
@@ -18,7 +18,16 @@ router.get("/profile", protect, getUserProfile);
 
 router.post(
   "/upload-image",
-  upload.single("image"),
+  (req: Request, res: Response, next: NextFunction) => {
+    upload.single("image")(req, res, (err) => {
+      if (err) {
+        console.error("Multer error:", err);
+        res.status(500).json({ message: "Upload failed", error: err.message });
+        return;
+      }
+      next();
+    });
+  },
   (req: Request, res: Response) => {
     if (!req.file) {
       res.status(400).json({ message: "No file uploaded" });
