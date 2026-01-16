@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.cleanAndParseJSON = exports.normalizeCodeBlocks = void 0;
-const logger_js_1 = require("../config/logger.js");
+import { logger } from "../config/logger.js";
 /**
  * Normalize markdown code blocks to ensure they are properly formatted
  * Fixes cases where AI puts language on separate line or text after closing ```
  */
-const normalizeCodeBlocks = (text) => {
+export const normalizeCodeBlocks = (text) => {
     let normalized = text;
     // Step 1: Fix case where language is on a separate line after ```
     // e.g., "```\ntypescript\ncode" -> "```typescript\ncode"
@@ -27,13 +24,12 @@ const normalizeCodeBlocks = (text) => {
     normalized = normalized.trim();
     return normalized;
 };
-exports.normalizeCodeBlocks = normalizeCodeBlocks;
 /**
  * Recursively normalize code blocks in all string values of parsed JSON
  */
 const normalizeCodeBlocksInObject = (obj) => {
     if (typeof obj === "string") {
-        return (0, exports.normalizeCodeBlocks)(obj);
+        return normalizeCodeBlocks(obj);
     }
     if (Array.isArray(obj)) {
         return obj.map(normalizeCodeBlocksInObject);
@@ -51,7 +47,7 @@ const normalizeCodeBlocksInObject = (obj) => {
  * Robustly clean and parse JSON from AI response
  * Handles common issues: markdown blocks, unescaped quotes, control characters
  */
-const cleanAndParseJSON = (rawText) => {
+export const cleanAndParseJSON = (rawText) => {
     let cleaned = rawText;
     // Step 1: Extract JSON structure (find first [ or { to last ] or })
     const arrayStart = cleaned.indexOf("[");
@@ -72,7 +68,7 @@ const cleanAndParseJSON = (rawText) => {
     }
     catch {
         // Continue with sanitization
-        logger_js_1.logger.debug("Initial JSON parse failed, attempting sanitization...");
+        logger.debug("Initial JSON parse failed, attempting sanitization...");
     }
     // Step 3: Fix trailing commas before ] or }
     cleaned = cleaned.replace(/,(\s*[}\]])/g, "$1");
@@ -84,7 +80,7 @@ const cleanAndParseJSON = (rawText) => {
         return normalizeCodeBlocksInObject(parsed);
     }
     catch {
-        logger_js_1.logger.debug("Second JSON parse failed, attempting quote fix...");
+        logger.debug("Second JSON parse failed, attempting quote fix...");
     }
     // Step 6: Last resort - try to fix unescaped quotes in string values
     cleaned = fixUnescapedQuotesInValues(cleaned);
@@ -95,11 +91,10 @@ const cleanAndParseJSON = (rawText) => {
     }
     catch (finalError) {
         // Log the problematic content for debugging (first 500 chars)
-        logger_js_1.logger.error(`JSON parsing failed after all sanitization attempts. Content preview: ${cleaned.substring(0, 500)}...`);
+        logger.error(`JSON parsing failed after all sanitization attempts. Content preview: ${cleaned.substring(0, 500)}...`);
         throw new Error(`Failed to parse AI response as JSON: ${finalError instanceof Error ? finalError.message : "Unknown error"}`);
     }
 };
-exports.cleanAndParseJSON = cleanAndParseJSON;
 /**
  * Fix control characters (newlines, tabs) inside JSON string values
  */

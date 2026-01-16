@@ -2,10 +2,15 @@ import multer, { FileFilterCallback } from "multer";
 import { Request } from "express";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from "url";
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Use process.cwd() to get project root (works in both dev and production)
 // This ensures uploads go to /backend/uploads regardless of where the compiled code runs
-const uploadDir = path.join(process.cwd(), "uploads");
+const uploadDir = path.join(__dirname, "uploads");
 
 // Check and log upload directory status
 const checkUploadDirectory = () => {

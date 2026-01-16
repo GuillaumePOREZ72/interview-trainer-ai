@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.conceptExplainPrompt = exports.questionAnswerPrompt = void 0;
 const getLanguageInstruction = (language) => {
     return language.startsWith("fr")
         ? "IMPORTANT: You MUST write ALL content (questions, answers, explanations) in French."
@@ -45,7 +42,6 @@ const questionAnswerPrompt = (role, experience, topicsToFocus, numberOfQuestions
   ]
   Important: Do NOT add any extra text. Only return valid JSON.
   `;
-exports.questionAnswerPrompt = questionAnswerPrompt;
 const conceptExplainPrompt = (question, language = "en") => `
   You are an AI trained to generate explanations for a given interview question.
   ${getLanguageInstruction(language)}
@@ -82,4 +78,4 @@ const conceptExplainPrompt = (question, language = "en") => `
   }
   Important: Do NOT add any extra text outside the JSON format. Only return valid JSON.
   `;
-exports.conceptExplainPrompt = conceptExplainPrompt;
+export { questionAnswerPrompt, conceptExplainPrompt };

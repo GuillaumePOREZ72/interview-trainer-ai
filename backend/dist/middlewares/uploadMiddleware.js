@@ -1,35 +1,33 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const multer_1 = __importDefault(require("multer"));
-const path_1 = __importDefault(require("path"));
-const fs_1 = __importDefault(require("fs"));
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 // Use process.cwd() to get project root (works in both dev and production)
 // This ensures uploads go to /backend/uploads regardless of where the compiled code runs
-const uploadDir = path_1.default.join(process.cwd(), "uploads");
+const uploadDir = path.join(__dirname, "uploads");
 // Check and log upload directory status
 const checkUploadDirectory = () => {
     console.log("📁 Upload directory:", uploadDir);
     console.log("📍 Process working directory:", process.cwd());
-    if (!fs_1.default.existsSync(uploadDir)) {
+    if (!fs.existsSync(uploadDir)) {
         console.log("🔧 Creating uploads directory:", uploadDir);
-        fs_1.default.mkdirSync(uploadDir, { recursive: true });
+        fs.mkdirSync(uploadDir, { recursive: true });
     }
     // Check write permissions
     try {
-        fs_1.default.accessSync(uploadDir, fs_1.default.constants.W_OK);
+        fs.accessSync(uploadDir, fs.constants.W_OK);
         console.log("✅ Upload directory is writable");
     }
     catch (err) {
         console.error("❌ Upload directory is NOT writable:", err);
-        console.error("   Directory permissions:", fs_1.default.statSync(uploadDir).mode.toString(8));
+        console.error("   Directory permissions:", fs.statSync(uploadDir).mode.toString(8));
     }
 };
 checkUploadDirectory();
 // Configure storage
-const storage = multer_1.default.diskStorage({
+const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         console.log("📦 Multer destination callback triggered", {
             filename: file.originalname,
@@ -38,10 +36,10 @@ const storage = multer_1.default.diskStorage({
             uploadDir,
         });
         // Double-check directory exists at runtime
-        if (!fs_1.default.existsSync(uploadDir)) {
+        if (!fs.existsSync(uploadDir)) {
             console.log("🔧 Creating uploads directory at runtime:", uploadDir);
             try {
-                fs_1.default.mkdirSync(uploadDir, { recursive: true });
+                fs.mkdirSync(uploadDir, { recursive: true });
                 console.log("✅ Upload directory created successfully");
             }
             catch (err) {
@@ -52,15 +50,15 @@ const storage = multer_1.default.diskStorage({
         }
         // Verify write permissions again at runtime
         try {
-            fs_1.default.accessSync(uploadDir, fs_1.default.constants.W_OK);
+            fs.accessSync(uploadDir, fs.constants.W_OK);
             console.log("✅ Upload directory is writable");
             cb(null, uploadDir);
         }
         catch (err) {
             console.error("❌ Upload directory is NOT writable:", err);
-            console.error("   Directory exists:", fs_1.default.existsSync(uploadDir));
-            if (fs_1.default.existsSync(uploadDir)) {
-                const stats = fs_1.default.statSync(uploadDir);
+            console.error("   Directory exists:", fs.existsSync(uploadDir));
+            if (fs.existsSync(uploadDir)) {
+                const stats = fs.statSync(uploadDir);
                 console.error("   Directory stats:", {
                     isDirectory: stats.isDirectory(),
                     mode: stats.mode.toString(8),
@@ -102,11 +100,11 @@ const fileFilter = (req, file, cb) => {
         cb(new Error("Only .jpeg, .jpg and .png formats are allowed"));
     }
 };
-const upload = (0, multer_1.default)({
+const upload = multer({
     storage,
     fileFilter,
     limits: {
         fileSize: 5 * 1024 * 1024, // 5MB max
     },
 });
-exports.default = upload;
+export default upload;

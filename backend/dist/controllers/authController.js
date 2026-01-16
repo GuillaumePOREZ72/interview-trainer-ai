@@ -1,22 +1,16 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.refreshAccessToken = exports.getUserProfile = exports.loginUser = exports.registerUser = void 0;
-const User_js_1 = __importDefault(require("../models/User.js"));
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const logger_js_1 = require("../config/logger.js");
+import User from "../models/User.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { logger } from "../config/logger.js";
 // Generate JWT Access Token (short-lived)
 const generateToken = (userId) => {
-    return jsonwebtoken_1.default.sign({ id: userId }, process.env.JWT_SECRET, {
+    return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
         expiresIn: "10m",
     });
 };
 // Generate Refresh Token (long-lived)
 const generateRefreshToken = (userId) => {
-    return jsonwebtoken_1.default.sign({ id: userId }, process.env.REFRESH_TOKEN_SECRET, {
+    return jwt.sign({ id: userId }, process.env.REFRESH_TOKEN_SECRET, {
         expiresIn: "7d",
     });
 };
@@ -24,15 +18,15 @@ const generateRefreshToken = (userId) => {
 const registerUser = async (req, res) => {
     try {
         const { name, email, password, profileImageUrl } = req.body;
-        const userExists = await User_js_1.default.findOne({ email });
+        const userExists = await User.findOne({ email });
         if (userExists) {
-            logger_js_1.logger.warn(`Registration attempt with existing email: ${email}`);
+            logger.warn(`Registration attempt with existing email: ${email}`);
             res.status(400).json({ message: "User already exists" });
             return;
         }
-        const salt = await bcryptjs_1.default.genSalt(10);
-        const hashedPassword = await bcryptjs_1.default.hash(password, salt);
-        const user = await User_js_1.default.create({
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+        const user = await User.create({
             name,
             email,
             password: hashedPassword,
@@ -40,7 +34,7 @@ const registerUser = async (req, res) => {
         });
         const accessToken = generateToken(user._id.toString());
         const refreshToken = generateRefreshToken(user._id.toString());
-        logger_js_1.logger.info(`✅ New user registered: ${email}`);
+        logger.info(`✅ New user registered: ${email}`);
         res.status(201).json({
             user: {
                 _id: user._id,
@@ -54,33 +48,32 @@ const registerUser = async (req, res) => {
     }
     catch (error) {
         const errorMessage = error instanceof Error ? error.message : "Server error";
-        logger_js_1.logger.error(`Registration error: ${errorMessage}`);
+        logger.error(`Registration error: ${errorMessage}`);
         res.status(500).json({
             message: "Server error",
             error: errorMessage,
         });
     }
 };
-exports.registerUser = registerUser;
 // Login user
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await User_js_1.default.findOne({ email });
+        const user = await User.findOne({ email });
         if (!user) {
-            logger_js_1.logger.warn(`Login attempt with invalid email: ${email}`);
+            logger.warn(`Login attempt with invalid email: ${email}`);
             res.status(401).json({ message: "Invalid email or password" });
             return;
         }
-        const isMatch = await bcryptjs_1.default.compare(password, user.password);
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            logger_js_1.logger.warn(`Login attempt with incorrect password for email: ${email}`);
+            logger.warn(`Login attempt with incorrect password for email: ${email}`);
             res.status(401).json({ message: "Invalid email or password" });
             return;
         }
         const accessToken = generateToken(user._id.toString());
         const refreshToken = generateRefreshToken(user._id.toString());
-        logger_js_1.logger.info(`✅ User logged in: ${email}`);
+        logger.info(`✅ User logged in: ${email}`);
         res.json({
             user: {
                 _id: user._id,
@@ -94,14 +87,13 @@ const loginUser = async (req, res) => {
     }
     catch (error) {
         const errorMessage = error instanceof Error ? error.message : "Server error";
-        logger_js_1.logger.error(`Login error: ${errorMessage}`);
+        logger.error(`Login error: ${errorMessage}`);
         res.status(500).json({
             message: "Server error",
             error: errorMessage,
         });
     }
 };
-exports.loginUser = loginUser;
 // Refresh access token using refresh token
 const refreshAccessToken = async (req, res) => {
     try {
@@ -111,32 +103,31 @@ const refreshAccessToken = async (req, res) => {
             return;
         }
         // Verify the refresh token
-        const decoded = jsonwebtoken_1.default.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
         // Check if user still exists
-        const user = await User_js_1.default.findById(decoded.id);
+        const user = await User.findById(decoded.id);
         if (!user) {
-            logger_js_1.logger.warn(`Refresh token attempt for non-existent user: ${decoded.id}`);
+            logger.warn(`Refresh token attempt for non-existent user: ${decoded.id}`);
             res.status(401).json({ message: "User not found" });
             return;
         }
         // Generate new access token
         const newAccessToken = generateToken(user._id.toString());
-        logger_js_1.logger.info(`🔄 Access token refreshed for user: ${user.email}`);
+        logger.info(`🔄 Access token refreshed for user: ${user.email}`);
         res.json({
             token: newAccessToken,
         });
     }
     catch (error) {
         const errorMessage = error instanceof Error ? error.message : "Invalid refresh token";
-        logger_js_1.logger.error(`Refresh token error: ${errorMessage}`);
+        logger.error(`Refresh token error: ${errorMessage}`);
         res.status(401).json({ message: "Invalid or expired refresh token" });
     }
 };
-exports.refreshAccessToken = refreshAccessToken;
 // Get user profile
 const getUserProfile = async (req, res) => {
     try {
-        const user = await User_js_1.default.findById(req.user?._id).select("-password");
+        const user = await User.findById(req.user?._id).select("-password");
         if (!user) {
             res.status(404).json({ message: "User not found" });
             return;
@@ -151,4 +142,4 @@ const getUserProfile = async (req, res) => {
         });
     }
 };
-exports.getUserProfile = getUserProfile;
+export { registerUser, loginUser, getUserProfile, refreshAccessToken };

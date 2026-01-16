@@ -1,61 +1,22 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createApp = void 0;
 /**
  * Express App Configuration
  * Separated from server.ts to allow testing with supertest
  */
-const dotenv = __importStar(require("dotenv"));
+import * as dotenv from "dotenv";
 dotenv.config();
-const express_1 = __importDefault(require("express"));
-const cors_1 = __importDefault(require("cors"));
-const path_1 = __importDefault(require("path"));
-const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const compression_1 = __importDefault(require("compression"));
-const helmet_1 = __importDefault(require("helmet"));
-const logger_1 = require("./config/logger");
-const rateLimiter_1 = __importDefault(require("./config/rateLimiter"));
-const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
-const sessionRoutes_1 = __importDefault(require("./routes/sessionRoutes"));
-const questionRoutes_1 = __importDefault(require("./routes/questionRoutes"));
-const authMiddleware_1 = require("./middlewares/authMiddleware");
-const aiController_1 = require("./controllers/aiController");
+import express from "express";
+import cors from "cors";
+import path from "path";
+import cookieParser from "cookie-parser";
+import compression from "compression";
+import helmet from "helmet";
+import { logger } from "./config/logger";
+import limiter from "./config/rateLimiter";
+import authRoutes from "./routes/authRoutes";
+import sessionRoutes from "./routes/sessionRoutes";
+import questionRoutes from "./routes/questionRoutes";
+import { protect } from "./middlewares/authMiddleware";
+import { generateConceptExplanation, generateInterviewQuestions, } from "./controllers/aiController";
 /**
  * Constants
  */
@@ -63,8 +24,8 @@ const NODE_ENV = process.env.NODE_ENV || "development";
 /**
  * Create and configure Express app
  */
-const createApp = () => {
-    const app = (0, express_1.default)();
+export const createApp = () => {
+    const app = express();
     // Trust proxy for rate limiting in production (o2switch/reverse proxies)
     if (NODE_ENV === "production") {
         app.set("trust proxy", 1);
@@ -82,7 +43,7 @@ const createApp = () => {
                 }
                 else {
                     callback(new Error(`CORS error: ${origin} is not allowed by CORS`));
-                    logger_1.logger.warn(`CORS error: ${origin} is not allowed by CORS`);
+                    logger.warn(`CORS error: ${origin} is not allowed by CORS`);
                 }
             }
         },
@@ -90,23 +51,23 @@ const createApp = () => {
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
     };
-    app.use((0, cors_1.default)(corsOptions));
+    app.use(cors(corsOptions));
     // Middlewares
-    app.use(express_1.default.json());
-    app.use(express_1.default.urlencoded({ extended: true }));
-    app.use((0, cookie_parser_1.default)());
+    app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
+    app.use(cookieParser());
     // Compression for responses larger than 1KB
-    app.use((0, compression_1.default)({
+    app.use(compression({
         threshold: 1024,
     }));
     // Security headers with relaxed CSP for development/test
-    app.use((0, helmet_1.default)({
+    app.use(helmet({
         crossOriginResourcePolicy: { policy: "cross-origin" },
         contentSecurityPolicy: NODE_ENV === "production" ? undefined : false,
     }));
     // Apply rate limiting middleware (skip in test environment)
     if (NODE_ENV !== "test") {
-        app.use(rateLimiter_1.default);
+        app.use(limiter);
     }
     // Health check endpoint
     app.get("/", (req, res) => {
@@ -117,16 +78,16 @@ const createApp = () => {
         });
     });
     // Serve uploads folder (use process.cwd() for consistency with uploadMiddleware)
-    app.use("/uploads", express_1.default.static(path_1.default.join(process.cwd(), "uploads")));
+    app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
     // API Routes (keeping /api prefix for consistency with frontend)
-    app.use("/api/auth", authRoutes_1.default);
-    app.use("/api/sessions", sessionRoutes_1.default);
-    app.use("/api/questions", questionRoutes_1.default);
-    app.use("/api/ai/generate-questions", authMiddleware_1.protect, aiController_1.generateInterviewQuestions);
-    app.use("/api/ai/generate-explanation", authMiddleware_1.protect, aiController_1.generateConceptExplanation);
+    app.use("/api/auth", authRoutes);
+    app.use("/api/sessions", sessionRoutes);
+    app.use("/api/questions", questionRoutes);
+    app.use("/api/ai/generate-questions", protect, generateInterviewQuestions);
+    app.use("/api/ai/generate-explanation", protect, generateConceptExplanation);
     // Global error handler (MUST be after all routes)
     app.use((err, req, res, next) => {
-        logger_1.logger.error("❌ Unhandled error", {
+        logger.error("❌ Unhandled error", {
             error: err.message,
             stack: err.stack,
             url: req.url,
@@ -142,7 +103,7 @@ const createApp = () => {
     });
     // 404 handler (MUST be after all routes and error handler)
     app.use((req, res) => {
-        logger_1.logger.warn("⚠️  Route not found", {
+        logger.warn("⚠️  Route not found", {
             url: req.url,
             method: req.method,
         });
@@ -150,7 +111,6 @@ const createApp = () => {
     });
     return app;
 };
-exports.createApp = createApp;
 // Export a default instance for backward compatibility
-const app = (0, exports.createApp)();
-exports.default = app;
+const app = createApp();
+export default app;

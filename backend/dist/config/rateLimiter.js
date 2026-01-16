@@ -1,7 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_rate_limit_1 = require("express-rate-limit");
-const limiter = (0, express_rate_limit_1.rateLimit)({
+import { rateLimit } from "express-rate-limit";
+const limiter = rateLimit({
     windowMs: 60000, // 1 minute
     limit: 60, // 60 requests per minute
     standardHeaders: "draft-8",
@@ -14,4 +12,4 @@ const limiter = (0, express_rate_limit_1.rateLimit)({
         return req.path === "/";
     },
 });
-exports.default = limiter;
+export default limiter;

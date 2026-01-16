@@ -1,8 +1,12 @@
 import winston from "winston";
 import path from "path";
+import { fileURLToPath } from "url";
 
 const { combine, timestamp, json, errors, align, printf, colorize } =
   winston.format;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Get environment variables
 const NODE_ENV = process.env.NODE_ENV || "development";
@@ -21,7 +25,7 @@ if (NODE_ENV === "production") {
   );
 
   // Add file transports for production
-  const logsDir = path.join(__dirname, "..", "logs");
+  const logsDir = path.join(__dirname, "logs");
 
   transports.push(
     new winston.transports.File({
