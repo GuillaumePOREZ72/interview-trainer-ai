@@ -113,7 +113,7 @@ pre {
 
   /* Gradient text utilities */
   .gradient-text-primary {
-    @apply text-transparent bg-clip-text bg-linear-to-r from-indigo-800 via-purple-800 to-violet-800 dark:from-indigo-400 dark:via-purple-400 dark:to-violet-400;
+    @apply text-transparent bg-clip-text bg-linear-to-r from-indigo-900 via-purple-900 to-violet-900 dark:from-indigo-400 dark:via-purple-400 dark:to-violet-400;
   }
 
   .gradient-text-purple {
