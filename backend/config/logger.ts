@@ -1,11 +1,10 @@
 import winston from "winston";
 import path from "path";
-import { fileURLToPath } from "url";
 
 const { combine, timestamp, json, errors, align, printf, colorize } =
   winston.format;
 
-const __filename = fileURLToPath(import.meta.url);
+// __filename and __dirname are available natively in CommonJS
 const __dirname = path.dirname(__filename);
 
 // Get environment variables

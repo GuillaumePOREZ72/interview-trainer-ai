@@ -11,6 +11,9 @@ import { logger } from "./config/logger";
 import fs from "fs";
 import path from "path";
 
+// __dirname is available natively in CommonJS
+declare const __dirname: string;
+
 /**
  * Validate critical environment variables
  */
