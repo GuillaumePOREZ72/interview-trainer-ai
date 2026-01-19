@@ -29,8 +29,20 @@ router.post(
       },
     });
 
-    upload.single("image")(req, res, (err) => {
+    (upload as any).single("image")(req, res, (err: any) => {
       if (err) {
+        if ((err as any).code === "LIMIT_UNEXPECTED_FILE") {
+          logger.error("❌ Multer upload error: Unexpected field name", {
+            error: err.message,
+            code: (err as any).code,
+            stack: err.stack,
+            field: (err as any).field,
+            storageErrors: (err as any).storageErrors,
+          });
+          return res.status(400).json({
+            message: "Unexpected field name. Expected 'image'",
+          });
+        }
         logger.error("❌ Multer upload error", {
           error: err.message,
           code: (err as any).code,
@@ -38,35 +50,21 @@ router.post(
           field: (err as any).field,
           storageErrors: (err as any).storageErrors,
         });
-
-        if ((err as any).code === "LIMIT_FILE_SIZE") {
-          res
-            .status(413)
-            .json({ message: "File too large. Maximum size is 5MB" });
-          return;
-        }
-        if ((err as any).code === "LIMIT_UNEXPECTED_FILE") {
-          res
-            .status(400)
-            .json({
-              message: "Unexpected field name. Expected 'image'",
-            });
-          return;
-        }
-
-        res
+        return res
           .status(500)
           .json({ message: "Upload failed", error: err.message });
-        return;
       }
+
       logger.info("✅ Multer upload successful", {
-        file: req.file ? {
-          filename: req.file.filename,
-          originalname: req.file.originalname,
-          size: req.file.size,
-          mimetype: req.file.mimetype,
-          path: req.file.path,
-        } : "No file",
+        file: req.file
+          ? {
+              filename: req.file.filename,
+              originalname: req.file.originalname,
+              size: req.file.size,
+              mimetype: req.file.mimetype,
+              path: req.file.path,
+            }
+          : "No file",
       });
       next();
     });
@@ -74,21 +72,18 @@ router.post(
   (req: Request, res: Response) => {
     if (!req.file) {
       logger.warn("⚠️  No file in request after multer processing");
-      res.status(400).json({ message: "No file uploaded" });
-      return;
+      return res.status(400).json({ message: "No file uploaded" });
     }
 
-    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${
-      req.file.filename
-    }`;
+    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
 
     logger.info("🎉 Image upload completed", {
       imageUrl,
       filename: req.file.filename,
     });
 
-    res.status(200).json({ imageUrl });
-  }
+      res.status(200).json({ imageUrl });
+  },
 );
 
 export default router;

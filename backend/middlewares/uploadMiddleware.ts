@@ -6,37 +6,15 @@ import fs from "fs";
 // __dirname is available natively in CommonJS
 const __dirname = path.dirname(__filename);
 
-// Use path to get the uploads directory in the backend root
+// Use path to get the uploads directory in backend root
 const uploadDir = path.join(__dirname, "..", "uploads");
-
-// Check and log upload directory status
-const checkUploadDirectory = () => {
-  console.log("📁 Upload directory:", uploadDir);
-  console.log("📍 Process working directory:", process.cwd());
-
-  if (!fs.existsSync(uploadDir)) {
-    console.log("🔧 Creating uploads directory:", uploadDir);
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
-
-  // Check write permissions
-  try {
-    fs.accessSync(uploadDir, fs.constants.W_OK);
-    console.log("✅ Upload directory is writable");
-  } catch (err) {
-    console.error("❌ Upload directory is NOT writable:", err);
-    console.error("   Directory permissions:", fs.statSync(uploadDir).mode.toString(8));
-  }
-};
-
-checkUploadDirectory();
 
 // Configure storage
 const storage = multer.diskStorage({
   destination: (
     req: Request,
-    file: Express.Multer.File | Express.Multer.UploadedFile,
-    cb: (error: Error | null, destination: string) => void,
+    file: Express.Multer.File,
+    cb: (error: Error | null, destination: string) => void
   ) => {
     console.log("📦 Multer destination callback triggered", {
       filename: file.originalname,
@@ -75,18 +53,13 @@ const storage = multer.diskStorage({
           gid: stats.gid,
         });
       }
-      cb(
-        new Error(
-          `Cannot write to upload directory: ${(err as Error).message}`,
-        ),
-        "",
-      );
+      cb(new Error(`Cannot write to upload directory: ${(err as Error).message}`), "");
     }
   },
   filename: (
     req: Request,
-    file: Express.Multer.File | Express.Multer.UploadedFile,
-    cb: (error: Error | null, filename: string) => void,
+    file: Express.Multer.File,
+    cb: (error: Error | null, filename: string) => void
   ) => {
     // Sanitize filename to avoid issues
     const sanitizedName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, "_");
@@ -97,7 +70,6 @@ const storage = multer.diskStorage({
       sanitizedName,
       newFilename,
     });
-
     cb(null, newFilename);
   },
 });
@@ -105,8 +77,8 @@ const storage = multer.diskStorage({
 // File filter
 const fileFilter = (
   req: Request,
-  file: Express.Multer.File | Express.Multer.UploadedFile,
-  cb: FileFilterCallback,
+  file: Express.Multer.File,
+  cb: FileFilterCallback
 ) => {
   const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
 
@@ -115,7 +87,7 @@ const fileFilter = (
     mimetype: file.mimetype,
     size: file.size,
     fieldname: file.fieldname,
-    allowedTypes,
+    allowedTypes: [ 'image/jpeg', 'image/png', 'image/jpg' ]
   });
 
   if (allowedTypes.includes(file.mimetype)) {
@@ -135,4 +107,5 @@ const upload = multer({
   },
 });
 
-export default upload;
+// Export single file upload middleware
+export default upload.single("image");
