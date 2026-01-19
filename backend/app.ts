@@ -11,6 +11,7 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import compression from "compression";
 import helmet from "helmet";
+import "./types/express.d";
 
 import { logger } from "./config/logger";
 import limiter from "./config/rateLimiter";

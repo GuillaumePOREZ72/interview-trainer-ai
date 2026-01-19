@@ -35,8 +35,8 @@ checkUploadDirectory();
 const storage = multer.diskStorage({
   destination: (
     req: Request,
-    file: Express.Multer.File,
-    cb: (error: Error | null, destination: string) => void
+    file: Express.Multer.File | Express.Multer.UploadedFile,
+    cb: (error: Error | null, destination: string) => void,
   ) => {
     console.log("📦 Multer destination callback triggered", {
       filename: file.originalname,
@@ -75,13 +75,18 @@ const storage = multer.diskStorage({
           gid: stats.gid,
         });
       }
-      cb(new Error(`Cannot write to upload directory: ${(err as Error).message}`), "");
+      cb(
+        new Error(
+          `Cannot write to upload directory: ${(err as Error).message}`,
+        ),
+        "",
+      );
     }
   },
   filename: (
     req: Request,
-    file: Express.Multer.File,
-    cb: (error: Error | null, filename: string) => void
+    file: Express.Multer.File | Express.Multer.UploadedFile,
+    cb: (error: Error | null, filename: string) => void,
   ) => {
     // Sanitize filename to avoid issues
     const sanitizedName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, "_");
@@ -100,8 +105,8 @@ const storage = multer.diskStorage({
 // File filter
 const fileFilter = (
   req: Request,
-  file: Express.Multer.File,
-  cb: FileFilterCallback
+  file: Express.Multer.File | Express.Multer.UploadedFile,
+  cb: FileFilterCallback,
 ) => {
   const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
 
