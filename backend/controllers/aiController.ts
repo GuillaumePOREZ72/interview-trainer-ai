@@ -21,7 +21,7 @@ interface GenerateExplanationRequest extends Request {
 // Generate interview questions and answers using Groq
 const generateInterviewQuestions = async (
   req: GenerateQuestionsRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const { role, experience, topicsToFocus, numberOfQuestions } = req.body;
@@ -35,7 +35,7 @@ const generateInterviewQuestions = async (
     const language = req.headers["accept-language"]?.split(",")[0] || "en";
 
     logger.info(
-      `🤖 Generating ${numberOfQuestions} questions - Role: ${role} - Experience: ${experience} - Language: ${language} - User: ${req.user?._id}`
+      `🤖 Generating ${numberOfQuestions} questions - Role: ${role} - Experience: ${experience} - Language: ${language} - User: ${req.user?._id}`,
     );
 
     const prompt = questionAnswerPrompt(
@@ -43,7 +43,7 @@ const generateInterviewQuestions = async (
       experience,
       topicsToFocus,
       numberOfQuestions,
-      language
+      language,
     );
 
     const response = await fetch(
@@ -55,7 +55,7 @@ const generateInterviewQuestions = async (
           Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
         },
         body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
+          model: "qwen/qwen3-32b",
           messages: [
             {
               role: "user",
@@ -64,7 +64,7 @@ const generateInterviewQuestions = async (
           ],
           temperature: 0.7,
         }),
-      }
+      },
     );
 
     const data = (await response.json()) as {
@@ -81,7 +81,7 @@ const generateInterviewQuestions = async (
     const parsedData = cleanAndParseJSON(data.choices[0].message.content);
 
     logger.info(
-      `✅ Questions generated successfully - User: ${req.user?._id} - Count: ${numberOfQuestions}`
+      `✅ Questions generated successfully - User: ${req.user?._id} - Count: ${numberOfQuestions}`,
     );
 
     res.status(200).json(parsedData);
@@ -89,7 +89,7 @@ const generateInterviewQuestions = async (
     const errorMessage =
       error instanceof Error ? error.message : "Failed to generate questions";
     logger.error(
-      `AI generation error: ${errorMessage} - User: ${req.user?._id}`
+      `AI generation error: ${errorMessage} - User: ${req.user?._id}`,
     );
     res
       .status(500)
@@ -100,7 +100,7 @@ const generateInterviewQuestions = async (
 // Generate explanations for an interview question
 const generateConceptExplanation = async (
   req: GenerateExplanationRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const { question } = req.body;
@@ -116,8 +116,8 @@ const generateConceptExplanation = async (
     logger.info(
       `🤖 Generating explanation - Question: "${question.substring(
         0,
-        50
-      )}..." - Language: ${language} - User: ${req.user?._id}`
+        50,
+      )}..." - Language: ${language} - User: ${req.user?._id}`,
     );
 
     const prompt = conceptExplainPrompt(question, language);
@@ -131,7 +131,7 @@ const generateConceptExplanation = async (
           Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
         },
         body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
+          model: "qwen/qwen3-32b",
           messages: [
             {
               role: "user",
@@ -140,7 +140,7 @@ const generateConceptExplanation = async (
           ],
           temperature: 0.7,
         }),
-      }
+      },
     );
 
     const data = (await response.json()) as {
@@ -151,7 +151,7 @@ const generateConceptExplanation = async (
     if (!response.ok) {
       const errorMsg = data.error?.message || "Groq API error";
       logger.error(
-        `Groq API error (explanation): ${errorMsg} - User: ${req.user?._id}`
+        `Groq API error (explanation): ${errorMsg} - User: ${req.user?._id}`,
       );
       throw new Error(errorMsg);
     }
@@ -159,7 +159,7 @@ const generateConceptExplanation = async (
     const parsedData = cleanAndParseJSON(data.choices[0].message.content);
 
     logger.info(
-      `✅ Explanation generated successfully - User: ${req.user?._id}`
+      `✅ Explanation generated successfully - User: ${req.user?._id}`,
     );
 
     res.status(200).json(parsedData);
@@ -167,7 +167,7 @@ const generateConceptExplanation = async (
     const errorMessage =
       error instanceof Error ? error.message : "Failed to generate explanation";
     logger.error(
-      `AI explanation error: ${errorMessage} - User: ${req.user?._id}`
+      `AI explanation error: ${errorMessage} - User: ${req.user?._id}`,
     );
     res
       .status(500)

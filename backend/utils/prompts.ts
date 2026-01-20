@@ -9,17 +9,17 @@ const questionAnswerPrompt = (
   experience: string,
   topicsToFocus: string,
   numberOfQuestions: number,
-  language: string = "en"
+  language: string = "en",
 ): string => `
-  You are an AI trained to generate technical interview questions and answers.
+  You are an expert technical interviewer and senior software architect.
   ${getLanguageInstruction(language)}
 
   Task:
   - Role: ${role}
   - Candidate Experience: ${experience} years
   - Focus Topics: ${topicsToFocus}
-  - Write ${numberOfQuestions} interviews questions
-  - For each question, generate a detailed but beginner-friendly answer.
+  - Generate ${numberOfQuestions} high-quality interview questions.
+  - For each question, provide a professional answer including code snippets where relevant, focusing on best practices, performance, and real-world scenarios.
 
   CRITICAL MARKDOWN FORMATTING RULES FOR CODE:
   1. Code blocks MUST have a blank line BEFORE the opening \`\`\`
@@ -40,27 +40,29 @@ const questionAnswerPrompt = (
 
   This text is correct here.
 
-  - Return a pure JSON array like:
+  - Return EXCLUSIVELY a pure JSON array. No preamble, no post-text, and NO markdown code blocks around the JSON.
+  
+  Format:
   [
     {
       "question": "Question here?",
       "answer": "Answer here with proper markdown formatting."
     }
   ]
-  Important: Do NOT add any extra text. Only return valid JSON.
   `;
 
 const conceptExplainPrompt = (
   question: string,
-  language: string = "en"
+  language: string = "en",
 ): string => `
-  You are an AI trained to generate explanations for a given interview question.
+  You are a senior software engineering mentor and architect.
   ${getLanguageInstruction(language)}
   
   Task:
-  - Explain the following interview question and its concept in depth as if you're teaching a beginner developer.
+  - Explain the following interview question and its underlying concept in depth.
   - Question: "${question}"
-  - After the explanation, provide a short and clear title that summarizes the concept for the article or page header.
+  - Your explanation should cover: core principles, real-world application, common pitfalls, and optimization tips.
+  - Provide a concise and professional title that summarizes the concept.
 
   CRITICAL MARKDOWN FORMATTING RULES FOR CODE:
   1. Code blocks MUST have a blank line BEFORE the opening \`\`\`
@@ -81,13 +83,13 @@ const conceptExplainPrompt = (
 
   This text is correct.
 
-  - Return the result as a valid JSON object in the following format:
+  - Return EXCLUSIVELY a valid JSON object. No preamble, no post-text, and NO markdown code blocks around the JSON.
 
+  Format:
   {
     "title": "Short title here",
     "explanation": "Explanation here with proper markdown formatting."
   }
-  Important: Do NOT add any extra text outside the JSON format. Only return valid JSON.
   `;
 
 export { questionAnswerPrompt, conceptExplainPrompt };
