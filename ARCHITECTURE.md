@@ -1,4 +1,4 @@
-# 🏛️ InterviewPrep AI - Architectural Masterplan
+# 🏛️ Interview Trainer AI - Architectural Masterplan
 
 > **Status:** Active Development
 > **Version:** 1.3.0
@@ -6,7 +6,7 @@
 
 ## 1. 🔭 Vision & Core Philosophy
 
-**InterviewPrep AI** is a high-performance, AI-driven platform designed to simulate technical interviews with extreme latency optimization. The architecture prioritizes **speed** (via Groq LPU), **modularity** (Service-Controller pattern), and **UX fluidity** (React 19 + Framer Motion).
+**Interview Trainer AI** is a high-performance, AI-driven platform designed to simulate technical interviews with extreme latency optimization. The architecture prioritizes **speed** (via Groq LPU), **modularity** (Service-Controller pattern), and **UX fluidity** (React 19 + Framer Motion).
 
 ---
 
@@ -474,3 +474,69 @@ CLIENT_URL=http://localhost:5173
 2. **Run Tests Before Commit:** Ensure all 105+ tests pass
 3. **Follow Patterns:** Use existing controller/route patterns
 4. **Document Changes:** Update ARCHITECTURE.md for significant changes
+
+---
+
+## 11. 🚢 Deployment & Operations (O2Switch / VPS)
+
+### **11.1 Deployment Checklist**
+
+**Pre-Deployment:**
+
+1.  **Architecture:** Ensure backend/frontend APIs match (`/api` prefix).
+2.  **Validation:** Run `node scripts/pre-deploy-check.js` in `backend/`.
+3.  **Secrets:** Generate strong keys via `node scripts/generate-secrets.js`.
+
+**Environment Variables (.env):**
+
+```env
+# Server
+PORT=8000
+NODE_ENV=production
+MONGO_URI=mongodb+srv://... (Atlas) OR mongodb://... (Local)
+GROQ_API_KEY=gsk_...
+
+# Auth & CORS
+JWT_SECRET=... (min 32 chars)
+REFRESH_TOKEN_SECRET=... (min 32 chars)
+WHITELIST_ORIGINS=https://gpdev.org,https://backend.gpdev.org
+
+# Cloudinary (Images)
+CLOUDINARY_CLOUD_NAME=...
+CLOUDINARY_API_KEY=...
+CLOUDINARY_API_SECRET=...
+```
+
+### **11.2 Troubleshooting Guide**
+
+**Use Case 1: CORS Errors**
+
+- **Symptom:** Frontend blocked from accessing Backend.
+- **Fix:** Edit `WHITELIST_ORIGINS` in `.env` (comma-separated, no spaces).
+- **Action:** Reload PM2: `pm2 restart interview-trainer-ai`.
+
+**Use Case 2: Viewing Logs**
+
+- **Path:** `backend/logs/app-YYYY-MM-DD.log`
+- **Commands (SSH/Terminal):**
+
+  ```bash
+  # Real-time monitoring
+  tail -f backend/logs/app-$(date +%Y-%m-%d).log
+
+  # Filter for errors
+  grep -i "error\|❌" backend/logs/app-*.log
+  ```
+
+**Use Case 3: Node Process Management**
+
+- **Start:** `pm2 start dist/server.js --name interview-trainer-ai`
+- **Restart:** `pm2 restart interview-trainer-ai`
+- **Monitor:** `pm2 monit`
+
+---
+
+## 12. 📜 Legacy & References
+
+- **Original Path (O2Switch):** `/home2/kuwa6817/interview-trainer-ai/`
+- **Deployment Docs:** Merged from `O2SWITCH_QUICKSTART.md`, `FIX_CORS_O2SWITCH.md`, `PRODUCTION_READY.md`.

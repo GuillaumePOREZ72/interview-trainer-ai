@@ -1,111 +1,21 @@
-import multer, { FileFilterCallback } from "multer";
-import { Request } from "express";
-import path from "path";
-import fs from "fs";
+import multer from "multer";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "../config/cloudinary";
 
-// __dirname is available natively in CommonJS
-const __dirname = path.dirname(__filename);
-
-// Use path to get the uploads directory in backend root
-const uploadDir = path.join(__dirname, "..", "uploads");
-
-// Configure storage
-const storage = multer.diskStorage({
-  destination: (
-    req: Request,
-    file: Express.Multer.File,
-    cb: (error: Error | null, destination: string) => void
-  ) => {
-    console.log("📦 Multer destination callback triggered", {
-      filename: file.originalname,
-      mimetype: file.mimetype,
-      size: file.size,
-      uploadDir,
-    });
-
-    // Double-check directory exists at runtime
-    if (!fs.existsSync(uploadDir)) {
-      console.log("🔧 Creating uploads directory at runtime:", uploadDir);
-      try {
-        fs.mkdirSync(uploadDir, { recursive: true });
-        console.log("✅ Upload directory created successfully");
-      } catch (err) {
-        console.error("❌ Failed to create upload directory:", err);
-        cb(err as Error, "");
-        return;
-      }
-    }
-
-    // Verify write permissions again at runtime
-    try {
-      fs.accessSync(uploadDir, fs.constants.W_OK);
-      console.log("✅ Upload directory is writable");
-      cb(null, uploadDir);
-    } catch (err) {
-      console.error("❌ Upload directory is NOT writable:", err);
-      console.error("   Directory exists:", fs.existsSync(uploadDir));
-      if (fs.existsSync(uploadDir)) {
-        const stats = fs.statSync(uploadDir);
-        console.error("   Directory stats:", {
-          isDirectory: stats.isDirectory(),
-          mode: stats.mode.toString(8),
-          uid: stats.uid,
-          gid: stats.gid,
-        });
-      }
-      cb(new Error(`Cannot write to upload directory: ${(err as Error).message}`), "");
-    }
-  },
-  filename: (
-    req: Request,
-    file: Express.Multer.File,
-    cb: (error: Error | null, filename: string) => void
-  ) => {
-    // Sanitize filename to avoid issues
-    const sanitizedName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const newFilename = `${Date.now()}-${sanitizedName}`;
-
-    console.log("📝 Multer filename callback", {
-      originalname: file.originalname,
-      sanitizedName,
-      newFilename,
-    });
-    cb(null, newFilename);
-  },
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "interview-trainer-ai",
+    allowed_formats: ["jpg", "png", "jpeg"],
+    transformation: [{ width: 500, height: 500, crop: "limit" }],
+  } as any,
 });
 
-// File filter
-const fileFilter = (
-  req: Request,
-  file: Express.Multer.File,
-  cb: FileFilterCallback
-) => {
-  const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
-
-  console.log("🔍 Multer fileFilter callback", {
-    filename: file.originalname,
-    mimetype: file.mimetype,
-    size: file.size,
-    fieldname: file.fieldname,
-    allowedTypes: [ 'image/jpeg', 'image/png', 'image/jpg' ]
-  });
-
-  if (allowedTypes.includes(file.mimetype)) {
-    console.log("✅ File type accepted:", file.mimetype);
-    cb(null, true);
-  } else {
-    console.log("❌ File type rejected:", file.mimetype);
-    cb(new Error("Only .jpeg, .jpg and .png formats are allowed"));
-  }
-};
-
 const upload = multer({
-  storage,
-  fileFilter,
+  storage: storage,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB max
   },
 });
 
-// Export single file upload middleware
 export default upload.single("image");

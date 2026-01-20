@@ -4,9 +4,6 @@ import path from "path";
 const { combine, timestamp, json, errors, align, printf, colorize } =
   winston.format;
 
-// __filename and __dirname are available natively in CommonJS
-const __dirname = path.dirname(__filename);
-
 // Get environment variables
 const NODE_ENV = process.env.NODE_ENV || "development";
 const LOG_LEVEL = process.env.LOG_LEVEL || "info";
@@ -20,11 +17,12 @@ if (NODE_ENV === "production") {
   transports.push(
     new winston.transports.Console({
       format: combine(timestamp(), json()),
-    })
+    }),
   );
 
   // Add file transports for production
-  const logsDir = path.join(__dirname, "logs");
+  // Use process.cwd() to get the backend root directory
+  const logsDir = path.join(process.cwd(), "logs");
 
   transports.push(
     new winston.transports.File({
@@ -32,7 +30,7 @@ if (NODE_ENV === "production") {
       level: "error",
       maxsize: 5242880, // 5MB
       maxFiles: 5,
-    })
+    }),
   );
 
   transports.push(
@@ -40,7 +38,7 @@ if (NODE_ENV === "production") {
       filename: path.join(logsDir, "combined.log"),
       maxsize: 5242880, // 5MB
       maxFiles: 5,
-    })
+    }),
   );
 } else {
   // Development: colorized, human-readable format
@@ -56,9 +54,9 @@ if (NODE_ENV === "production") {
             : "";
 
           return `${timestamp} [${level}]: ${message}${metaStr}`;
-        })
+        }),
       ),
-    })
+    }),
   );
 }
 

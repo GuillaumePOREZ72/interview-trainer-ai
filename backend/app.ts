@@ -69,7 +69,7 @@ export const createApp = (): Express => {
   app.use(
     compression({
       threshold: 1024,
-    })
+    }),
   );
 
   // Security headers with relaxed CSP for development/test
@@ -77,7 +77,7 @@ export const createApp = (): Express => {
     helmet({
       crossOriginResourcePolicy: { policy: "cross-origin" },
       contentSecurityPolicy: NODE_ENV === "production" ? undefined : false,
-    })
+    }),
   );
 
   // Apply rate limiting middleware (skip in test environment)
@@ -94,8 +94,6 @@ export const createApp = (): Express => {
     });
   });
 
-  // Serve uploads folder (use process.cwd() for consistency with uploadMiddleware)
-  app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
   // API Routes (keeping /api prefix for consistency with frontend)
   app.use("/api/auth", authRoutes);
@@ -104,13 +102,13 @@ export const createApp = (): Express => {
   app.use("/api/ai/generate-questions", protect, generateInterviewQuestions);
   app.use("/api/ai/generate-explanation", protect, generateConceptExplanation);
 
-  // Global error handler (MUST be after all routes)
+  // Global error handler
   app.use(
     (
       err: Error,
       req: express.Request,
       res: express.Response,
-      next: express.NextFunction
+      next: express.NextFunction,
     ) => {
       logger.error("❌ Unhandled error", {
         error: err.message,
@@ -126,7 +124,7 @@ export const createApp = (): Express => {
         message: "Internal server error",
         error: NODE_ENV === "development" ? err.message : undefined,
       });
-    }
+    },
   );
 
   // 404 handler (MUST be after all routes and error handler)
