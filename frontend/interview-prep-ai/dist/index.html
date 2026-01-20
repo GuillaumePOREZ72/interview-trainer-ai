@@ -1,26 +1,28 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/interview-trainer-ai/interview.png" />
+    <link rel="icon" type="image/png" href="/interview-trainer-ai/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Interview trainer AI</title>
+    <title>Interview Trainer AI</title>
     <script>
-      (function() {
-        const storageKey = 'theme-preference';
-        const darkClass = 'dark';
+      (function () {
+        const storageKey = "theme-preference";
+        const darkClass = "dark";
         const preference = localStorage.getItem(storageKey);
-        const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        if (preference === 'dark' || (!preference && systemPreference)) {
+        const systemPreference = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+
+        if (preference === "dark" || (!preference && systemPreference)) {
           document.documentElement.classList.add(darkClass);
         } else {
           document.documentElement.classList.remove(darkClass);
         }
       })();
     </script>
-    <script type="module" crossorigin src="/interview-trainer-ai/assets/index-CJpJN6Yr.js"></script>
-    <link rel="stylesheet" crossorigin href="/interview-trainer-ai/assets/index-CMqGA13p.css">
+    <script type="module" crossorigin src="/interview-trainer-ai/assets/index-CyGFZ68I.js"></script>
+    <link rel="stylesheet" crossorigin href="/interview-trainer-ai/assets/index-DDBL5b7M.css">
   </head>
   <body>
     <div id="root"></div>

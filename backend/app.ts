@@ -94,13 +94,29 @@ export const createApp = (): Express => {
     });
   });
 
-
   // API Routes (keeping /api prefix for consistency with frontend)
   app.use("/api/auth", authRoutes);
   app.use("/api/sessions", sessionRoutes);
   app.use("/api/questions", questionRoutes);
   app.use("/api/ai/generate-questions", protect, generateInterviewQuestions);
   app.use("/api/ai/generate-explanation", protect, generateConceptExplanation);
+
+  // Serve static files from React frontend in production
+  if (NODE_ENV === "production") {
+    const frontendDistPath = path.join(
+      __dirname,
+      "../../frontend/interview-prep-ai/dist",
+    );
+    app.use(express.static(frontendDistPath));
+
+    // Support React Router client-side routing
+    app.get("*", (req, res, next) => {
+      if (req.originalUrl.startsWith("/api")) {
+        return next();
+      }
+      res.sendFile(path.join(frontendDistPath, "index.html"));
+    });
+  }
 
   // Global error handler
   app.use(
