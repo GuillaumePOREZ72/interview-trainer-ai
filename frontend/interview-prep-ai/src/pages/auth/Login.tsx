@@ -11,7 +11,7 @@ import { AuthResponse } from "../../types";
 import { LuSparkles } from "react-icons/lu";
 
 interface LoginProps {
-  setCurrentPage: (page: "login" | "signup") => void;
+  setCurrentPage: (page: "login" | "signup" | "forgotPassword") => void;
 }
 
 const Login = ({ setCurrentPage }: LoginProps) => {
@@ -45,7 +45,7 @@ const Login = ({ setCurrentPage }: LoginProps) => {
         {
           email,
           password,
-        }
+        },
       );
 
       const { token } = response.data;
@@ -95,6 +95,16 @@ const Login = ({ setCurrentPage }: LoginProps) => {
           placeholder={t("auth.login.passwordPlaceholder")}
           type="password"
         />
+
+        <div className="flex justify-end mt-1">
+          <button
+            type="button"
+            className="text-xs text-slate-500 hover:text-primary transition-colors cursor-pointer"
+            onClick={() => setCurrentPage("forgotPassword")}
+          >
+            {t("auth.login.forgotPassword")}
+          </button>
+        </div>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">

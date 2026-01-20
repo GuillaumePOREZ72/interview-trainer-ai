@@ -8,13 +8,14 @@ import { LuSparkles } from "react-icons/lu";
 import Login from "./auth/Login";
 import Signup from "./auth/Signup";
 import Modal from "../components/Modal";
+import ForgotPassword from "./auth/ForgotPassword";
 import { useUser } from "../hooks/useUser";
 import ProfileInfoCard from "../components/cards/ProfileInfoCard";
 import { useTheme } from "../hooks/useTheme";
 import { LuSun, LuMoon } from "react-icons/lu";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 
-type AuthPage = "login" | "signup";
+type AuthPage = "login" | "signup" | "forgotPassword";
 
 const LandingPage = () => {
   const { t } = useTranslation();
@@ -201,6 +202,9 @@ const LandingPage = () => {
           {currentPage === "login" && <Login setCurrentPage={setCurrentPage} />}
           {currentPage === "signup" && (
             <Signup setCurrentPage={setCurrentPage} />
+          )}
+          {currentPage === "forgotPassword" && (
+            <ForgotPassword setCurrentPage={setCurrentPage} />
           )}
         </div>
       </Modal>

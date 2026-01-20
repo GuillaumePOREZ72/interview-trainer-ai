@@ -9,6 +9,7 @@ import { Toaster } from "react-hot-toast";
 import LandingPage from "./pages/LandingPage";
 import InterviewPrep from "./pages/interviewPrep/components/InterviewPrep";
 import Dashboard from "./pages/home/Dashboard";
+import ResetPassword from "./pages/auth/ResetPassword";
 import UserProvider from "./context/useContext";
 import { useUser } from "./hooks/useUser";
 import { ReactNode } from "react";
@@ -39,6 +40,10 @@ const App = () => {
         <Router>
           <Routes>
             <Route path="/" element={<LandingPage />} />
+            <Route
+              path="/reset-password/:resetToken"
+              element={<ResetPassword />}
+            />
 
             <Route
               path="/dashboard"

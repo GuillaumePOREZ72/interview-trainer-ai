@@ -56,7 +56,8 @@
       "passwordPlaceholder": "Enter your password (min 8 characters)",
       "submit": "Sign In",
       "noAccount": "Don't have an account?",
-      "signupLink": "Signup for free"
+      "signupLink": "Signup for free",
+      "forgotPassword": "Forgot Password?"
     },
     "signup": {
       "title": "Create Account",
@@ -74,13 +75,35 @@
     },
     "modal": {
       "title": "Welcome to Interview Trainer AI"
+    },
+    "forgotPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter your email to receive a reset link",
+      "email": "Email Address",
+      "emailPlaceholder": "johndoe@example.com",
+      "submit": "Send Reset Link",
+      "successMessage": "Reset link sent! Check your email.",
+      "backToLogin": "Back to Login"
+    },
+    "resetPassword": {
+      "title": "New Password",
+      "subtitle": "Create a new secure password",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Min 8 characters",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Re-enter password",
+      "submit": "Reset Password",
+      "successMessage": "Password reset successfully!",
+      "invalidToken": "Invalid or expired token"
     }
   },
   "validation": {
     "invalidEmail": "Please enter a valid email address.",
     "passwordRequired": "Please enter the password",
     "fullNameRequired": "Please enter full name",
-    "requiredFields": "Please fill all the required fields"
+    "requiredFields": "Please fill all the required fields",
+    "passwordMismatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 8 characters"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",

@@ -35,7 +35,7 @@ const ProfileInfoCard = () => {
         {/* User Info */}
         <div className="hidden md:block">
           {" "}
-          <div className="text-sm text-slate-900 font-semibold leading-tight">
+          <div className="text-sm text-slate-900 dark:text-text-tertiary font-medium leading-tight">
             {user.name}
           </div>
           <button

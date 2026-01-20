@@ -56,7 +56,8 @@
       "passwordPlaceholder": "Entrez votre mot de passe (min 8 caractères)",
       "submit": "Se connecter",
       "noAccount": "Vous n'avez pas de compte ?",
-      "signupLink": "Inscrivez-vous gratuitement"
+      "signupLink": "Inscrivez-vous gratuitement",
+      "forgotPassword": "Mot de passe oublié ?"
     },
     "signup": {
       "title": "Créer un compte",
@@ -74,13 +75,35 @@
     },
     "modal": {
       "title": "Bienvenue sur Interview Trainer AI"
+    },
+    "forgotPassword": {
+      "title": "Réinitialiser le mot de passe",
+      "subtitle": "Entrez votre email pour recevoir un lien",
+      "email": "Adresse Email",
+      "emailPlaceholder": "johndoe@exemple.com",
+      "submit": "Envoyer le lien",
+      "successMessage": "Lien envoyé ! Vérifiez vos emails.",
+      "backToLogin": "Retour à la connexion"
+    },
+    "resetPassword": {
+      "title": "Nouveau mot de passe",
+      "subtitle": "Créez un nouveau mot de passe sécurisé",
+      "newPassword": "Nouveau mot de passe",
+      "newPasswordPlaceholder": "Min 8 caractères",
+      "confirmPassword": "Confirmer le mot de passe",
+      "confirmPasswordPlaceholder": "Ressaisir le mot de passe",
+      "submit": "Réinitialiser",
+      "successMessage": "Mot de passe réinitialisé avec succès !",
+      "invalidToken": "Jeton invalide ou expiré"
     }
   },
   "validation": {
     "invalidEmail": "Veuillez entrer une adresse e-mail valide.",
     "passwordRequired": "Veuillez entrer le mot de passe",
     "fullNameRequired": "Veuillez entrer votre nom complet",
-    "requiredFields": "Veuillez remplir tous les champs obligatoires"
+    "requiredFields": "Veuillez remplir tous les champs obligatoires",
+    "passwordMismatch": "Les mots de passe ne correspondent pas",
+    "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères"
   },
   "errors": {
     "generic": "Une erreur s'est produite. Veuillez réessayer.",
