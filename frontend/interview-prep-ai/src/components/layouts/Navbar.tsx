@@ -23,16 +23,16 @@ const Navbar = () => {
               className="w-full h-full object-cover"
             />
           </div>
-          <h2 className="text-xl font-bold text-text-primary tracking-tight">
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight">
             Interview Trainer <span className="text-secondary">AI</span>
           </h2>
         </Link>
 
         <div className="flex items-center gap-4">
-          <LanguageSwitcher />
+          <LanguageSwitcher className="!text-slate-900" />
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-full hover:bg-bg-secondary text-text-primary hover:text-primary dark:text-text-tertiary transition-all cursor-pointer"
+            className="p-2 rounded-full hover:bg-bg-secondary text-slate-900 hover:text-primary transition-all cursor-pointer"
             aria-label="Toggle theme"
           >
             {theme === "dark" ? (
@@ -41,7 +41,7 @@ const Navbar = () => {
               <LuMoon className="text-xl" />
             )}
           </button>
-          <ProfileInfoCard />
+          <ProfileInfoCard className="!text-slate-900" />
         </div>
       </div>
     </div>

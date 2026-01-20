@@ -49,7 +49,7 @@ const LanguageSwitcher = ({ className = "" }: LanguageSwitcherProps) => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 p-2 rounded-full hover:bg-bg-secondary text-text-primary hover:text-primary dark:text-text-tertiary transition-all cursor-pointer ${className}`}
+        className={`flex items-center gap-2 p-2 rounded-full hover:bg-bg-secondary text-text-primary hover:text-primary transition-all cursor-pointer ${className}`}
         aria-label={t("language.select")}
         aria-expanded={isOpen}
         aria-haspopup="listbox"

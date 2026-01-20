@@ -56,7 +56,7 @@ const LandingPage = () => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h2 className="text-xl font-bold text-text-primary dark:text-text-primary tracking-tight leading-5">
+              <h2 className="text-xl font-bold text-text-primary tracking-tight leading-5">
                 Interview Trainer <span className="text-secondary">AI</span>
               </h2>
             </div>
@@ -64,7 +64,7 @@ const LandingPage = () => {
               <LanguageSwitcher />
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-full hover:bg-bg-secondary text-text-primary hover:text-primary dark:text-text-tertiary dark:hover:text-primary transition-all cursor-pointer"
+                className="p-2 rounded-full hover:bg-bg-secondary text-text-primary hover:text-primary transition-all cursor-pointer"
                 aria-label={t("nav.toggleTheme")}
               >
                 {theme === "dark" ? (

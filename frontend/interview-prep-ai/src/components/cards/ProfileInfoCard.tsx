@@ -4,7 +4,7 @@ import { useUser } from "../../hooks/useUser";
 import { getInitials } from "../../utils/helper";
 import { LuLogOut } from "react-icons/lu";
 
-const ProfileInfoCard = () => {
+const ProfileInfoCard = ({ className = "" }: { className?: string }) => {
   const { t } = useTranslation();
   const { user, clearUser } = useUser();
   const navigate = useNavigate();
@@ -35,7 +35,9 @@ const ProfileInfoCard = () => {
         {/* User Info */}
         <div className="hidden md:block">
           {" "}
-          <div className="text-sm text-slate-900 dark:text-text-tertiary font-medium leading-tight">
+          <div
+            className={`text-sm font-medium leading-tight text-text-primary ${className}`}
+          >
             {user.name}
           </div>
           <button
