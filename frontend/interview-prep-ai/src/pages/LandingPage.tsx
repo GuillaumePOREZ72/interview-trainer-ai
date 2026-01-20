@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import HERO_IMG from "../assets/hero-img.png";
+import LOGO from "../assets/logo.png";
 import { APP_FEATURES } from "../utils/data";
 import { useNavigate } from "react-router-dom";
 import { LuSparkles } from "react-icons/lu";
@@ -46,24 +47,27 @@ const LandingPage = () => {
         <div className="container mx-auto px-4 md:px-8 pt-6 pb-[200px] relative z-10">
           {/* Header */}
           <header className="flex justify-between items-center mb-16">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-linear-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
-                <LuSparkles className="text-white text-lg" />
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/20 overflow-hidden">
+                <img
+                  src={LOGO}
+                  alt="Interview Trainer AI Logo"
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <h2 className="text-lg md:text-xl font-bold text-text-primary leading-5">
-                Interview Trainer{" "}
-                <span className="gradient-text-purple">AI</span>
+              <h2 className="text-xl font-bold text-text-primary dark:text-text-primary tracking-tight leading-5">
+                Interview Trainer <span className="text-secondary">AI</span>
               </h2>
             </div>
             <div className="flex items-center gap-4">
-              <LanguageSwitcher className="text-text-secondary" />
+              <LanguageSwitcher />
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-full hover:bg-bg-secondary text-text-secondary hover:text-primary transition-all cursor-pointer"
+                className="p-2 rounded-full hover:bg-bg-secondary text-text-primary hover:text-primary dark:text-text-tertiary dark:hover:text-primary transition-all cursor-pointer"
                 aria-label={t("nav.toggleTheme")}
               >
                 {theme === "dark" ? (
-                  <LuSun className="text-xl text-text-tertiary" />
+                  <LuSun className="text-xl" />
                 ) : (
                   <LuMoon className="text-xl" />
                 )}

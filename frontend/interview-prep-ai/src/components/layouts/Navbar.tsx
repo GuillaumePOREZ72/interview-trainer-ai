@@ -1,6 +1,7 @@
 import ProfileInfoCard from "../cards/ProfileInfoCard";
+import LOGO from "../../assets/logo.png";
 import { Link } from "react-router-dom";
-import { LuSparkles, LuSun, LuMoon } from "react-icons/lu";
+import { LuSun, LuMoon } from "react-icons/lu";
 import { useTheme } from "../../hooks/useTheme";
 import LanguageSwitcher from "../LanguageSwitcher";
 
@@ -14,12 +15,16 @@ const Navbar = () => {
   return (
     <div className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200/50 py-2.5 px-4 md:px-8 sticky top-0 z-50 shadow-sm transition-colors duration-300">
       <div className="container mx-auto flex items-center justify-between gap-5">
-        <Link to="/dashboard" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 bg-linear-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
-            <LuSparkles className="text-white text-lg" />
+        <Link to="/dashboard" className="flex items-center gap-3 group">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/20 transition-transform group-hover:scale-105 overflow-hidden">
+            <img
+              src={LOGO}
+              alt="Interview Trainer AI Logo"
+              className="w-full h-full object-cover"
+            />
           </div>
-          <h2 className="text-lg md:text-xl font-bold text-black leading-5">
-            Interview Trainer <span className="gradient-text-purple">AI</span>
+          <h2 className="text-xl font-bold text-text-primary tracking-tight">
+            Interview Trainer <span className="text-secondary">AI</span>
           </h2>
         </Link>
 
@@ -27,7 +32,7 @@ const Navbar = () => {
           <LanguageSwitcher />
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-full hover:bg-bg-secondary text-text-secondary hover:text-primary dark:text-text-tertiary transition-all cursor-pointer"
+            className="p-2 rounded-full hover:bg-bg-secondary text-text-primary hover:text-primary dark:text-text-tertiary transition-all cursor-pointer"
             aria-label="Toggle theme"
           >
             {theme === "dark" ? (
