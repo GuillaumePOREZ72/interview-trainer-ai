@@ -4,6 +4,8 @@ import {
   loginUser,
   getUserProfile,
   refreshAccessToken,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/authController";
 import { protect } from "../middlewares/authMiddleware";
 import upload from "../middlewares/uploadMiddleware";
@@ -15,6 +17,8 @@ const router: Router = express.Router();
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/refresh-token", refreshAccessToken);
+router.post("/forgotpassword", forgotPassword);
+router.put("/resetpassword/:resetToken", resetPassword);
 router.get("/profile", protect, getUserProfile);
 
 router.post(

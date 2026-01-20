@@ -5,6 +5,8 @@ export interface IUser extends Document {
   email: string;
   password: string;
   profileImageUrl?: string | null;
+  resetPasswordToken?: string;
+  resetPasswordExpire?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -15,8 +17,10 @@ const userSchema = new Schema<IUser>(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     profileImageUrl: { type: String, default: null },
+    resetPasswordToken: { type: String },
+    resetPasswordExpire: { type: Date },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model<IUser>("User", userSchema);

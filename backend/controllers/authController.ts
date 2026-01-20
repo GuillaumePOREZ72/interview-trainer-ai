@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import { logger } from "../config/logger.js";
+import crypto from "crypto";
+import sendEmail from "../utils/sendEmail.js";
 
 // Generate JWT Access Token (short-lived)
 const generateToken = (userId: string): string => {
@@ -114,7 +116,7 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
 // Refresh access token using refresh token
 const refreshAccessToken = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const { refreshToken } = req.body;
@@ -127,7 +129,7 @@ const refreshAccessToken = async (
     // Verify the refresh token
     const decoded = jwt.verify(
       refreshToken,
-      process.env.REFRESH_TOKEN_SECRET!
+      process.env.REFRESH_TOKEN_SECRET!,
     ) as {
       id: string;
     };
@@ -175,4 +177,116 @@ const getUserProfile = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export { registerUser, loginUser, getUserProfile, refreshAccessToken };
+// Forgot Password
+const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    // Get reset token
+    const resetToken = crypto.randomBytes(20).toString("hex");
+
+    // Hash token and set to resetPasswordToken field
+    user.resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    // Set expire (10 minutes)
+    user.resetPasswordExpire = new Date(Date.now() + 10 * 60 * 1000);
+
+    await user.save();
+
+    const resetUrl = `${
+      process.env.CLIENT_URL || "http://localhost:5173"
+    }/reset-password/${resetToken}`;
+
+    const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: "Password Reset Token",
+        message,
+      });
+
+      res.status(200).json({ success: true, data: "Email sent" });
+    } catch (err) {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpire = undefined;
+
+      await user.save();
+      logger.error("Email send error", err);
+      res.status(500).json({ message: "Email could not be sent" });
+    }
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Server error";
+    res.status(500).json({ message: "Server error", error: errorMessage });
+  }
+};
+
+// Reset Password
+const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { password } = req.body;
+    const { resetToken } = req.params;
+
+    if (!resetToken) {
+      res.status(400).json({ message: "Invalid token" });
+      return;
+    }
+
+    // Get hashed token
+    const resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      res.status(400).json({ message: "Invalid token" });
+      return;
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    // Optional: Auto login logic could act here, but let's return success
+    const accessToken = generateToken(user._id.toString());
+
+    res.status(200).json({
+      success: true,
+      data: "Password updated successfully",
+      token: accessToken,
+    });
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Server error";
+    res.status(500).json({ message: "Server error", error: errorMessage });
+  }
+};
+
+export {
+  registerUser,
+  loginUser,
+  getUserProfile,
+  refreshAccessToken,
+  forgotPassword,
+  resetPassword,
+};
