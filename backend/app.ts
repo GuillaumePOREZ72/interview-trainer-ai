@@ -109,8 +109,8 @@ export const createApp = (): Express => {
     );
     app.use(express.static(frontendDistPath));
 
-    // Support React Router client-side routing
-    app.get("*", (req, res, next) => {
+    // Support React Router client-side routing (Express 5 catch-all syntax)
+    app.get("(.*)", (req, res, next) => {
       if (req.originalUrl.startsWith("/api")) {
         return next();
       }

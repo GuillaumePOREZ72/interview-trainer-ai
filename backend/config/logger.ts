@@ -1,5 +1,6 @@
 import winston from "winston";
 import path from "path";
+import fs from "fs";
 
 const { combine, timestamp, json, errors, align, printf, colorize } =
   winston.format;
@@ -25,13 +26,12 @@ if (NODE_ENV === "production") {
   const logsDir = path.join(process.cwd(), "logs");
 
   try {
-    const fs = require("fs");
     if (!fs.existsSync(logsDir)) {
-      console.log(`📁 Creating logs directory: ${logsDir}`);
+      console.log(`[DEBUG] Creating logs directory: ${logsDir}`);
       fs.mkdirSync(logsDir, { recursive: true });
     }
   } catch (e) {
-    console.error("⚠️ Failed to create logs directory:", e);
+    console.error("[DEBUG] Failed to create logs directory:", e);
   }
 
   transports.push(

@@ -37,20 +37,19 @@ const validateEnvVariables = () => {
  * Create necessary directories for production
  */
 const createRequiredDirectories = () => {
-  // If we are running from dist/server.js, __dirname is backend/dist
-  // We want logs and uploads at the backend/ root level
-  const rootPath = __dirname.endsWith("dist")
-    ? path.join(__dirname, "..")
-    : __dirname;
+  // Use process.cwd() to get the backend/ folder root
+  const rootPath = process.cwd();
 
   const dirs = [path.join(rootPath, "logs"), path.join(rootPath, "uploads")];
 
   dirs.forEach((dir) => {
     if (!fs.existsSync(dir)) {
       try {
+        console.log(`[DEBUG] Attempting to create directory: ${dir}`);
         fs.mkdirSync(dir, { recursive: true });
         logger.info(`📁 Created directory: ${dir}`);
       } catch (err) {
+        console.error(`[DEBUG] Failed to create directory ${dir}:`, err);
         logger.error(`❌ Failed to create directory ${dir}:`, err);
       }
     }
