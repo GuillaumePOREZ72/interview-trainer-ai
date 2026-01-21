@@ -69,9 +69,7 @@ router.post(
   (req: Request, res: Response) => {
     const imageUrl = req.file?.path;
     logger.info("📤 Sending upload response", { imageUrl });
-
-    res.setHeader("Content-Type", "application/json");
-    return res.status(200).send(JSON.stringify({ imageUrl }));
+    return res.status(200).json({ imageUrl });
   },
 );
 

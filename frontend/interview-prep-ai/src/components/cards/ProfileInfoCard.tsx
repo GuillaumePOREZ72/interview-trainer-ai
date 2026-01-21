@@ -7,6 +7,7 @@ import { LuLogOut } from "react-icons/lu";
 const ProfileInfoCard = ({ className = "" }: { className?: string }) => {
   const { t } = useTranslation();
   const { user, clearUser } = useUser();
+  console.log("👤 ProfileInfoCard User:", user);
   const navigate = useNavigate();
 
   const handleLogout = () => {

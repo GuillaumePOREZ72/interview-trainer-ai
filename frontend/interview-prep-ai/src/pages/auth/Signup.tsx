@@ -56,10 +56,13 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
       setIsLoading(true);
 
       if (profilePic) {
+        console.log("📸 Starting image upload...", profilePic.name);
         const imgUploadRes = await uploadImage(profilePic);
+        console.log("✅ Image upload result:", imgUploadRes);
         profileImageUrl = imgUploadRes.imageUrl || "";
       }
 
+      console.log("📝 Registering with profileImageUrl:", profileImageUrl);
       const response = await axiosInstance.post<AuthResponse>(
         API_PATHS.AUTH.REGISTER,
         {
@@ -67,7 +70,7 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
           email,
           password,
           profileImageUrl,
-        }
+        },
       );
 
       const { token } = response.data;
