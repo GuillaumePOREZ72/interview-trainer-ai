@@ -159,7 +159,18 @@ export const createApp = (): Express => {
     }
 
     logger.info(`📁 Serving frontend from: ${frontendDistPath}`);
-    app.use(express.static(frontendDistPath));
+
+    // IMPORTANT: Skip static serving for API routes to prevent HTML fallback
+    app.use((req, res, next) => {
+      if (req.originalUrl.startsWith("/api")) {
+        logger.info(
+          `🔀 API route detected, skipping static: ${req.method} ${req.originalUrl}`,
+        );
+        return next();
+      }
+      // For non-API routes, use static serving
+      express.static(frontendDistPath)(req, res, next);
+    });
 
     app.get("*", (req, res, next) => {
       if (req.originalUrl.startsWith("/api")) return next();
