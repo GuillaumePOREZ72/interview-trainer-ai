@@ -1,10 +1,10 @@
-import User, { IUser } from "../models/User.js";
+import User, { IUser } from "../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
-import { logger } from "../config/logger.js";
+import { logger } from "../config/logger";
 import crypto from "crypto";
-import sendEmail from "../utils/sendEmail.js";
+import sendEmail from "../utils/sendEmail";
 
 // Generate JWT Access Token (short-lived)
 const generateToken = (userId: string): string => {
@@ -58,7 +58,7 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        profileImageUrl: user.profileImageUrl,
+        profileImageUrl: user.profileImageUrl || null,
       },
       token: accessToken,
       refreshToken,
@@ -103,7 +103,7 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        profileImageUrl: user.profileImageUrl,
+        profileImageUrl: user.profileImageUrl || null,
       },
       token: accessToken,
       refreshToken,
