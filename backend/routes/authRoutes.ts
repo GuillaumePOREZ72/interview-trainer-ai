@@ -24,70 +24,54 @@ router.get("/profile", protect, getUserProfile);
 router.post(
   "/upload-image",
   (req: Request, res: Response, next: NextFunction) => {
-    logger.info("📤 Upload request received", {
-      method: req.method,
-      url: req.url,
-      headers: {
-        "content-type": req.headers["content-type"],
-        "content-length": req.headers["content-length"],
-      },
-    });
+    logger.info("📤 Upload request received at /api/auth/upload-image");
 
-    upload(req, res, (err: any) => {
-      if (err) {
-        if ((err as any).code === "LIMIT_UNEXPECTED_FILE") {
-          logger.error("❌ Multer upload error: Unexpected field name", {
-            error: err.message,
-            code: (err as any).code,
+    try {
+      upload(req, res, (err: any) => {
+        if (err) {
+          logger.error("❌ Multer/Cloudinary upload error", {
+            message: err.message,
+            code: err.code,
+            name: err.name,
             stack: err.stack,
-            field: (err as any).field,
-            storageErrors: (err as any).storageErrors,
           });
-          return res.status(400).json({
-            message: "Unexpected field name. Expected 'image'",
+
+          return res.status(500).json({
+            message: "Upload failed at storage level",
+            error: err.message,
+            code: err.code,
           });
         }
-        logger.error("❌ Multer upload error", {
-          error: err.message,
-          code: (err as any).code,
-          stack: err.stack,
-          field: (err as any).field,
-          storageErrors: (err as any).storageErrors,
-        });
-        return res
-          .status(500)
-          .json({ message: "Upload failed", error: err.message });
-      }
 
-      logger.info("✅ Multer upload successful", {
-        file: req.file
-          ? {
-              filename: req.file.filename,
-              originalname: req.file.originalname,
-              size: req.file.size,
-              mimetype: req.file.mimetype,
-              path: req.file.path,
-            }
-          : "No file",
+        if (!req.file) {
+          logger.warn("⚠️  No file received by Multer");
+          return res
+            .status(400)
+            .json({ message: "No file uploaded or invalid field name" });
+        }
+
+        logger.info("✅ File uploaded to Cloudinary successfully", {
+          filename: req.file.filename,
+          size: req.file.size,
+        });
+
+        // Pass to final handler
+        next();
       });
-      next();
-    });
+    } catch (criticalErr: any) {
+      logger.error("🔥 Critical error during upload initialization", {
+        message: criticalErr.message,
+        stack: criticalErr.stack,
+      });
+      res.status(500).json({ message: "Internal server error during upload" });
+    }
   },
   (req: Request, res: Response) => {
-    if (!req.file) {
-      logger.warn("⚠️  No file in request after multer processing");
-      return res.status(400).json({ message: "No file uploaded" });
-    }
+    const imageUrl = req.file?.path;
+    logger.info("📤 Sending upload response", { imageUrl });
 
-    // Cloudinary returns the secure URL in req.file.path
-    const imageUrl = req.file.path;
-
-    logger.info("🎉 Image upload completed", {
-      imageUrl,
-      filename: req.file.filename,
-    });
-
-    res.status(200).json({ imageUrl });
+    res.setHeader("Content-Type", "application/json");
+    return res.status(200).send(JSON.stringify({ imageUrl }));
   },
 );
 

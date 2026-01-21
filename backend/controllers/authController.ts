@@ -32,6 +32,12 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    logger.info("🆕 Registration attempt:", {
+      name,
+      email,
+      hasImage: !!profileImageUrl,
+    });
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -39,7 +45,7 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
       name,
       email,
       password: hashedPassword,
-      profileImageUrl,
+      profileImageUrl: profileImageUrl || null,
     });
 
     const accessToken = generateToken(user._id.toString());
