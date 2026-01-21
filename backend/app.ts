@@ -8,6 +8,7 @@ dotenv.config();
 import express, { Express } from "express";
 import cors from "cors";
 import path from "path";
+import fs from "fs";
 import cookieParser from "cookie-parser";
 import compression from "compression";
 import helmet from "helmet";
@@ -139,34 +140,42 @@ export const createApp = (): Express => {
 
   // Serve static files from React frontend in production
   if (NODE_ENV === "production") {
-    // In production, app.js is in dist folder, so we go two levels up to reach backend root
-    const frontendDistPath = path.resolve(
-      __dirname,
-      "../../frontend/interview-prep-ai/dist",
-    );
+    // Try multiple possible locations for the frontend dist
+    const possibleDistPaths = [
+      path.resolve(__dirname, "../../frontend/interview-prep-ai/dist"),
+      path.resolve(__dirname, "../frontend/interview-prep-ai/dist"),
+      path.resolve(process.cwd(), "frontend/interview-prep-ai/dist"),
+      path.resolve(process.cwd(), "../frontend/interview-prep-ai/dist"),
+      path.resolve(process.cwd(), "dist"), // If uploaded directly inside backend/dist
+    ];
+
+    let frontendDistPath = possibleDistPaths[0];
+    for (const p of possibleDistPaths) {
+      if (fs.existsSync(path.join(p, "index.html"))) {
+        frontendDistPath = p;
+        logger.info(`✨ Found frontend index.html at: ${p}`);
+        break;
+      }
+    }
 
     logger.info(`📁 Serving frontend from: ${frontendDistPath}`);
-    logger.info(`📂 __dirname is: ${__dirname}`);
-
     app.use(express.static(frontendDistPath));
 
-    // Support React Router client-side routing
     app.get("*", (req, res, next) => {
-      if (req.originalUrl.startsWith("/api")) {
-        return next();
-      }
+      if (req.originalUrl.startsWith("/api")) return next();
 
       const indexPath = path.join(frontendDistPath, "index.html");
-      res.sendFile(indexPath, (err) => {
-        if (err) {
-          logger.error(`❌ Failed to send index.html from: ${indexPath}`, {
-            error: err.message,
-          });
-          res.status(500).json({
-            message: "Frontend files not found on server",
-          });
-        }
-      });
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        logger.error(
+          `❌ index.html not found even after discovery: ${indexPath}`,
+        );
+        res.status(500).json({
+          message: "Frontend files not found. Check path resolution.",
+          attemptedPath: indexPath,
+        });
+      }
     });
   }
 

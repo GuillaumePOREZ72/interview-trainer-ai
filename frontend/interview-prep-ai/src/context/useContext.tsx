@@ -4,7 +4,7 @@ import { API_PATHS } from "../utils/apiPaths";
 import { User, UserContextType, AuthResponse } from "../types";
 
 export const UserContext = createContext<UserContextType | undefined>(
-  undefined
+  undefined,
 );
 
 interface UserProviderProps {
@@ -27,7 +27,7 @@ const UserProvider = ({ children }: UserProviderProps) => {
     const fetchUser = async () => {
       try {
         const response = await axiosInstance.get<User>(
-          API_PATHS.AUTH.GET_PROFILE
+          API_PATHS.AUTH.GET_PROFILE,
         );
         setUser(response.data);
       } catch (error) {
@@ -40,9 +40,10 @@ const UserProvider = ({ children }: UserProviderProps) => {
   }, [user]);
 
   const updateUser = (userData: AuthResponse) => {
-    setUser(userData.user);
+    localStorage.setItem("user", JSON.stringify(userData.user));
     localStorage.setItem("token", userData.token);
     localStorage.setItem("refreshToken", userData.refreshToken);
+    setUser(userData.user);
     setLoading(false);
   };
 

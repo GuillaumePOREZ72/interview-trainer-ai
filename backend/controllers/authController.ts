@@ -172,7 +172,12 @@ const getUserProfile = async (req: Request, res: Response): Promise<void> => {
       res.status(404).json({ message: "User not found" });
       return;
     }
-    res.json(user);
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      profileImageUrl: user.profileImageUrl || null,
+    });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Server error";
