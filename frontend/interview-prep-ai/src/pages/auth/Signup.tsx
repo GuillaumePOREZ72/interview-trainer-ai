@@ -57,9 +57,25 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
 
       if (profilePic) {
         console.log("📸 Starting image upload...", profilePic.name);
-        const imgUploadRes = await uploadImage(profilePic);
-        console.log("✅ Image upload result:", imgUploadRes);
-        profileImageUrl = imgUploadRes.imageUrl || "";
+        try {
+          const imgUploadRes = await uploadImage(profilePic);
+          console.log("✅ Image upload result:", imgUploadRes);
+
+          if (!imgUploadRes || !imgUploadRes.imageUrl) {
+            console.error("❌ Upload succeeded but no imageUrl returned!");
+            setError("Image upload failed. Please try again.");
+            setIsLoading(false);
+            return;
+          }
+
+          profileImageUrl = imgUploadRes.imageUrl;
+          console.log("🖼️ Profile image URL set to:", profileImageUrl);
+        } catch (uploadError) {
+          console.error("❌ Image upload failed:", uploadError);
+          setError("Failed to upload profile picture. Please try again.");
+          setIsLoading(false);
+          return;
+        }
       }
 
       console.log("📝 Registering with profileImageUrl:", profileImageUrl);
