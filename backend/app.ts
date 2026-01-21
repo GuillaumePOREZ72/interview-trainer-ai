@@ -72,11 +72,22 @@ export const createApp = (): Express => {
     }),
   );
 
-  // Security headers with relaxed CSP for development/test
+  // Security headers with a robust CSP
   app.use(
     helmet({
       crossOriginResourcePolicy: { policy: "cross-origin" },
-      contentSecurityPolicy: NODE_ENV === "production" ? undefined : false,
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", "'unsafe-inline'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: ["'self'", "data:", "res.cloudinary.com"],
+          connectSrc: ["'self'"],
+          fontSrc: ["'self'", "https:", "data:"],
+          objectSrc: ["'none'"],
+          upgradeInsecureRequests: null,
+        },
+      },
     }),
   );
 
@@ -85,13 +96,21 @@ export const createApp = (): Express => {
     app.use(limiter);
   }
 
-  // Health check endpoint
-  app.get("/", (req, res) => {
+  // Health check endpoint (Hidden at root, explicit at /api/health)
+  app.get("/api/health", (req, res) => {
     res.json({
-      message: "Interview Prep AI Backend is running.",
+      message: "Interview Trainer AI Backend is running.",
       version: "v1",
       status: "healthy",
     });
+  });
+
+  // Handle root to satisfy cPanel health check but serve frontend for users
+  app.get("/", (req, res, next) => {
+    if (req.headers.accept && req.headers.accept.includes("application/json")) {
+      return res.json({ status: "healthy" });
+    }
+    next();
   });
 
   // API Routes (keeping /api prefix for consistency with frontend)
@@ -104,17 +123,31 @@ export const createApp = (): Express => {
   // Serve static files from React frontend in production
   if (NODE_ENV === "production") {
     const frontendDistPath = path.join(
-      __dirname,
-      "../../frontend/interview-prep-ai/dist",
+      process.cwd(),
+      "../frontend/interview-prep-ai/dist",
     );
+
+    logger.info(`📁 Serving frontend from: ${frontendDistPath}`);
+
     app.use(express.static(frontendDistPath));
 
-    // Support React Router client-side routing (Express 5 catch-all syntax)
-    app.get("(.*)", (req, res, next) => {
+    // Support React Router client-side routing
+    app.get("*", (req, res, next) => {
       if (req.originalUrl.startsWith("/api")) {
         return next();
       }
-      res.sendFile(path.join(frontendDistPath, "index.html"));
+
+      const indexPath = path.join(frontendDistPath, "index.html");
+      res.sendFile(indexPath, (err) => {
+        if (err) {
+          logger.error(`❌ Failed to send index.html from: ${indexPath}`, {
+            error: err.message,
+          });
+          res.status(500).json({
+            message: "Frontend files not found on server",
+          });
+        }
+      });
     });
   }
 
