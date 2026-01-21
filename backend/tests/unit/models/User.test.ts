@@ -93,44 +93,6 @@ describe("User Model", () => {
   });
 
   // ============================================================================
-  // DEFAULT VALUES
-  // ============================================================================
-
-  describe("Default values", () => {
-    it("should set profileImageUrl to null by default", async () => {
-      // ARRANGE
-      const user = new User({
-        name: "Test User",
-        email: "test@example.com",
-        password: "hashedPassword123",
-      });
-
-      // ACT
-      await user.save();
-
-      // ASSERT
-      expect(user.profileImageUrl).toBeNull();
-    });
-
-    it("should accept custom profileImageUrl", async () => {
-      // ARRANGE
-      const imageUrl = "https://example.com/avatar.png";
-      const user = new User({
-        name: "Test User",
-        email: "custom-image@example.com",
-        password: "hashedPassword123",
-        profileImageUrl: imageUrl,
-      });
-
-      // ACT
-      await user.save();
-
-      // ASSERT
-      expect(user.profileImageUrl).toBe(imageUrl);
-    });
-  });
-
-  // ============================================================================
   // UNIQUE CONSTRAINTS
   // ============================================================================
 

@@ -80,7 +80,6 @@ export function createMockUser(overrides: Partial<User> = {}): User {
     _id: "user-123",
     name: "Test User",
     email: "test@example.com",
-    profileImageUrl: null,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     ...overrides,

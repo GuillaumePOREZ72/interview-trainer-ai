@@ -19,19 +19,11 @@ const ProfileInfoCard = ({ className = "" }: { className?: string }) => {
     user && (
       <div className="flex items-center justify-center gap-2">
         {/* Avatar */}
-        {user.profileImageUrl ? (
-          <img
-            src={user.profileImageUrl}
-            alt={user.name || t("profile.userAvatar")}
-            className="w-9 h-9 rounded-full object-cover ring-2 ring-slate-100"
-          />
-        ) : (
-          <div className="w-9 h-9 bg-linear-to-br from-primary to-secondary rounded-full flex items-center justify-center">
-            <span className="text-sm font-bold text-white">
-              {getInitials(user.name)}
-            </span>
-          </div>
-        )}
+        <div className="w-9 h-9 bg-linear-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+          <span className="text-sm font-bold text-white">
+            {getInitials(user.name)}
+          </span>
+        </div>
 
         {/* User Info */}
         <div className="hidden md:block">

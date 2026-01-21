@@ -13,10 +13,6 @@ export const API_PATHS = {
     RESET_PASSWORD: "/api/auth/resetpassword", // Reset password with token
   },
 
-  IMAGE: {
-    UPLOAD_IMAGE: "/api/auth/upload-image", // Upload profile picture
-  },
-
   AI: {
     GENERATE_QUESTIONS: "/api/ai/generate-questions", // Generate interview questions and answers using Groq
     GENERATE_EXPLANATION: "/api/ai/generate-explanation", // Generate concept explanation using Groq

@@ -8,9 +8,6 @@ module.exports = {
       REFRESH_TOKEN: "/api/auth/refresh-token",
       GET_PROFILE: "/api/auth/profile",
     },
-    IMAGE: {
-      UPLOAD_IMAGE: "/api/auth/upload-image",
-    },
     AI: {
       GENERATE_QUESTIONS: "/api/ai/generate-questions",
       GENERATE_EXPLANATION: "/api/ai/generate-explanation",

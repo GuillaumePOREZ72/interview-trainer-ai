@@ -40,7 +40,7 @@ const createRequiredDirectories = () => {
   // Use process.cwd() to get the backend/ folder root
   const rootPath = process.cwd();
 
-  const dirs = [path.join(rootPath, "logs"), path.join(rootPath, "uploads")];
+  const dirs = [path.join(rootPath, "logs")];
 
   dirs.forEach((dir) => {
     if (!fs.existsSync(dir)) {

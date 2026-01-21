@@ -23,7 +23,7 @@ const generateRefreshToken = (userId: string): string => {
 // Register a new user
 const registerUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, password, profileImageUrl } = req.body;
+    const { name, email, password } = req.body;
 
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -32,11 +32,7 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    logger.info("🆕 Registration attempt:", {
-      name,
-      email,
-      hasImage: !!profileImageUrl,
-    });
+    logger.info("🆕 Registration attempt:", { name, email });
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -45,7 +41,6 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
       name,
       email,
       password: hashedPassword,
-      profileImageUrl: profileImageUrl || null,
     });
 
     const accessToken = generateToken(user._id.toString());
@@ -58,7 +53,6 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        profileImageUrl: user.profileImageUrl || null,
       },
       token: accessToken,
       refreshToken,
@@ -103,7 +97,6 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        profileImageUrl: user.profileImageUrl || null,
       },
       token: accessToken,
       refreshToken,
@@ -176,7 +169,6 @@ const getUserProfile = async (req: Request, res: Response): Promise<void> => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      profileImageUrl: user.profileImageUrl || null,
     });
   } catch (error) {
     const errorMessage =

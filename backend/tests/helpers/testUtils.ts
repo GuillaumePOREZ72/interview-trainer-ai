@@ -29,7 +29,6 @@ export interface TestUserData {
   name: string;
   email: string;
   password: string;
-  profileImageUrl?: string;
 }
 
 /**
@@ -40,7 +39,6 @@ export interface AuthenticatedUser {
     _id: string;
     name: string;
     email: string;
-    profileImageUrl?: string | null;
   };
   token: string;
   refreshToken: string;
@@ -137,7 +135,6 @@ export const createTestUser = async (
     name: data.name,
     email: data.email,
     password: hashedPassword,
-    profileImageUrl: data.profileImageUrl || null,
   });
 
   // Generate tokens (same as login flow)
@@ -156,7 +153,6 @@ export const createTestUser = async (
       _id: user._id.toString(),
       name: user.name,
       email: user.email,
-      profileImageUrl: user.profileImageUrl,
     },
     token,
     refreshToken,

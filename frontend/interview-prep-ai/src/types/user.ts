@@ -3,7 +3,6 @@ export interface User {
   _id: string;
   name: string;
   email: string;
-  profileImageUrl?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }

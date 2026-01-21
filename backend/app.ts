@@ -99,7 +99,7 @@ export const createApp = (): Express => {
             "'unsafe-inline'",
             "https://fonts.googleapis.com",
           ],
-          imgSrc: ["'self'", "data:", "blob:", "res.cloudinary.com"],
+          imgSrc: ["'self'", "data:", "blob:"],
           connectSrc: ["'self'"],
           fontSrc: ["'self'", "https:", "data:", "https://fonts.gstatic.com"],
           objectSrc: ["'none'"],
@@ -123,12 +123,39 @@ export const createApp = (): Express => {
     });
   });
 
-  // Handle root to satisfy cPanel health check but serve frontend for users
-  app.get("/", (req, res, next) => {
-    if (req.headers.accept && req.headers.accept.includes("application/json")) {
-      return res.json({ status: "healthy" });
-    }
-    next();
+  // Simple ping to verify Node.js is receiving requests
+  app.get("/api/ping", (req, res) => {
+    logger.info("🏓 PING received! Node.js is handling this request.");
+    res.json({ pong: true, timestamp: new Date().toISOString() });
+  });
+
+  // POST test to verify POST requests work
+  app.post("/api/ping-post", (req, res) => {
+    logger.info("🏓 POST PING received!", { body: req.body });
+    res.json({
+      pong: true,
+      method: "POST",
+      body: req.body,
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  // Raw POST test - no middleware at all
+  app.post("/api/debug/raw-post", (req, res) => {
+    logger.info("📬 Raw POST received!", {
+      contentType: req.headers["content-type"],
+      contentLength: req.headers["content-length"],
+    });
+    res.json({
+      received: true,
+      contentType: req.headers["content-type"],
+      contentLength: req.headers["content-length"],
+    });
+  });
+
+  // Health check endpoint at root
+  app.get("/", (req, res) => {
+    res.json({ status: "healthy", message: "Interview Prep AI Backend is running." });
   });
 
   // API Routes (keeping /api prefix for consistency with frontend)

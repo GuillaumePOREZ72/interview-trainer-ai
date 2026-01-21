@@ -2,12 +2,10 @@ import { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Input from "../../components/inputs/Input";
-import ProfilePhotoSelector from "../../components/inputs/ProfilePhotoSelector";
 import { validateEmail } from "../../utils/helper";
 import { useUser } from "../../hooks/useUser";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
-import uploadImage from "../../utils/uploadImage";
 import { AuthResponse } from "../../types";
 import { AxiosError } from "axios";
 import { LuSparkles } from "react-icons/lu";
@@ -18,7 +16,6 @@ interface SignupProps {
 
 const Signup = ({ setCurrentPage }: SignupProps) => {
   const { t } = useTranslation();
-  const [profilePic, setProfilePic] = useState<File | null>(null);
   const [fullName, setFullName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -31,8 +28,6 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
 
   const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    let profileImageUrl = "";
 
     if (!fullName) {
       setError(t("validation.fullNameRequired"));
@@ -55,37 +50,12 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
     try {
       setIsLoading(true);
 
-      if (profilePic) {
-        console.log("📸 Starting image upload...", profilePic.name);
-        try {
-          const imgUploadRes = await uploadImage(profilePic);
-          console.log("✅ Image upload result:", imgUploadRes);
-
-          if (!imgUploadRes || !imgUploadRes.imageUrl) {
-            console.error("❌ Upload succeeded but no imageUrl returned!");
-            setError("Image upload failed. Please try again.");
-            setIsLoading(false);
-            return;
-          }
-
-          profileImageUrl = imgUploadRes.imageUrl;
-          console.log("🖼️ Profile image URL set to:", profileImageUrl);
-        } catch (uploadError) {
-          console.error("❌ Image upload failed:", uploadError);
-          setError("Failed to upload profile picture. Please try again.");
-          setIsLoading(false);
-          return;
-        }
-      }
-
-      console.log("📝 Registering with profileImageUrl:", profileImageUrl);
       const response = await axiosInstance.post<AuthResponse>(
         API_PATHS.AUTH.REGISTER,
         {
           name: fullName,
           email,
           password,
-          profileImageUrl,
         },
       );
 
@@ -121,8 +91,6 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
       <p className="text-sm text-slate-600 mb-8">{t("auth.signup.subtitle")}</p>
 
       <form onSubmit={handleSignup} className="space-y-1">
-        <ProfilePhotoSelector image={profilePic} setImage={setProfilePic} />
-
         <div className="grid grid-cols-1 md:grid-cols-1 gap-2">
           <Input
             value={fullName}

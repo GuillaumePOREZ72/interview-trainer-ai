@@ -100,7 +100,6 @@ checkFileExists(
 
 // Check required directories
 checkTitle("Required Directories");
-checkDirExists(path.join(__dirname, "..", "uploads"), "uploads");
 checkDirExists(path.join(__dirname, "..", "logs"), "logs");
 
 // Check package.json scripts
