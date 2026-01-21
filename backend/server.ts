@@ -23,10 +23,10 @@ const validateEnvVariables = () => {
 
   if (missing.length > 0) {
     logger.error(
-      `❌ Missing required environment variables: ${missing.join(", ")}`
+      `❌ Missing required environment variables: ${missing.join(", ")}`,
     );
     throw new Error(
-      `Missing required environment variables: ${missing.join(", ")}`
+      `Missing required environment variables: ${missing.join(", ")}`,
     );
   }
 
@@ -37,12 +37,22 @@ const validateEnvVariables = () => {
  * Create necessary directories for production
  */
 const createRequiredDirectories = () => {
-  const dirs = [path.join(__dirname, "logs"), path.join(__dirname, "uploads")];
+  // If we are running from dist/server.js, __dirname is backend/dist
+  // We want logs and uploads at the backend/ root level
+  const rootPath = __dirname.endsWith("dist")
+    ? path.join(__dirname, "..")
+    : __dirname;
+
+  const dirs = [path.join(rootPath, "logs"), path.join(rootPath, "uploads")];
 
   dirs.forEach((dir) => {
     if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-      logger.info(`📁 Created directory: ${dir}`);
+      try {
+        fs.mkdirSync(dir, { recursive: true });
+        logger.info(`📁 Created directory: ${dir}`);
+      } catch (err) {
+        logger.error(`❌ Failed to create directory ${dir}:`, err);
+      }
     }
   });
 };
@@ -59,29 +69,52 @@ const NODE_ENV = process.env.NODE_ENV || "development";
  * Database connection and server startup
  */
 const startServer = async () => {
-  try {
-    // Validate environment variables
-    validateEnvVariables();
+  console.log("🎬 Starting Interview Trainer AI Server...");
 
-    // Create required directories
+  try {
+    // Create required directories early and safely
     createRequiredDirectories();
 
-    // Conect to database
-    await connectDB();
-    logger.info("✅ Database connected successfully");
+    // Start listening as soon as possible to satisfy Passenger/o2switch
+    const server = app.listen(PORT, () => {
+      const msg = `🚀 Server listening on port ${PORT} in ${NODE_ENV} mode`;
+      console.log(msg);
+      logger.info(msg);
 
-    // Start server
-    app.listen(PORT, () => {
-      logger.info(
-        `🚀 Server running in ${NODE_ENV} mode on http://localhost:${PORT}`
-      );
+      // Perform background initialization once port is bound
+      initializeBackgroundServices();
+    });
+
+    server.on("error", (error: any) => {
+      console.error("❌ Server listener error:", error);
+      logger.error("❌ Server listener error:", error);
     });
   } catch (error) {
-    logger.error("❌ Error starting server:", error);
-
+    console.error("❌ Fatal error during startup:", error);
+    logger.error("❌ Fatal error during startup:", error);
     if (NODE_ENV === "production") {
-      process.exit(1);
+      // Small delay before exit to allow logs/Passenger to catch up
+      setTimeout(() => process.exit(1), 5000);
     }
+  }
+};
+
+/**
+ * Background initialization to keep startup fast
+ */
+const initializeBackgroundServices = async () => {
+  try {
+    // Validate environment variables (non-fatal start)
+    validateEnvVariables();
+
+    // Connect to database
+    console.log("🔌 Connecting to MongoDB...");
+    await connectDB();
+    console.log("✅ Database connected successfully");
+    logger.info("✅ Database connected successfully");
+  } catch (error) {
+    console.error("❌ Background initialization failed:", error);
+    logger.error("❌ Background initialization failed:", error);
   }
 };
 
