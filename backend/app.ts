@@ -139,12 +139,14 @@ export const createApp = (): Express => {
 
   // Serve static files from React frontend in production
   if (NODE_ENV === "production") {
-    const frontendDistPath = path.join(
-      process.cwd(),
-      "../frontend/interview-prep-ai/dist",
+    // In production, app.js is in dist folder, so we go two levels up to reach backend root
+    const frontendDistPath = path.resolve(
+      __dirname,
+      "../../frontend/interview-prep-ai/dist",
     );
 
     logger.info(`📁 Serving frontend from: ${frontendDistPath}`);
+    logger.info(`📂 __dirname is: ${__dirname}`);
 
     app.use(express.static(frontendDistPath));
 
