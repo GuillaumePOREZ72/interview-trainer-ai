@@ -29,7 +29,7 @@ const Navbar = () => {
         </Link>
 
         <div className="flex items-center gap-4">
-          <LanguageSwitcher className="!text-slate-900" />
+          <LanguageSwitcher className="text-slate-900 transition-colors duration-300" />
           <button
             onClick={toggleTheme}
             className="p-2 rounded-full hover:bg-bg-secondary text-slate-900 hover:text-primary transition-all cursor-pointer"
