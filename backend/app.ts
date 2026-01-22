@@ -153,9 +153,12 @@ export const createApp = (): Express => {
     });
   });
 
-  // Health check endpoint at root
-  app.get("/", (req, res) => {
-    res.json({ status: "healthy", message: "Interview Prep AI Backend is running." });
+  // Health check endpoint at root (only for JSON requests)
+  app.get("/", (req, res, next) => {
+    if (req.headers.accept && req.headers.accept.includes("application/json")) {
+      return res.json({ status: "healthy", message: "Interview Prep AI Backend is running." });
+    }
+    next();
   });
 
   // API Routes (keeping /api prefix for consistency with frontend)
