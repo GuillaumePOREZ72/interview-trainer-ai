@@ -16,13 +16,11 @@ const app = createApp();
 describe("Auth Routes", () => {
   describe("POST /api/auth/register", () => {
     it("should register a new user successfully", async () => {
-      const response = await request(app)
-        .post("/api/auth/register")
-        .send({
-          name: "New User",
-          email: "newuser@example.com",
-          password: "SecurePass123!",
-        });
+      const response = await request(app).post("/api/auth/register").send({
+        name: "New User",
+        email: "newuser@example.com",
+        password: "SecurePass123!",
+      });
 
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty("token");
@@ -38,13 +36,11 @@ describe("Auth Routes", () => {
       await createTestUser({ email: "existing@example.com" });
 
       // Try to register with same email
-      const response = await request(app)
-        .post("/api/auth/register")
-        .send({
-          name: "Another User",
-          email: "existing@example.com",
-          password: "SecurePass123!",
-        });
+      const response = await request(app).post("/api/auth/register").send({
+        name: "Another User",
+        email: "existing@example.com",
+        password: "SecurePass123!",
+      });
 
       expect(response.status).toBe(400);
       expect(response.body.message).toBe("User already exists");
@@ -58,12 +54,10 @@ describe("Auth Routes", () => {
     });
 
     it("should login successfully with valid credentials", async () => {
-      const response = await request(app)
-        .post("/api/auth/login")
-        .send({
-          email: defaultTestUser.email,
-          password: defaultTestUser.password,
-        });
+      const response = await request(app).post("/api/auth/login").send({
+        email: defaultTestUser.email,
+        password: defaultTestUser.password,
+      });
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty("token");
@@ -73,24 +67,20 @@ describe("Auth Routes", () => {
     });
 
     it("should return 401 with invalid email", async () => {
-      const response = await request(app)
-        .post("/api/auth/login")
-        .send({
-          email: "nonexistent@example.com",
-          password: defaultTestUser.password,
-        });
+      const response = await request(app).post("/api/auth/login").send({
+        email: "nonexistent@example.com",
+        password: defaultTestUser.password,
+      });
 
       expect(response.status).toBe(401);
       expect(response.body.message).toBe("Invalid email or password");
     });
 
     it("should return 401 with invalid password", async () => {
-      const response = await request(app)
-        .post("/api/auth/login")
-        .send({
-          email: defaultTestUser.email,
-          password: "wrongpassword",
-        });
+      const response = await request(app).post("/api/auth/login").send({
+        email: defaultTestUser.email,
+        password: "wrongpassword",
+      });
 
       expect(response.status).toBe(401);
       expect(response.body.message).toBe("Invalid email or password");
@@ -101,8 +91,9 @@ describe("Auth Routes", () => {
     it("should return user profile with valid token", async () => {
       const { token, user } = await createTestUser();
 
-      const response = await authenticatedRequest(app, token)
-        .get("/api/auth/profile");
+      const response = await authenticatedRequest(app, token).get(
+        "/api/auth/profile",
+      );
 
       expect(response.status).toBe(200);
       expect(response.body.email).toBe(user.email);
@@ -120,8 +111,9 @@ describe("Auth Routes", () => {
     it("should return 401 with invalid token", async () => {
       const invalidToken = generateInvalidToken();
 
-      const response = await authenticatedRequest(app, invalidToken)
-        .get("/api/auth/profile");
+      const response = await authenticatedRequest(app, invalidToken).get(
+        "/api/auth/profile",
+      );
 
       expect(response.status).toBe(401);
     });
@@ -161,11 +153,12 @@ describe("Auth Routes", () => {
 
 describe("Health Check", () => {
   it("should return healthy status on GET /", async () => {
-    const response = await request(app).get("/");
+    const response = await request(app)
+      .get("/")
+      .set("Accept", "application/json");
 
     expect(response.status).toBe(200);
     expect(response.body.status).toBe("healthy");
     expect(response.body.message).toBe("Interview Prep AI Backend is running.");
   });
 });
-
