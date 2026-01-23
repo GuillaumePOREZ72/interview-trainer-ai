@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { LuChevronDown, LuPin, LuPinOff, LuSparkles } from "react-icons/lu";
 import AIResponsePreview from "../../pages/interviewPrep/components/AIResponsePreview";
 import { useTranslation } from "react-i18next";
@@ -23,18 +23,6 @@ const QuestionCard = ({
   onToggleOpen,
 }: QuestionCardProps) => {
   const { t } = useTranslation();
-  const [isExpanded, setIsExpanded] = useState<boolean>(false);
-  const [height, setHeight] = useState<number>(0);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (isExpanded && contentRef.current) {
-      const contentHeight = contentRef.current.scrollHeight;
-      setHeight(contentHeight + 10);
-    } else {
-      setHeight(0);
-    }
-  }, [isExpanded]);
 
   const toggleExpand = () => {
     onToggleOpen?.();
@@ -113,18 +101,25 @@ const QuestionCard = ({
         </div>
       </div>
 
-      {/* Answer Content */}
-      <div
-        ref={contentRef}
-        style={{ height: `${height}px` }}
-        className="transition-all duration-300 ease-in-out overflow-hidden"
-      >
-        <div className="pt-4">
-          <div className="bg-bg-secondary rounded-xl p-4 border border-border-primary">
-            <AIResponsePreview content={answer} />
-          </div>
-        </div>
-      </div>
+      {/* Answer Content (animated with framer-motion) */}
+      <AnimatePresence initial={false} mode="wait">
+        {isOpen && (
+          <motion.div
+            key="answer"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.28, ease: [0.2, 0.8, 0.2, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="pt-4">
+              <div className="bg-bg-secondary rounded-xl p-4 border border-border-primary">
+                <AIResponsePreview content={answer} />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

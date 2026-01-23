@@ -192,18 +192,24 @@ const InterviewPrep = () => {
                   layout
                   layoutId={`question-${data._id || index}`}
                 >
-                  <QuestionCard
-                    question={data.question}
-                    answer={data.answer}
-                    onLearnMore={() =>
-                      generateConceptExplanation(data.question)
-                    }
-                    isPinned={data.isPinned || false}
-                    onTogglePin={() => toggleQuestionPinStatus(data._id!)}
-                    isOpen={activeQuestionId === (data._id || index)}
-                    onToggleOpen={() => setActiveQuestionId(activeQuestionId === (data._id || index).toString() ? null : (data._id || index).toString())}
-                  />
-
+                    <QuestionCard
+                      question={data.question}
+                      answer={data.answer}
+                      onLearnMore={() =>
+                        generateConceptExplanation(data.question)
+                      }
+                      isPinned={data.isPinned || false}
+                      onTogglePin={() => toggleQuestionPinStatus(data._id!)}
+                      isOpen={activeQuestionId === (data._id || index).toString()}
+                      onToggleOpen={() =>
+                        setActiveQuestionId(
+                          activeQuestionId === (data._id || index).toString()
+                            ? null
+                            : (data._id || index).toString(),
+                        )
+                      }
+                    />
+                  
                   {!isLoading && sessionData.questions.length === index + 1 && (
                     <div className="flex items-center justify-center mt-8">
                       <button
