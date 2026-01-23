@@ -19,7 +19,7 @@ const ProfileInfoCard = ({ className = "" }: { className?: string }) => {
         {/* Avatar */}
         <div className="w-9 h-9 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm shrink-0">
           <img
-            src={`https://api.dicebear.com/9.x/notionists/svg?seed=${user._id}&backgroundColor=c0aede,b6e3f4,ffdfbf,ffd5dc,d1d4f9`}
+            src={`https://api.dicebear.com/9.x/bottts/svg?seed=${user._id}&backgroundColor=c0aede,b6e3f4,ffdfbf,ffd5dc,d1d4f9`}
             alt={user.name}
             className="w-full h-full object-cover"
           />
