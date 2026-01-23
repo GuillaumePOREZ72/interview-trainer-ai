@@ -29,7 +29,7 @@ const InterviewPrep = () => {
 
   const [openLeanMoreDrawer, setOpenLeanMoreDrawer] = useState<boolean>(false);
   const [explanation, setExplanation] = useState<ExplanationResponse | null>(
-    null
+    null,
   );
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -41,7 +41,7 @@ const InterviewPrep = () => {
 
     try {
       const response = await axiosInstance.get<SessionResponse>(
-        API_PATHS.SESSION.GET_ONE(sessionId)
+        API_PATHS.SESSION.GET_ONE(sessionId),
       );
 
       if (response.data?.session) {
@@ -64,7 +64,7 @@ const InterviewPrep = () => {
         API_PATHS.AI.GENERATE_EXPLANATION,
         {
           question,
-        }
+        },
       );
 
       if (response.data) {
@@ -75,7 +75,7 @@ const InterviewPrep = () => {
       setExplanation(null);
       setErrorMsg(
         axiosError.response?.data?.message ||
-          "Something went wrong while generating explanation."
+          "Something went wrong while generating explanation.",
       );
     } finally {
       setIsLoading(false);
@@ -86,7 +86,7 @@ const InterviewPrep = () => {
   const toggleQuestionPinStatus = async (questionId: string) => {
     try {
       const response = await axiosInstance.post(
-        API_PATHS.QUESTION.PIN(questionId)
+        API_PATHS.QUESTION.PIN(questionId),
       );
 
       if (response.data?.question) {
@@ -112,7 +112,7 @@ const InterviewPrep = () => {
           experience: sessionData.experience,
           topicsToFocus: sessionData.topicsToFocus,
           numberOfQuestions: 10,
-        }
+        },
       );
 
       const generatedQuestions = aiResponse.data;
@@ -122,7 +122,7 @@ const InterviewPrep = () => {
         {
           sessionId,
           questions: generatedQuestions,
-        }
+        },
       );
 
       if (response.data) {
@@ -171,7 +171,7 @@ const InterviewPrep = () => {
         <div className="grid grid-cols-12 gap-4 mt-5 mb-10">
           <div
             className={`col-span-12 ${
-              openLeanMoreDrawer ? "md:col-span-7" : "md:col-span-8"
+              openLeanMoreDrawer ? "md:col-span-7" : "md:col-span-12"
             }`}
           >
             <AnimatePresence>
