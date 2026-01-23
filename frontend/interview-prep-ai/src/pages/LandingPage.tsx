@@ -4,7 +4,8 @@ import HERO_IMG from "../assets/hero-img.png";
 import LOGO from "../assets/logo.png";
 import { APP_FEATURES } from "../utils/data";
 import { useNavigate } from "react-router-dom";
-import { LuSparkles } from "react-icons/lu";
+import { LuSparkles, LuMenu, LuX } from "react-icons/lu";
+import { AnimatePresence, motion } from "framer-motion";
 import Login from "./auth/Login";
 import Signup from "./auth/Signup";
 import Modal from "../components/Modal";
@@ -22,9 +23,10 @@ const LandingPage = () => {
   const { user } = useUser();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
-
+  
   const [openAuthModal, setOpenAuthModal] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<AuthPage>("login");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
@@ -60,7 +62,8 @@ const LandingPage = () => {
                 Interview Trainer <span className="text-secondary">AI</span>
               </h2>
             </div>
-            <div className="flex items-center gap-2 md:gap-4">
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-4">
               <LanguageSwitcher />
               <button
                 onClick={toggleTheme}
@@ -77,12 +80,88 @@ const LandingPage = () => {
                 <ProfileInfoCard />
               ) : (
                 <button
-                  className="bg-linear-to-r from-primary to-secondary text-xs md:text-sm font-semibold text-white px-3 py-2 md:px-7 md:py-2.5 rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] border border-indigo-400/30 transition-all duration-200 cursor-pointer whitespace-nowrap"
+                  className="bg-linear-to-r from-primary to-secondary text-sm font-semibold text-white px-7 py-2.5 rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] border border-indigo-400/30 transition-all duration-200 cursor-pointer whitespace-nowrap"
                   onClick={() => setOpenAuthModal(true)}
                 >
                   {t("nav.login")}
                 </button>
               )}
+            </div>
+
+            {/* Mobile Navigation */}
+            <div className="md:hidden relative">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 text-text-primary hover:text-primary transition-colors cursor-pointer"
+                aria-label="Toggle menu"
+              >
+                {isMobileMenuOpen ? (
+                  <LuX className="text-2xl" />
+                ) : (
+                  <LuMenu className="text-2xl" />
+                )}
+              </button>
+
+              <AnimatePresence>
+                {isMobileMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 top-full mt-2 w-64 bg-white/90 dark:bg-bg-secondary/95 backdrop-blur-md rounded-2xl shadow-xl border border-border-primary p-4 flex flex-col gap-4 z-50"
+                  >
+                    {/* User Profile or Auth */}
+                    {user ? (
+                      <div className="pb-4 border-b border-border-primary">
+                        <ProfileInfoCard />
+                      </div>
+                    ) : (
+                      <button
+                        className="w-full bg-linear-to-r from-primary to-secondary text-sm font-semibold text-white px-4 py-3 rounded-xl shadow-md hover:shadow-lg hover:shadow-primary/30 transition-all duration-200"
+                        onClick={() => {
+                          setOpenAuthModal(true);
+                          setIsMobileMenuOpen(false);
+                        }}
+                      >
+                        {t("nav.login")}
+                      </button>
+                    )}
+
+                    {/* Controls */}
+                    <div className="flex flex-col gap-2">
+                      {/* Language */}
+                      <div className="flex items-center justify-between px-2">
+                        <span className="text-sm font-medium text-text-secondary">
+                          Language
+                        </span>
+                        <LanguageSwitcher />
+                      </div>
+
+                      {/* Theme */}
+                      <div className="flex items-center justify-between px-2 py-2">
+                        <span className="text-sm font-medium text-text-secondary">
+                          Theme
+                        </span>
+                        <div className="flex bg-bg-tertiary rounded-lg p-1">
+                          <button
+                            onClick={() => setTheme("light")}
+                            className={`p-1.5 rounded-md transition-all ${theme === "light" ? "bg-white shadow text-primary" : "text-text-tertiary"}`}
+                          >
+                            <LuSun className="text-lg" />
+                          </button>
+                          <button
+                            onClick={() => setTheme("dark")}
+                            className={`p-1.5 rounded-md transition-all ${theme === "dark" ? "bg-bg-primary shadow text-primary" : "text-text-tertiary"}`}
+                          >
+                            <LuMoon className="text-lg" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </header>
 
