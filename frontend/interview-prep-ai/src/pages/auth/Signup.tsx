@@ -78,7 +78,7 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
   };
 
   return (
-    <div className="w-[90vw] md:w-[33vw] p-8 flex flex-col justify-center">
+    <div className="w-[90vw] md:w-[60vw] lg:w-[33vw] p-8 flex flex-col justify-center">
       {/* Header with icon */}
       <div className="flex items-center gap-2 mb-2">
         <div className="w-10 h-10 bg-linear-to-br from-primary to-secondary rounded-lg flex items-center justify-center">

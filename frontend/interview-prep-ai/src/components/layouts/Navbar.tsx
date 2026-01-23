@@ -23,7 +23,7 @@ const Navbar = () => {
               className="w-full h-full object-cover"
             />
           </div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+          <h2 className="text-sm md:text-xl font-bold text-slate-900 tracking-tight">
             Interview Trainer <span className="text-secondary">AI</span>
           </h2>
         </Link>
