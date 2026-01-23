@@ -31,6 +31,7 @@ const InterviewPrep = () => {
   const [explanation, setExplanation] = useState<ExplanationResponse | null>(
     null,
   );
+  const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null);  
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isUpdateLoader, setIsUpdateLoader] = useState<boolean>(false);
@@ -199,6 +200,8 @@ const InterviewPrep = () => {
                     }
                     isPinned={data.isPinned || false}
                     onTogglePin={() => toggleQuestionPinStatus(data._id!)}
+                    isOpen={activeQuestionId === (data._id || index)}
+                    onToggleOpen={() => setActiveQuestionId(activeQuestionId === (data._id || index).toString() ? null : (data._id || index).toString())}
                   />
 
                   {!isLoading && sessionData.questions.length === index + 1 && (

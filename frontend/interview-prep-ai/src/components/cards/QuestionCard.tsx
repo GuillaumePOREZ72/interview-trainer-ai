@@ -8,7 +8,9 @@ interface QuestionCardProps {
   answer: string;
   onLearnMore: () => void;
   isPinned: boolean;
+  isOpen?: boolean;
   onTogglePin: () => void;
+  onToggleOpen?: () => void;
 }
 
 const QuestionCard = ({
@@ -17,6 +19,8 @@ const QuestionCard = ({
   onLearnMore,
   isPinned,
   onTogglePin,
+  isOpen,
+  onToggleOpen,
 }: QuestionCardProps) => {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
@@ -33,7 +37,7 @@ const QuestionCard = ({
   }, [isExpanded]);
 
   const toggleExpand = () => {
-    setIsExpanded(!isExpanded);
+    onToggleOpen?.();
   };
 
   return (
@@ -46,7 +50,7 @@ const QuestionCard = ({
             </span>
           </div>
           <h3
-            className="text-sm md:text-base font-medium text-text-primary dark:text-text-tertiary leading-relaxed flex-1"
+            className="text-sm md:text-base font-medium text-black leading-relaxed flex-1"
             onClick={toggleExpand}
           >
             {question}
@@ -57,7 +61,7 @@ const QuestionCard = ({
           {/* Actions */}
           <div
             className={`flex items-center gap-2 ${
-              isExpanded ? "flex" : "hidden group-hover:flex"
+              isOpen ? "flex" : "hidden group-hover:flex"
             }`}
           >
             {/* Pin Button */}
@@ -84,7 +88,6 @@ const QuestionCard = ({
               className="flex items-center gap-1.5 text-xs text-white font-medium bg-linear-to-r from-accent to-cyan-600 px-3 py-1.5 mr-2 rounded-lg hover:shadow-lg hover:shadow-accent/30 transition-all duration-200 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
-                setIsExpanded(true);
                 onLearnMore();
               }}
             >
@@ -103,7 +106,7 @@ const QuestionCard = ({
             <LuChevronDown
               size={20}
               className={`transform transition-transform duration-300 ${
-                isExpanded ? "rotate-180" : ""
+                isOpen ? "rotate-180" : ""
               }`}
             />
           </button>
