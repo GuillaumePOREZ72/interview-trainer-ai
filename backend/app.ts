@@ -99,7 +99,7 @@ export const createApp = (): Express => {
             "'unsafe-inline'",
             "https://fonts.googleapis.com",
           ],
-          imgSrc: ["'self'", "data:", "blob:"],
+          imgSrc: ["'self'", "data:", "blob:", "https://api.dicebear.com"],
           connectSrc: ["'self'"],
           fontSrc: ["'self'", "https:", "data:", "https://fonts.gstatic.com"],
           objectSrc: ["'none'"],
@@ -156,7 +156,10 @@ export const createApp = (): Express => {
   // Health check endpoint at root (only for JSON requests)
   app.get("/", (req, res, next) => {
     if (req.headers.accept && req.headers.accept.includes("application/json")) {
-      return res.json({ status: "healthy", message: "Interview Prep AI Backend is running." });
+      return res.json({
+        status: "healthy",
+        message: "Interview Prep AI Backend is running.",
+      });
     }
     next();
   });
