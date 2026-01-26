@@ -42,7 +42,7 @@ const renderForm = () => {
   return render(
     <MemoryRouter>
       <CreateSessionForm />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 };
 
@@ -59,16 +59,16 @@ describe("CreateSessionForm Component", () => {
       expect(screen.getByText("createSession.title")).toBeInTheDocument();
       expect(screen.getByText(/createSession.role.label/)).toBeInTheDocument();
       expect(
-        screen.getByText(/createSession.experience.label/)
+        screen.getByText(/createSession.experience.label/),
       ).toBeInTheDocument();
       expect(
-        screen.getByText(/createSession.topics.label/)
+        screen.getByText(/createSession.topics.label/),
       ).toBeInTheDocument();
       expect(
-        screen.getByText(/createSession.description.label/)
+        screen.getByText(/createSession.description.label/),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: /createSession.submit/i })
+        screen.getByRole("button", { name: /createSession.submit/i }),
       ).toBeInTheDocument();
     });
 
@@ -86,7 +86,7 @@ describe("CreateSessionForm Component", () => {
       const user = userEvent.setup();
 
       await user.click(
-        screen.getByRole("button", { name: /createSession.submit/i })
+        screen.getByRole("button", { name: /createSession.submit/i }),
       );
 
       // Error message uses translation key
@@ -100,10 +100,10 @@ describe("CreateSessionForm Component", () => {
       // Use translation key for placeholder
       await user.type(
         screen.getByPlaceholderText(/createSession.role.placeholder/i),
-        "Software Engineer"
+        "Software Engineer",
       );
       await user.click(
-        screen.getByRole("button", { name: /createSession.submit/i })
+        screen.getByRole("button", { name: /createSession.submit/i }),
       );
 
       expect(screen.getByText("validation.requiredFields")).toBeInTheDocument();
@@ -126,23 +126,23 @@ describe("CreateSessionForm Component", () => {
 
       await user.type(
         screen.getByPlaceholderText(/createSession.role.placeholder/i),
-        "Software Engineer"
+        "Software Engineer",
       );
       await user.type(
         screen.getByPlaceholderText(/createSession.experience.placeholder/i),
-        "3 years"
+        "3",
       );
       await user.type(
         screen.getByPlaceholderText(/createSession.topics.placeholder/i),
-        "React, TypeScript"
+        "React, TypeScript",
       );
       await user.click(
-        screen.getByRole("button", { name: /createSession.submit/i })
+        screen.getByRole("button", { name: /createSession.submit/i }),
       );
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith(
-          "/interview-prep/session-123"
+          "/interview-prep/session-123",
         );
       });
     });
@@ -151,7 +151,9 @@ describe("CreateSessionForm Component", () => {
       // Make the API call take some time
       mockedAxios.post.mockImplementation(
         () =>
-          new Promise((resolve) => setTimeout(() => resolve({ data: [] }), 100))
+          new Promise((resolve) =>
+            setTimeout(() => resolve({ data: [] }), 100),
+          ),
       );
 
       renderForm();
@@ -159,21 +161,24 @@ describe("CreateSessionForm Component", () => {
 
       await user.type(
         screen.getByPlaceholderText(/createSession.role.placeholder/i),
-        "Software Engineer"
+        "Software Engineer",
       );
       await user.type(
         screen.getByPlaceholderText(/createSession.experience.placeholder/i),
-        "3 years"
+        "3",
       );
       await user.type(
         screen.getByPlaceholderText(/createSession.topics.placeholder/i),
-        "React, TypeScript"
+        "React, TypeScript",
       );
       await user.click(
-        screen.getByRole("button", { name: /createSession.submit/i })
+        screen.getByRole("button", { name: /createSession.submit/i }),
       );
 
-      expect(screen.getByText(/createSession.generating/i)).toBeInTheDocument();
+      // Wait for loading state to appear
+      expect(
+        await screen.findByText(/createSession.generating/i),
+      ).toBeInTheDocument();
     });
   });
 });

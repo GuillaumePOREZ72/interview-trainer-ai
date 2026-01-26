@@ -11,6 +11,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import QuestionCard from "../../../components/cards/QuestionCard";
+import { useState } from "react";
 
 // Mock AIResponsePreview component
 jest.mock("../../../pages/interviewPrep/components/AIResponsePreview", () => ({
@@ -33,6 +34,9 @@ describe("QuestionCard Component", () => {
     jest.clearAllMocks();
   });
 
+  // The component is controlled via the `isOpen` prop in the app.
+  // Tests will render it with `isOpen` explicitly set.
+
   describe("Rendering", () => {
     it("should render the question text", () => {
       render(<QuestionCard {...defaultProps} />);
@@ -48,69 +52,48 @@ describe("QuestionCard Component", () => {
     });
 
     it("should not show answer content initially (collapsed)", () => {
-      render(<QuestionCard {...defaultProps} />);
+      const { queryByTestId } = render(
+        <QuestionCard {...defaultProps} isOpen={false} />,
+      );
 
-      // The answer container should have height 0
-      const answerContainer = screen.getByTestId("ai-response-preview")
-        .parentElement?.parentElement;
-      expect(answerContainer?.parentElement).toHaveStyle({ height: "0px" });
+      // The AI preview should not be rendered when closed
+      expect(queryByTestId("ai-response-preview")).toBeNull();
     });
   });
 
   describe("Expand/Collapse", () => {
-    it("should expand when clicking on the question", async () => {
-      render(<QuestionCard {...defaultProps} />);
-      const user = userEvent.setup();
+    it("should render expanded content when `isOpen` is true", async () => {
+      render(<QuestionCard {...defaultProps} isOpen={true} />);
 
-      // Click on the question text
-      await user.click(screen.getByText("What is React?"));
-
-      // Wait for expansion animation
-      await waitFor(() => {
-        const answerContainer = screen.getByTestId("ai-response-preview")
-          .parentElement?.parentElement;
-        expect(answerContainer?.parentElement).not.toHaveStyle({
-          height: "0px",
-        });
+      // The AI preview should be rendered when open
+      const answerContainer = screen.getByTestId("ai-response-preview")
+        .parentElement?.parentElement;
+      expect(answerContainer?.parentElement).not.toHaveStyle({
+        height: "0px",
       });
     });
 
-    it("should collapse when clicking again", async () => {
-      render(<QuestionCard {...defaultProps} />);
-      const user = userEvent.setup();
+    it("should not render answer content when `isOpen` is false", async () => {
+      const { queryByTestId } = render(
+        <QuestionCard {...defaultProps} isOpen={false} />,
+      );
 
-      // Expand
-      await user.click(screen.getByText("What is React?"));
-
-      // Collapse
-      await user.click(screen.getByText("What is React?"));
-
-      await waitFor(() => {
-        const answerContainer = screen.getByTestId("ai-response-preview")
-          .parentElement?.parentElement;
-        expect(answerContainer?.parentElement).toHaveStyle({ height: "0px" });
-      });
+      expect(queryByTestId("ai-response-preview")).toBeNull();
     });
 
     it("should show answer content when expanded", async () => {
-      render(<QuestionCard {...defaultProps} />);
-      const user = userEvent.setup();
-
-      await user.click(screen.getByText("What is React?"));
+      render(<QuestionCard {...defaultProps} isOpen={true} />);
 
       expect(screen.getByTestId("ai-response-preview")).toHaveTextContent(
-        "React is a JavaScript library for building user interfaces."
+        "React is a JavaScript library for building user interfaces.",
       );
     });
   });
 
   describe("Pin Button", () => {
     it("should call onTogglePin when pin button is clicked", async () => {
-      render(<QuestionCard {...defaultProps} />);
+      render(<QuestionCard {...defaultProps} isOpen={true} />);
       const user = userEvent.setup();
-
-      // Hover to show buttons (or expand)
-      await user.click(screen.getByText("What is React?"));
 
       // Find and click pin button
       const pinButtons = screen.getAllByRole("button");
@@ -128,7 +111,7 @@ describe("QuestionCard Component", () => {
       // When pinned, the button should have the primary background
       const buttons = screen.getAllByRole("button");
       const pinnedButton = buttons.find((btn) =>
-        btn.className.includes("bg-primary")
+        btn.className.includes("bg-primary"),
       );
       expect(pinnedButton).toBeInTheDocument();
     });
@@ -136,11 +119,8 @@ describe("QuestionCard Component", () => {
 
   describe("Learn More Button", () => {
     it("should call onLearnMore and expand when Learn More is clicked", async () => {
-      render(<QuestionCard {...defaultProps} />);
+      render(<QuestionCard {...defaultProps} isOpen={true} />);
       const user = userEvent.setup();
-
-      // First expand to see the button
-      await user.click(screen.getByText("What is React?"));
 
       // Find and click Learn More button (using translation key)
       const learnMoreButton = screen.getByText("question.learnMore");
@@ -151,11 +131,8 @@ describe("QuestionCard Component", () => {
 
     it("should not propagate click event to parent", async () => {
       const mockToggle = jest.fn();
-      render(<QuestionCard {...defaultProps} />);
+      render(<QuestionCard {...defaultProps} isOpen={true} />);
       const user = userEvent.setup();
-
-      // Expand first
-      await user.click(screen.getByText("What is React?"));
 
       // Click Learn More (using translation key)
       await user.click(screen.getByText("question.learnMore"));
