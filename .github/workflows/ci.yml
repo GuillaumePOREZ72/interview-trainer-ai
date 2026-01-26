@@ -119,7 +119,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./deploy-frontend
+          local-dir: ./deploy-frontend/
           server-dir: interview-app/frontend/
 
       - name: Deploy backend via FTP
