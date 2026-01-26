@@ -92,7 +92,7 @@ jobs:
           path: backend-dist
 
       - name: Deploy frontend via FTP
-        uses: SamKirkland/FTP-Deploy-Action@4.4.0
+        uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
@@ -101,7 +101,7 @@ jobs:
           server-dir: interview-app/frontend
 
       - name: Deploy backend via FTP
-        uses: SamKirkland/FTP-Deploy-Action@4.4.0
+        uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
