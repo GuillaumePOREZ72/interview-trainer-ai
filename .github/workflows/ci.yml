@@ -26,12 +26,18 @@ jobs:
       - name: Run tests
         run: cd backend && npm test
         env:
-          JWT_SECRET: ${{ secrets.JWT_SECRET || 'test-secret' }}
-          REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET || 'test-refresh-secret' }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || 'test-key' }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
 
       - name: Build backend
         run: cd backend && npm run build
+
+      - name: Upload backend build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist
+          path: backend/dist
 
   frontend-tests:
     name: Frontend Tests & Build
@@ -52,9 +58,53 @@ jobs:
       - name: Run tests
         run: cd frontend/interview-prep-ai && npm test
         env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL || 'http://localhost:8000' }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
       - name: Build frontend
         run: cd frontend/interview-prep-ai && npm run build
         env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL || 'https://backend.gpdev.org' }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+
+      - name: Upload frontend build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/interview-prep-ai/dist
+
+  ftp-deploy:
+    name: Deploy via FTP
+    needs: [backend-tests, frontend-tests]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download frontend build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend-dist
+
+      - name: Download backend build
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist
+          path: backend-dist
+
+      - name: Deploy frontend via FTP
+        uses: SamKirkland/FTP-Deploy-Action@4.4.0
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./frontend-dist
+          server-dir: interview-app/frontend
+
+      - name: Deploy backend via FTP
+        uses: SamKirkland/FTP-Deploy-Action@4.4.0
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./backend-dist
+          server-dir: interview-app/backend
