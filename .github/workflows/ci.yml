@@ -85,6 +85,28 @@ jobs:
           name: frontend-dist
           path: frontend-dist
 
+      - name: Inspect frontend artifact
+        run: |
+          echo "Listing frontend-dist contents for debug"
+          ls -laR frontend-dist || true
+
+      - name: Prepare frontend for FTP
+        run: |
+          echo "Preparing deploy-frontend folder with dist contents"
+          rm -rf deploy-frontend || true
+          mkdir -p deploy-frontend
+          # If artifact contains a top-level dist, copy it. Otherwise search for any dist/ folders inside
+          if [ -d frontend-dist/dist ]; then
+            cp -r frontend-dist/dist/* deploy-frontend/ || true
+          else
+            # enable globstar for recursive **
+            bash -lc 'shopt -s globstar; cp -r frontend-dist/**/dist/* ../deploy-frontend/ 2>/dev/null || true'
+            # fallback: copy everything
+            cp -r frontend-dist/* deploy-frontend/ || true
+          fi
+          echo "deploy-frontend contents:"
+          ls -la deploy-frontend || true
+
       - name: Download backend build
         uses: actions/download-artifact@v4
         with:
@@ -97,7 +119,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./frontend-dist/
+          local-dir: ./deploy-frontend
           server-dir: interview-app/frontend/
 
       - name: Deploy backend via FTP
