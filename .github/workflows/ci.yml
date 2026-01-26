@@ -98,7 +98,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./frontend-dist/
-          server-dir: interview-app/frontend
+          server-dir: interview-app/frontend/
 
       - name: Deploy backend via FTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.0
@@ -106,5 +106,5 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./backend-dist
-          server-dir: interview-app/backend
+          local-dir: ./backend-dist/
+          server-dir: interview-app/backend/
