@@ -14,7 +14,7 @@ export interface Session {
 
 export interface CreateSessionFormData {
   role: string;
-  experience: string;
+  experience: number;
   topicsToFocus: string;
   description: string;
 }

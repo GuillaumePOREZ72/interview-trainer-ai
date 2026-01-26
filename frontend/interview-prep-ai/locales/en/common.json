@@ -182,8 +182,12 @@
     "yesDelete": "Yes, Delete"
   },
   "language": {
-    "en": "English",
-    "fr": "Français",
+    "en": "EN",
+    "fr": "FR",
     "select": "Select language"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark"
   }
 }

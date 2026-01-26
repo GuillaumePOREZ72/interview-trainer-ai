@@ -4,7 +4,7 @@ import HERO_IMG from "../assets/hero-img.png";
 import LOGO from "../assets/logo.png";
 import { APP_FEATURES } from "../utils/data";
 import { useNavigate } from "react-router-dom";
-import { LuSparkles, LuMenu, LuX } from "react-icons/lu";
+import { LuSparkles, LuMenu, LuX, LuHouse } from "react-icons/lu";
 import { AnimatePresence, motion } from "framer-motion";
 import Login from "./auth/Login";
 import Signup from "./auth/Signup";
@@ -23,7 +23,7 @@ const LandingPage = () => {
   const { user } = useUser();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
-  
+
   const [openAuthModal, setOpenAuthModal] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<AuthPage>("login");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
@@ -114,7 +114,10 @@ const LandingPage = () => {
                     {/* User Profile or Auth */}
                     {user ? (
                       <div className="pb-4 border-b border-border-primary">
-                        <ProfileInfoCard />
+                        <ProfileInfoCard
+                          compact
+                          onClose={() => setIsMobileMenuOpen(false)}
+                        />
                       </div>
                     ) : (
                       <button
@@ -158,6 +161,19 @@ const LandingPage = () => {
                           </button>
                         </div>
                       </div>
+                      {/* Dashboard (mobile) */}
+                      {user && (
+                        <button
+                          onClick={() => {
+                            navigate("/dashboard");
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className="w-full text-left px-2 py-3 text-sm hover:bg-bg-tertiary transition-all flex items-center gap-18 rounded-xl"
+                        >
+                          {t("nav.dashboard")}
+                          <LuHouse className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
                   </motion.div>
                 )}

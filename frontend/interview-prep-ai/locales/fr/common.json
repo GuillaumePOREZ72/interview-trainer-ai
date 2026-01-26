@@ -185,5 +185,9 @@
     "en": "English",
     "fr": "Français",
     "select": "Choisir la langue"
+  },
+  "theme": {
+    "light": "Clair",
+    "dark": "Sombre"
   }
 }

@@ -1,4 +1,4 @@
-import { useState, FormEvent, ChangeEvent } from "react";
+import { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Input from "../../components/inputs/Input";
@@ -12,7 +12,6 @@ import {
   CreateSessionResponse,
 } from "../../types";
 import {
-  LuSparkles,
   LuBriefcase,
   LuClock,
   LuTags,
@@ -23,7 +22,7 @@ const CreateSessionForm = () => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState<CreateSessionFormData>({
     role: "",
-    experience: "",
+    experience: 0,
     topicsToFocus: "",
     description: "",
   });
@@ -54,7 +53,7 @@ const CreateSessionForm = () => {
     setIsLoading(true);
 
     try {
-      // Call AI API to generate questons
+      // Call AI API to generate questions
       const aiResponse = await axiosInstance.post<Question[]>(
         API_PATHS.AI.GENERATE_QUESTIONS,
         {
@@ -65,7 +64,7 @@ const CreateSessionForm = () => {
         }
       );
 
-      // Should an array: [{question, answer}, ...]
+      // Should generate an array: [{question, answer}, ...]
       const generatedQuestions = aiResponse.data;
 
       const response = await axiosInstance.post<CreateSessionResponse>(
@@ -129,7 +128,7 @@ const CreateSessionForm = () => {
             value={formData.experience}
             onChange={({ target }) => handleChange("experience", target.value)}
             placeholder={t("createSession.experience.placeholder")}
-            type="text"
+            type="number"
           />
         </div>
 
