@@ -50,7 +50,7 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
     try {
       setIsLoading(true);
 
-      const response = await axiosInstance.post<AuthResponse>(
+      const response = await axiosInstance.post<{ user: User }>(
         API_PATHS.AUTH.REGISTER,
         {
           name: fullName,
@@ -59,12 +59,8 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
         },
       );
 
-      const { token } = response.data;
-
-      if (token) {
-        updateUser(response.data);
-        navigate("/dashboard");
-      }
+      updateUser(response.data.user);
+      navigate("/dashboard");
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
       if (axiosError.response?.data.message) {

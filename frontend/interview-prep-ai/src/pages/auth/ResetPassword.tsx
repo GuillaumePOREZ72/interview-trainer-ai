@@ -7,11 +7,14 @@ import { API_PATHS } from "../../utils/apiPaths";
 import { AxiosError } from "axios";
 import { LuLock } from "react-icons/lu";
 import { toast } from "react-hot-toast";
+import { useUser } from "../../hooks/useUser";
+import { User } from "../../types";
 
 const ResetPassword = () => {
   const { t } = useTranslation();
   const { resetToken } = useParams();
   const navigate = useNavigate();
+  const { updateUser } = useUser();
 
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -48,11 +51,17 @@ const ResetPassword = () => {
         },
       );
 
+      // Fetch user profile to log in immediately
+      const profileResponse = await axiosInstance.get<User>(
+        API_PATHS.AUTH.GET_PROFILE,
+      );
+      updateUser(profileResponse.data);
+
       toast.success(t("auth.resetPassword.successMessage"));
 
-      // Redirect to home (Login modal handling could be improved later)
+      // Redirect to dashboard
       setTimeout(() => {
-        navigate("/");
+        navigate("/dashboard");
       }, 2000);
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;

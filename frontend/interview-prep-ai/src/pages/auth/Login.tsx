@@ -40,7 +40,7 @@ const Login = ({ setCurrentPage }: LoginProps) => {
 
     // Login API call
     try {
-      const response = await axiosInstance.post<AuthResponse>(
+      const response = await axiosInstance.post<{ user: User }>(
         API_PATHS.AUTH.LOGIN,
         {
           email,
@@ -48,12 +48,8 @@ const Login = ({ setCurrentPage }: LoginProps) => {
         },
       );
 
-      const { token } = response.data;
-
-      if (token) {
-        updateUser(response.data);
-        navigate("/dashboard");
-      }
+      updateUser(response.data.user);
+      navigate("/dashboard");
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
       if (axiosError.response?.data?.message) {

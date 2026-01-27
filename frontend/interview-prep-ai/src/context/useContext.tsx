@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect, ReactNode } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import { API_PATHS } from "../utils/apiPaths";
-import { User, UserContextType, AuthResponse } from "../types";
+import { User, UserContextType } from "../types";
 
 export const UserContext = createContext<UserContextType | undefined>(
   undefined,
@@ -15,10 +15,18 @@ const UserProvider = ({ children }: UserProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Helper function to get cookie value
+  const getCookie = (name: string): string | null => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+    return null;
+  };
+
   useEffect(() => {
     if (user) return;
 
-    const accessToken = localStorage.getItem("token");
+    const accessToken = getCookie("token");
     if (!accessToken) {
       setLoading(false);
       return;
@@ -39,18 +47,18 @@ const UserProvider = ({ children }: UserProviderProps) => {
     fetchUser();
   }, [user]);
 
-  const updateUser = (userData: AuthResponse) => {
-    localStorage.setItem("user", JSON.stringify(userData.user));
-    localStorage.setItem("token", userData.token);
-    localStorage.setItem("refreshToken", userData.refreshToken);
-    setUser(userData.user);
+  const updateUser = (userData: User) => {
+    localStorage.setItem("user", JSON.stringify(userData));
+    setUser(userData);
     setLoading(false);
   };
 
   const clearUser = () => {
     setUser(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
+    // Clear cookies by setting expired ones
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   };
 
   return (

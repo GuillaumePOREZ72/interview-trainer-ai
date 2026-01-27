@@ -10,14 +10,12 @@ export interface User {
 // Type pour la réponse de login/signup
 export interface AuthResponse {
   user: User;
-  token: string;
-  refreshToken: string;
 }
 
 // Type pour le UserContext
 export interface UserContextType {
   user: User | null;
   loading: boolean;
-  updateUser: (userData: AuthResponse) => void;
+  updateUser: (user: User) => void;
   clearUser: () => void;
 }

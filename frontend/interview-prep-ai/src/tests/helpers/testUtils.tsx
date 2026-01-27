@@ -94,8 +94,6 @@ export function createMockAuthResponse(
 ): AuthResponse {
   return {
     user: createMockUser(),
-    token: "mock-access-token-12345",
-    refreshToken: "mock-refresh-token-67890",
     ...overrides,
   };
 }
@@ -145,16 +143,16 @@ export function setupAuthenticatedUser(
   token = "mock-access-token",
   refreshToken = "mock-refresh-token"
 ): void {
-  localStorage.setItem("token", token);
-  localStorage.setItem("refreshToken", refreshToken);
+  document.cookie = `token=${token}; path=/`;
+  document.cookie = `refreshToken=${refreshToken}; path=/`;
 }
 
 /**
  * Clear authentication from localStorage
  */
 export function clearAuthentication(): void {
-  localStorage.removeItem("token");
-  localStorage.removeItem("refreshToken");
+  document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 }
 
 /**
