@@ -97,7 +97,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./frontend-dist/
+          local-dir: ./frontend-dist/frontend/interview-prep-ai/dist/
           server-dir: interview-app/frontend/interview-prep-ai/dist/
 
       - name: Deploy backend via FTP
@@ -106,5 +106,5 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./backend-dist/
+          local-dir: ./backend-dist/backend/dist/
           server-dir: interview-app/backend/
