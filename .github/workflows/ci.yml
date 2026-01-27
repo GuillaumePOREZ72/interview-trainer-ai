@@ -91,13 +91,20 @@ jobs:
           name: backend-dist
           path: backend-dist
 
+      - name: Inspect downloaded artifacts
+        run: |
+          echo "--- frontend-dist ---"
+          ls -laR frontend-dist || true
+          echo "--- backend-dist ---"
+          ls -laR backend-dist || true
+
       - name: Deploy frontend via FTP (to dist)
         uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./frontend-dist/frontend/interview-prep-ai/dist/
+          local-dir: ./frontend-dist/
           server-dir: interview-app/frontend/interview-prep-ai/dist/
 
       - name: Deploy backend via FTP
@@ -106,5 +113,5 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./backend-dist/backend/dist/
+          local-dir: ./backend-dist/
           server-dir: interview-app/backend/
