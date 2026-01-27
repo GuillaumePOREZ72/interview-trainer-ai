@@ -79,13 +79,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Download frontend build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend-dist
+
+      - name: Download backend build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist
+          path: backend-dist
+
       - name: Deploy frontend via FTP (to dist)
         uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./frontend/interview-prep-ai/dist/
+          local-dir: ./frontend-dist/
           server-dir: interview-app/frontend/interview-prep-ai/dist/
 
       - name: Deploy backend via FTP
