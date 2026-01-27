@@ -122,6 +122,33 @@ jobs:
           local-dir: ./deploy-frontend/
           server-dir: interview-app/frontend/interview-prep-ai/
 
+      - name: Create root redirect to interview-prep-ai
+        run: |
+          mkdir -p deploy-root
+          cat > deploy-root/index.html <<'HTML'
+          <!doctype html>
+          <html>
+            <head>
+              <meta charset="utf-8" />
+              <meta http-equiv="refresh" content="0; url=./interview-prep-ai/" />
+              <script>window.location.href = './interview-prep-ai/';</script>
+              <title>Redirecting...</title>
+            </head>
+            <body>
+              Redirecting to the app...
+            </body>
+          </html>
+          HTML
+
+      - name: Deploy root redirect (no delete)
+        uses: SamKirkland/FTP-Deploy-Action@4.3.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./deploy-root/
+          server-dir: interview-app/frontend/
+
       - name: Deploy backend via FTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
