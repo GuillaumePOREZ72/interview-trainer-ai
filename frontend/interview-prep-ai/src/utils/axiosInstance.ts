@@ -98,11 +98,6 @@ axiosInstance.interceptors.response.use(
         `${BASE_URL}${API_PATHS.AUTH.REFRESH_TOKEN}`
       );
 
-      // Tokens are now in cookies, no need to update localStorage
-
-      // Update authorization header for the original request (though not needed with cookies)
-      // originalRequest.headers.Authorization = `Bearer ${newAccessToken}`; // Remove since no Bearer
-
       // Process queued requests
       processQueue(null, "refreshed");
 

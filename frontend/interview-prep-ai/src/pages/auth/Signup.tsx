@@ -44,6 +44,11 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
       return;
     }
 
+    if (password.length < 8 || !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+      setError("Password must be at least 8 characters long and contain uppercase, lowercase, and a number");
+      return;
+    }
+
     setError("");
 
     // Signup API Call

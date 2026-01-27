@@ -39,7 +39,6 @@ const sendEmail = async (options: EmailOptions): Promise<void> => {
     to: options.email,
     subject: options.subject,
     text: options.message,
-    // html: options.html // Could extend later
   };
 
   const info = await transporter.sendMail(message);
