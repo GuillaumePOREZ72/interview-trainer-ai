@@ -50,8 +50,8 @@ export const createApp = (): Express => {
         if (whitelist.includes(origin)) {
           callback(null, true);
         } else {
+          logger.warn(`CORS blocked: ${origin} not in whitelist. Current whitelist: ${whitelist.join(', ')}`);
           callback(new Error(`CORS error: ${origin} is not allowed by CORS`));
-          logger.warn(`CORS error: ${origin} is not allowed by CORS`);
         }
       }
     },
