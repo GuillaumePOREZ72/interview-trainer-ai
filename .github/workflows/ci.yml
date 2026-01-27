@@ -120,7 +120,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./deploy-frontend/
-          server-dir: interview-app/frontend/
+          server-dir: interview-app/frontend/interview-prep-ai/
 
       - name: Deploy backend via FTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.0
