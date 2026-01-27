@@ -12,6 +12,7 @@ const axiosInstance: AxiosInstance = axios.create({
     "Content-Type": "application/json",
     Accept: "application/json",
   },
+  withCredentials: true, // Send cookies with requests
 });
 
 // Flag to prevent multiple refresh attempts
@@ -39,10 +40,6 @@ const processQueue = (
 // Request Interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    const accessToken = localStorage.getItem("token");
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
     const language = localStorage.getItem("i18nextLng") || "en";
     (config.headers as any)["Accept-Language"] = language;
 
@@ -85,8 +82,7 @@ axiosInstance.interceptors.response.use(
       return new Promise((resolve, reject) => {
         failedQueue.push({ resolve, reject });
       })
-        .then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
+        .then(() => {
           return axiosInstance(originalRequest);
         })
         .catch((err) => {
@@ -97,31 +93,18 @@ axiosInstance.interceptors.response.use(
     originalRequest._retry = true;
     isRefreshing = true;
 
-    const refreshToken = localStorage.getItem("refreshToken");
-
-    if (!refreshToken) {
-      isRefreshing = false;
-      clearAuthTokens();
-      window.location.href = "/";
-      return Promise.reject(error);
-    }
-
     try {
       const response = await axios.post(
-        `${BASE_URL}${API_PATHS.AUTH.REFRESH_TOKEN}`,
-        {
-          refreshToken,
-        }
+        `${BASE_URL}${API_PATHS.AUTH.REFRESH_TOKEN}`
       );
 
-      const { token: newAccessToken } = response.data;
-      localStorage.setItem("token", newAccessToken);
+      // Tokens are now in cookies, no need to update localStorage
 
-      // Update authorization header for the original request
-      originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+      // Update authorization header for the original request (though not needed with cookies)
+      // originalRequest.headers.Authorization = `Bearer ${newAccessToken}`; // Remove since no Bearer
 
-      // Process queued requests with new token
-      processQueue(null, newAccessToken);
+      // Process queued requests
+      processQueue(null, "refreshed");
 
       return axiosInstance(originalRequest);
     } catch (refreshError) {
@@ -137,8 +120,9 @@ axiosInstance.interceptors.response.use(
 
 // Helper function to clear auth tokens
 const clearAuthTokens = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("refreshToken");
+  // Clear cookies by setting expired ones
+  document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 };
 
 export default axiosInstance;

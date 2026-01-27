@@ -1,7 +1,10 @@
 import User, { IUser } from "../models/User";
+import RevokedToken from "../models/RevokedToken";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
+import { body, validationResult } from "express-validator";
+import validator from "validator";
 import { logger } from "../config/logger";
 import crypto from "crypto";
 import sendEmail from "../utils/sendEmail";
@@ -23,7 +26,25 @@ const generateRefreshToken = (userId: string): string => {
 // Register a new user
 const registerUser = async (req: Request, res: Response): Promise<void> => {
   try {
+    // Validate input
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ message: "Validation errors", errors: errors.array() });
+      return;
+    }
+
     const { name, email, password } = req.body;
+
+    if (!validator.isEmail(email)) {
+      res.status(400).json({ message: "Invalid email format" });
+      return;
+    }
+
+    // Password strength: at least 8 chars, mix of letters and numbers
+    if (password.length < 8 || !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+      res.status(400).json({ message: "Password must be at least 8 characters long and contain uppercase, lowercase, and number" });
+      return;
+    }
 
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -48,14 +69,26 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
 
     logger.info(`✅ New user registered: ${email}`);
 
+    // Send tokens in HttpOnly cookies
+    res.cookie('token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 10 * 60 * 1000, // 10 minutes
+    });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
     res.status(201).json({
       user: {
         _id: user._id,
         name: user.name,
         email: user.email,
       },
-      token: accessToken,
-      refreshToken,
     });
   } catch (error) {
     const errorMessage =
@@ -71,7 +104,19 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
 // Login user
 const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {
+    // Validate input
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ message: "Validation errors", errors: errors.array() });
+      return;
+    }
+
     const { email, password } = req.body;
+
+    if (!validator.isEmail(email)) {
+      res.status(400).json({ message: "Invalid email format" });
+      return;
+    }
 
     const user = await User.findOne({ email });
     if (!user) {
@@ -92,14 +137,26 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
 
     logger.info(`✅ User logged in: ${email}`);
 
+    // Send tokens in HttpOnly cookies
+    res.cookie('token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 10 * 60 * 1000, // 10 minutes
+    });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
     res.json({
       user: {
         _id: user._id,
         name: user.name,
         email: user.email,
       },
-      token: accessToken,
-      refreshToken,
     });
   } catch (error) {
     const errorMessage =
@@ -118,10 +175,18 @@ const refreshAccessToken = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const { refreshToken } = req.body;
+    const refreshToken = req.cookies?.refreshToken;
 
     if (!refreshToken) {
       res.status(401).json({ message: "Refresh token is required" });
+      return;
+    }
+
+    // Check if refresh token is revoked
+    const revoked = await RevokedToken.findOne({ token: refreshToken });
+    if (revoked) {
+      logger.warn(`Attempt to use revoked refresh token`);
+      res.status(401).json({ message: "Invalid refresh token" });
       return;
     }
 
@@ -131,6 +196,7 @@ const refreshAccessToken = async (
       process.env.REFRESH_TOKEN_SECRET!,
     ) as {
       id: string;
+      exp: number;
     };
 
     // Check if user still exists
@@ -141,13 +207,34 @@ const refreshAccessToken = async (
       return;
     }
 
-    // Generate new access token
+    // Revoke the old refresh token
+    await RevokedToken.create({
+      token: refreshToken,
+      expiry: new Date(decoded.exp * 1000),
+    });
+
+    // Generate new access token and new refresh token
     const newAccessToken = generateToken(user._id.toString());
+    const newRefreshToken = generateRefreshToken(user._id.toString());
 
     logger.info(`🔄 Access token refreshed for user: ${user.email}`);
 
+    // Send new tokens in HttpOnly cookies
+    res.cookie('token', newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 10 * 60 * 1000,
+    });
+    res.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     res.json({
-      token: newAccessToken,
+      message: "Token refreshed",
     });
   } catch (error) {
     const errorMessage =
@@ -183,7 +270,20 @@ const getUserProfile = async (req: Request, res: Response): Promise<void> => {
 // Forgot Password
 const forgotPassword = async (req: Request, res: Response): Promise<void> => {
   try {
+    // Validate input
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ message: "Validation errors", errors: errors.array() });
+      return;
+    }
+
     const { email } = req.body;
+
+    if (!validator.isEmail(email)) {
+      res.status(400).json({ message: "Invalid email format" });
+      return;
+    }
+
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -237,11 +337,24 @@ const forgotPassword = async (req: Request, res: Response): Promise<void> => {
 // Reset Password
 const resetPassword = async (req: Request, res: Response): Promise<void> => {
   try {
+    // Validate input
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ message: "Validation errors", errors: errors.array() });
+      return;
+    }
+
     const { password } = req.body;
     const { resetToken } = req.params;
 
     if (!resetToken) {
       res.status(400).json({ message: "Invalid token" });
+      return;
+    }
+
+    // Password strength
+    if (password.length < 8 || !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+      res.status(400).json({ message: "Password must be at least 8 characters long and contain uppercase, lowercase, and number" });
       return;
     }
 
@@ -270,13 +383,27 @@ const resetPassword = async (req: Request, res: Response): Promise<void> => {
 
     await user.save();
 
-    // Optional: Auto login logic could act here, but let's return success
+    // Auto login: generate tokens
     const accessToken = generateToken(user._id.toString());
+    const refreshToken = generateRefreshToken(user._id.toString());
+
+    // Send tokens in cookies
+    res.cookie('token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 10 * 60 * 1000,
+    });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
     res.status(200).json({
       success: true,
       data: "Password updated successfully",
-      token: accessToken,
     });
   } catch (error) {
     const errorMessage =

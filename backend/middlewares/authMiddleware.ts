@@ -19,19 +19,29 @@ export const protect = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    let token = req.headers.authorization;
+    let token = req.headers.authorization?.startsWith("Bearer")
+      ? req.headers.authorization.split(" ")[1]
+      : req.cookies?.token;
 
-    if (token && token.startsWith("Bearer")) {
-      token = token.split(" ")[1]; // Extract token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-        id: string;
-      };
-      req.user = await User.findById(decoded.id).select("-password");
-      next();
-    } else {
-      logger.warn("Authentication failed: User not found for token");
+    if (!token) {
+      logger.warn("Authentication failed: No token provided");
       res.status(401).json({ message: "Not authorized, no token" });
+      return;
     }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+      id: string;
+    };
+
+    req.user = await User.findById(decoded.id).select("-password");
+
+    if (!req.user) {
+      logger.warn("Authentication failed: User not found");
+      res.status(401).json({ message: "User not found" });
+      return;
+    }
+
+    next();
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Token failed";
