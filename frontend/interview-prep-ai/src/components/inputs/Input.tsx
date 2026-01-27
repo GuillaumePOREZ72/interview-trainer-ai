@@ -9,6 +9,7 @@ interface InputProps {
   placeholder?: string;
   type?: InputType;
   label?: string;
+  id?: string;
 }
 
 const Input = ({
@@ -17,6 +18,7 @@ const Input = ({
   placeholder = "",
   type = "text",
   label,
+  id,
 }: InputProps) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
@@ -27,12 +29,14 @@ const Input = ({
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-slate-700 mb-2">
+        <label htmlFor={id} className="block text-sm font-medium text-slate-700 mb-2">
           {label}
         </label>
       )}
       <div className="relative flex items-center w-full bg-white border border-slate-200 rounded-lg px-4 py-3 transition-all duration-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 hover:border-slate-300">
         <input
+          id={id}
+          name={id}
           type={
             type === "password" ? (showPassword ? "text" : "password") : type
           }

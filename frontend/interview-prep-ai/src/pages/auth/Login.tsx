@@ -77,6 +77,7 @@ const Login = ({ setCurrentPage }: LoginProps) => {
 
       <form onSubmit={handleLogin} className="space-y-1">
         <Input
+          id="email"
           value={email}
           onChange={({ target }) => setEmail(target.value)}
           label={t("auth.login.email")}
@@ -85,6 +86,7 @@ const Login = ({ setCurrentPage }: LoginProps) => {
         />
 
         <Input
+          id="password"
           value={password}
           onChange={({ target }) => setPassword(target.value)}
           label={t("auth.login.password")}

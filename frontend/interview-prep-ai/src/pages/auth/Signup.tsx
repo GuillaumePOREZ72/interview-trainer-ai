@@ -94,6 +94,7 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
       <form onSubmit={handleSignup} className="space-y-1">
         <div className="grid grid-cols-1 md:grid-cols-1 gap-2">
           <Input
+            id="fullName"
             value={fullName}
             onChange={({ target }) => setFullName(target.value)}
             label={t("auth.signup.fullName")}
@@ -102,6 +103,7 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
           />
 
           <Input
+            id="email"
             value={email}
             onChange={({ target }) => setEmail(target.value)}
             label={t("auth.signup.email")}
@@ -110,6 +112,7 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
           />
 
           <Input
+            id="password"
             value={password}
             onChange={({ target }) => setPassword(target.value)}
             label={t("auth.signup.password")}
