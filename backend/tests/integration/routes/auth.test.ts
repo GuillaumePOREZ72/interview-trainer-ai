@@ -23,8 +23,7 @@ describe("Auth Routes", () => {
       });
 
       expect(response.status).toBe(201);
-      expect(response.body).toHaveProperty("token");
-      expect(response.body).toHaveProperty("refreshToken");
+      expect(response.headers['set-cookie']).toBeDefined();
       expect(response.body).toHaveProperty("user");
       expect(response.body.user.email).toBe("newuser@example.com");
       expect(response.body.user.name).toBe("New User");
@@ -60,8 +59,7 @@ describe("Auth Routes", () => {
       });
 
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty("token");
-      expect(response.body).toHaveProperty("refreshToken");
+      expect(response.headers['set-cookie']).toBeDefined();
       expect(response.body).toHaveProperty("user");
       expect(response.body.user.email).toBe(defaultTestUser.email);
     });
@@ -125,10 +123,10 @@ describe("Auth Routes", () => {
 
       const response = await request(app)
         .post("/api/auth/refresh-token")
-        .send({ refreshToken });
+        .set('Cookie', [`refreshToken=${refreshToken}`]);
 
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty("token");
+      expect(response.body.message).toBe("Token refreshed");
     });
 
     it("should return 401 without refresh token", async () => {
@@ -143,7 +141,7 @@ describe("Auth Routes", () => {
     it("should return 401 with invalid refresh token", async () => {
       const response = await request(app)
         .post("/api/auth/refresh-token")
-        .send({ refreshToken: "invalid-refresh-token" });
+        .set('Cookie', [`refreshToken=invalid-refresh-token`]);
 
       expect(response.status).toBe(401);
       expect(response.body.message).toBe("Invalid or expired refresh token");

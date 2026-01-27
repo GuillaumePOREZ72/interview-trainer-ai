@@ -81,7 +81,7 @@ describe("Auth Routes - Forgot Password", () => {
     // 3. Request Reset Password
     const response = await request(app)
       .put(`/api/auth/resetpassword/${resetToken}`)
-      .send({ password: "newpassword123" });
+      .send({ password: "NewPassword123" });
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
@@ -98,7 +98,7 @@ describe("Auth Routes - Forgot Password", () => {
   it("should return 400 for invalid token", async () => {
     const response = await request(app)
       .put(`/api/auth/resetpassword/invalidtoken`)
-      .send({ password: "newpassword123" });
+      .send({ password: "NewPassword123" });
 
     expect(response.status).toBe(400);
   });

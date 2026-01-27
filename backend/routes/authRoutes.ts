@@ -22,6 +22,7 @@ const authLimiter = rateLimit({
   message: {
     error: "Too many authentication attempts. Try again later.",
   },
+  skip: (req) => process.env.NODE_ENV === 'test', // Skip in tests
 });
 
 // Auth Routes
