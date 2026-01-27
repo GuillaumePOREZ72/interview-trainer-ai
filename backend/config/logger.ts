@@ -27,11 +27,10 @@ if (NODE_ENV === "production") {
 
   try {
     if (!fs.existsSync(logsDir)) {
-      console.log(`[DEBUG] Creating logs directory: ${logsDir}`);
       fs.mkdirSync(logsDir, { recursive: true });
     }
   } catch (e) {
-    console.error("[DEBUG] Failed to create logs directory:", e);
+    // Intentionally silent: if directory creation fails we'll rely on transports' behavior
   }
 
   transports.push(

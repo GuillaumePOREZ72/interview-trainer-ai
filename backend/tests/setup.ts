@@ -30,8 +30,10 @@ beforeAll(async () => {
 
   // Connect to in-memory database
   await mongoose.connect(mongoUri);
-  
-  console.log("✅ Connected to in-memory MongoDB for testing");
+
+  if (process.env.NODE_ENV !== "production") {
+    console.log("✅ Connected to in-memory MongoDB for testing");
+  }
 });
 
 /**
@@ -56,6 +58,7 @@ afterAll(async () => {
   if (mongoServer) {
     await mongoServer.stop();
   }
-  console.log("✅ Disconnected from in-memory MongoDB");
+  if (process.env.NODE_ENV !== "production") {
+    console.log("✅ Disconnected from in-memory MongoDB");
+  }
 });
-

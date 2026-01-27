@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import HERO_IMG from "../assets/hero-img.png";
+import HERO_IMG from "../assets/hero-img.webp";
 import LOGO from "../assets/logo.png";
 import { APP_FEATURES } from "../utils/data";
 import { useNavigate } from "react-router-dom";

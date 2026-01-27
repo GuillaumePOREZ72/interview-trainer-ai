@@ -45,12 +45,10 @@ const createRequiredDirectories = () => {
   dirs.forEach((dir) => {
     if (!fs.existsSync(dir)) {
       try {
-        console.log(`[DEBUG] Attempting to create directory: ${dir}`);
         fs.mkdirSync(dir, { recursive: true });
         logger.info(`📁 Created directory: ${dir}`);
       } catch (err) {
-        console.error(`[DEBUG] Failed to create directory ${dir}:`, err);
-        logger.error(`❌ Failed to create directory ${dir}:`, err);
+        logger.error(`❌ Failed to create directory ${dir}: ${String(err)}`);
       }
     }
   });
@@ -68,16 +66,18 @@ const NODE_ENV = process.env.NODE_ENV || "development";
  * Database connection and server startup
  */
 const startServer = async () => {
-  console.log("🎬 Starting Interview Trainer AI Server...");
+  logger.info("🎬 Starting Interview Trainer AI Server...");
 
   try {
+    // Validate critical env vars before binding to the port
+    validateEnvVariables();
+
     // Create required directories early and safely
     createRequiredDirectories();
 
     // Start listening as soon as possible to satisfy Passenger/o2switch
     const server = app.listen(PORT, () => {
       const msg = `🚀 Server listening on port ${PORT} in ${NODE_ENV} mode`;
-      console.log(msg);
       logger.info(msg);
 
       // Perform background initialization once port is bound
@@ -85,12 +85,10 @@ const startServer = async () => {
     });
 
     server.on("error", (error: any) => {
-      console.error("❌ Server listener error:", error);
-      logger.error("❌ Server listener error:", error);
+      logger.error("❌ Server listener error:", String(error));
     });
   } catch (error) {
-    console.error("❌ Fatal error during startup:", error);
-    logger.error("❌ Fatal error during startup:", error);
+    logger.error("❌ Fatal error during startup:", String(error));
     if (NODE_ENV === "production") {
       // Small delay before exit to allow logs/Passenger to catch up
       setTimeout(() => process.exit(1), 5000);
@@ -103,17 +101,12 @@ const startServer = async () => {
  */
 const initializeBackgroundServices = async () => {
   try {
-    // Validate environment variables (non-fatal start)
-    validateEnvVariables();
-
-    // Connect to database
-    console.log("🔌 Connecting to MongoDB...");
+    // Connect to database (background)
+    logger.info("🔌 Connecting to MongoDB...");
     await connectDB();
-    console.log("✅ Database connected successfully");
     logger.info("✅ Database connected successfully");
   } catch (error) {
-    console.error("❌ Background initialization failed:", error);
-    logger.error("❌ Background initialization failed:", error);
+    logger.error("❌ Background initialization failed:", String(error));
   }
 };
 

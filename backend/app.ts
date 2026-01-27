@@ -66,7 +66,7 @@ export const createApp = (): Express => {
   app.use(express.urlencoded({ extended: true, limit: "10mb" }));
   app.use(cookieParser());
 
-  // Diagnostic middleware for production
+  // Diagnostic middleware for production (do not log request bodies)
   if (NODE_ENV === "production") {
     app.use((req, res, next) => {
       logger.info(`🔍 [${req.method}] ${req.url}`, {
@@ -93,12 +93,8 @@ export const createApp = (): Express => {
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          scriptSrc: ["'self'", "'unsafe-inline'"],
-          styleSrc: [
-            "'self'",
-            "'unsafe-inline'",
-            "https://fonts.googleapis.com",
-          ],
+          scriptSrc: ["'self'"],
+          styleSrc: ["'self'", "https://fonts.googleapis.com"],
           imgSrc: ["'self'", "data:", "blob:", "https://api.dicebear.com"],
           connectSrc: ["'self'"],
           fontSrc: ["'self'", "https:", "data:", "https://fonts.gstatic.com"],
@@ -131,7 +127,8 @@ export const createApp = (): Express => {
 
   // POST test to verify POST requests work
   app.post("/api/ping-post", (req, res) => {
-    logger.info("🏓 POST PING received!", { body: req.body });
+    // Avoid logging request body in production
+    logger.info("🏓 POST PING received!");
     res.json({
       pong: true,
       method: "POST",
@@ -231,15 +228,16 @@ export const createApp = (): Express => {
       res: express.Response,
       next: express.NextFunction,
     ) => {
-      logger.error("❌ Unhandled error", {
-        error: err.message,
-        stack: err.stack,
+      // Do not log request bodies or other potentially sensitive payloads in production
+      const meta: any = {
         url: req.url,
         method: req.method,
-        body: req.body,
-        query: req.query,
-        params: req.params,
-      });
+      };
+      if (NODE_ENV === "development") {
+        meta.stack = err.stack;
+      }
+
+      logger.error("❌ Unhandled error", { error: err.message, ...meta });
 
       res.status(500).json({
         message: "Internal server error",

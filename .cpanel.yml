@@ -1,5 +1,3 @@
-deployment:
-  tasks:
-    - export DEPLOYPATH=/home2/kuwa6817/interview-trainer-ai
-    - /usr/bin/rsync -av --delete --exclude='node_modules' --exclude='.env' --exclude='uploads' --exclude='logs' backend/ $DEPLOYPATH/backend/
-    - /usr/bin/rsync -av --delete frontend/interview-prep-ai/dist/ /home2/kuwa6817/public_html/interview-trainer-ai/
+## Disabled: legacy cpanel deployment config
+# This file was intentionally disabled by maintainer on 2026-01-27
+# If you need a deployment script, prefer documented CI/CD workflows
