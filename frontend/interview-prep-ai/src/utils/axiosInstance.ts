@@ -71,7 +71,7 @@ axiosInstance.interceptors.response.use(
     }
 
     // Don't try to refresh if this is already a refresh token request
-    if (originalRequest.url === API_PATHS.AUTH.REFRESH_TOKEN) {
+    if (originalRequest.url?.endsWith(API_PATHS.AUTH.REFRESH_TOKEN)) {
       window.location.href = "/";
       return Promise.reject(error);
     }

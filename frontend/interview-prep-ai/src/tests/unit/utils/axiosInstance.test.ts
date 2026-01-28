@@ -3,34 +3,15 @@
  *
  * Tests the axios instance configuration and behavior.
  * Note: Testing interceptors directly is complex due to axios internals.
- * These tests verify basic configuration and token storage.
+ * These tests verify basic configuration and API path mocks.
  */
 
+import axiosInstance from "../../../utils/axiosInstance";
+
 describe("axiosInstance", () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
-
-  describe("Token Storage", () => {
-    it("should read token from localStorage", () => {
-      localStorage.setItem("token", "test-token");
-      expect(localStorage.getItem("token")).toBe("test-token");
-    });
-
-    it("should read refreshToken from localStorage", () => {
-      localStorage.setItem("refreshToken", "test-refresh-token");
-      expect(localStorage.getItem("refreshToken")).toBe("test-refresh-token");
-    });
-
-    it("should clear both tokens when cleared", () => {
-      localStorage.setItem("token", "test-token");
-      localStorage.setItem("refreshToken", "test-refresh-token");
-
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
-
-      expect(localStorage.getItem("token")).toBeNull();
-      expect(localStorage.getItem("refreshToken")).toBeNull();
+  describe("Basic Configuration", () => {
+    it("should enable credentials for cookie-based auth", () => {
+      expect(axiosInstance.defaults.withCredentials).toBe(true);
     });
   });
 

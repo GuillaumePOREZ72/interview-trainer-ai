@@ -168,14 +168,14 @@ The authentication system implements a dual-token strategy for enhanced security
 
 1. **Signup/Login:** `authController` validates credentials (bcrypt hashing).
 2. **Token Issue:** Two tokens are generated:
-   - **Access Token:** Short-lived (15 min), used for API authentication via `Authorization: Bearer` header.
-   - **Refresh Token:** Long-lived (7 days), stored in localStorage, used to obtain new access tokens.
+   - **Access Token:** Short-lived (10 min), used for API authentication via `Authorization: Bearer` header.
+   - **Refresh Token:** Long-lived (7 days), stored in HttpOnly cookies, used to obtain new access tokens.
 3. **Token Refresh:** When access token expires:
    - Frontend interceptor catches 401 errors.
    - Automatically calls `POST /api/auth/refresh-token` with refresh token.
    - New access token is issued and original request is retried.
 4. **Protection:** `authMiddleware` intercepts protected routes, verifies the JWT, and attaches `req.user`.
-5. **Logout:** Client removes both tokens from localStorage.
+5. **Logout:** Client clears auth cookies to end the session.
 
 ```mermaid
 sequenceDiagram
@@ -188,12 +188,12 @@ sequenceDiagram
     DB-->>API: User found
     API-->>Client: { accessToken, refreshToken, user }
 
-    Note over Client: Store tokens in localStorage
+    Note over Client: Store tokens in HttpOnly cookies
 
     Client->>API: GET /protected (Authorization: Bearer accessToken)
     API-->>Client: 200 OK (data)
 
-    Note over Client: Access token expires (15 min)
+    Note over Client: Access token expires (10 min)
 
     Client->>API: GET /protected (expired token)
     API-->>Client: 401 Unauthorized
@@ -404,13 +404,13 @@ Each test file operates in complete isolation:
 
 ### **9.1 Authentication Security**
 
-| Layer                | Implementation                       |
-| -------------------- | ------------------------------------ |
-| **Password Hashing** | bcrypt (10 salt rounds)              |
-| **Access Token**     | JWT, 15 min expiry, HS256            |
-| **Refresh Token**    | JWT, 7 days expiry, separate secret  |
-| **Token Storage**    | localStorage (frontend)              |
-| **API Protection**   | Bearer token in Authorization header |
+| Layer                | Implementation                      |
+| -------------------- | ----------------------------------- |
+| **Password Hashing** | bcrypt (10 salt rounds)             |
+| **Access Token**     | JWT, 10 min expiry, HS256           |
+| **Refresh Token**    | JWT, 7 days expiry, separate secret |
+| **Token Storage**    | HttpOnly cookies (frontend)         |
+| **API Protection**   | HttpOnly cookies + CSRF protections |
 
 ### **9.2 API Security**
 
