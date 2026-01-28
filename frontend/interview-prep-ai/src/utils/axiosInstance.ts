@@ -94,7 +94,7 @@ axiosInstance.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${BASE_URL}${API_PATHS.AUTH.REFRESH_TOKEN}`
       );
 

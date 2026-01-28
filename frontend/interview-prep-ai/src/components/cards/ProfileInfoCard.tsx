@@ -19,7 +19,7 @@ const ProfileInfoCard = ({
 }: ProfileInfoCardProps) => {
   const { t, i18n } = useTranslation();
   const { theme, setTheme } = useTheme();
-  const { user, clearUser } = useUser();
+  const { user, logout } = useUser();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -34,8 +34,8 @@ const ProfileInfoCard = ({
     setIsOpen(false);
   };
 
-  const handleLogout = () => {
-    clearUser();
+  const handleLogout = async () => {
+    await logout();
     navigate("/");
     setIsOpen(false);
     if (onClose) onClose();

@@ -29,7 +29,9 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
     // Validate input
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      res.status(400).json({ message: "Validation errors", errors: errors.array() });
+      res
+        .status(400)
+        .json({ message: "Validation errors", errors: errors.array() });
       return;
     }
 
@@ -41,8 +43,14 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Password strength: at least 8 chars, mix of letters and numbers
-    if (password.length < 8 || !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-      res.status(400).json({ message: "Password must be at least 8 characters long and contain uppercase, lowercase, and number" });
+    if (
+      password.length < 8 ||
+      !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)
+    ) {
+      res.status(400).json({
+        message:
+          "Password must be at least 8 characters long and contain uppercase, lowercase, and number",
+      });
       return;
     }
 
@@ -70,16 +78,16 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
     logger.info(`✅ New user registered: ${email}`);
 
     // Send tokens in HttpOnly cookies
-    res.cookie('token', accessToken, {
+    res.cookie("token", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax" as const,
       maxAge: 10 * 60 * 1000, // 10 minutes
     });
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax" as const,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -107,7 +115,9 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
     // Validate input
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      res.status(400).json({ message: "Validation errors", errors: errors.array() });
+      res
+        .status(400)
+        .json({ message: "Validation errors", errors: errors.array() });
       return;
     }
 
@@ -138,16 +148,16 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
     logger.info(`✅ User logged in: ${email}`);
 
     // Send tokens in HttpOnly cookies
-    res.cookie('token', accessToken, {
+    res.cookie("token", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax" as const,
       maxAge: 10 * 60 * 1000, // 10 minutes
     });
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax" as const,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -220,16 +230,16 @@ const refreshAccessToken = async (
     logger.info(`🔄 Access token refreshed for user: ${user.email}`);
 
     // Send new tokens in HttpOnly cookies
-    res.cookie('token', newAccessToken, {
+    res.cookie("token", newAccessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax" as const,
       maxAge: 10 * 60 * 1000,
     });
-    res.cookie('refreshToken', newRefreshToken, {
+    res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax" as const,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -273,7 +283,9 @@ const forgotPassword = async (req: Request, res: Response): Promise<void> => {
     // Validate input
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      res.status(400).json({ message: "Validation errors", errors: errors.array() });
+      res
+        .status(400)
+        .json({ message: "Validation errors", errors: errors.array() });
       return;
     }
 
@@ -340,7 +352,9 @@ const resetPassword = async (req: Request, res: Response): Promise<void> => {
     // Validate input
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      res.status(400).json({ message: "Validation errors", errors: errors.array() });
+      res
+        .status(400)
+        .json({ message: "Validation errors", errors: errors.array() });
       return;
     }
 
@@ -353,8 +367,14 @@ const resetPassword = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Password strength
-    if (password.length < 8 || !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-      res.status(400).json({ message: "Password must be at least 8 characters long and contain uppercase, lowercase, and number" });
+    if (
+      password.length < 8 ||
+      !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)
+    ) {
+      res.status(400).json({
+        message:
+          "Password must be at least 8 characters long and contain uppercase, lowercase, and number",
+      });
       return;
     }
 
@@ -388,16 +408,16 @@ const resetPassword = async (req: Request, res: Response): Promise<void> => {
     const refreshToken = generateRefreshToken(user._id.toString());
 
     // Send tokens in cookies
-    res.cookie('token', accessToken, {
+    res.cookie("token", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax" as const,
       maxAge: 10 * 60 * 1000,
     });
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax" as const,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -412,6 +432,19 @@ const resetPassword = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+// Logout User
+const logoutUser = (req: Request, res: Response): void => {
+  const options = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+  };
+  res.clearCookie("token", options);
+  res.clearCookie("refreshToken", options);
+  res.status(200).json({ ok: true });
+};
+
 export {
   registerUser,
   loginUser,
@@ -419,4 +452,5 @@ export {
   refreshAccessToken,
   forgotPassword,
   resetPassword,
+  logoutUser,
 };
