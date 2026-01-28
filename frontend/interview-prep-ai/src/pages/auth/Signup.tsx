@@ -2,13 +2,13 @@ import { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Input from "../../components/inputs/Input";
-import { validateEmail } from "../../utils/helper";
 import { useUser } from "../../hooks/useUser";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import { AuthResponse, User } from "../../types";
 import { AxiosError } from "axios";
 import { LuSparkles } from "react-icons/lu";
+import { signupSchema } from "../../utils/validationSchemas";
 
 interface SignupProps {
   setCurrentPage: (page: "login" | "signup") => void;
@@ -29,34 +29,28 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
   const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const trimmedFullName = fullName.trim();
-    const trimmedEmail = email.trim();
-    const trimmedPassword = password.trim();
+    const result = signupSchema.safeParse({
+      name: fullName,
+      email: email,
+      password: password,
+    });
 
-    if (!trimmedFullName) {
-      setError(t("validation.fullNameRequired"));
+    if (!result.success) {
+      const firstError = result.error.issues[0];
+      // If the error message is a translation key (e.g. validation.invalidEmail), use t()
+      // otherwise use the message directly (e.g. "Password must be...")
+      const message = firstError.message.includes(".")
+        ? t(firstError.message as any)
+        : firstError.message;
+      setError(message);
       return;
     }
 
-    if (!validateEmail(email)) {
-      setError(t("validation.invalidEmail"));
-      return;
-    }
-
-    if (!password) {
-      setError(t("validation.passwordRequired"));
-      return;
-    }
-
-    if (
-      password.length < 8 ||
-      !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)
-    ) {
-      setError(
-        "Password must be at least 8 characters long and contain uppercase, lowercase, and a number",
-      );
-      return;
-    }
+    const {
+      name: trimmedFullName,
+      email: trimmedEmail,
+      password: trimmedPassword,
+    } = result.data;
 
     setError("");
 

@@ -9,6 +9,7 @@ import { LuLock } from "react-icons/lu";
 import { toast } from "react-hot-toast";
 import { useUser } from "../../hooks/useUser";
 import { User } from "../../types";
+import { resetPasswordSchema } from "../../utils/validationSchemas";
 
 const ResetPassword = () => {
   const { t } = useTranslation();
@@ -30,13 +31,17 @@ const ResetPassword = () => {
   const handleResetPassword = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
-      setError(t("validation.passwordMismatch"));
-      return;
-    }
+    const result = resetPasswordSchema.safeParse({
+      password: password,
+      confirmPassword: confirmPassword,
+    });
 
-    if (password.length < 6) {
-      setError(t("validation.passwordTooShort"));
+    if (!result.success) {
+      const firstError = result.error.issues[0];
+      const message = firstError.message.includes(".")
+        ? t(firstError.message as any)
+        : firstError.message;
+      setError(message);
       return;
     }
 
@@ -47,7 +52,7 @@ const ResetPassword = () => {
       await axiosInstance.put(
         `${API_PATHS.AUTH.RESET_PASSWORD}/${resetToken}`,
         {
-          password,
+          password: result.data.password,
         },
       );
 

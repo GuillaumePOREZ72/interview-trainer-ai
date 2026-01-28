@@ -2,13 +2,13 @@ import { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Input from "../../components/inputs/Input";
-import { validateEmail } from "../../utils/helper";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import { useUser } from "../../hooks/useUser";
 import { AxiosError } from "axios";
 import { AuthResponse, User } from "../../types";
 import { LuSparkles } from "react-icons/lu";
+import { loginSchema } from "../../utils/validationSchemas";
 
 interface LoginProps {
   setCurrentPage: (page: "login" | "signup" | "forgotPassword") => void;
@@ -26,18 +26,21 @@ const Login = ({ setCurrentPage }: LoginProps) => {
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const trimmedEmail = email.trim();
-    const trimmedPassword = password.trim();
+    const result = loginSchema.safeParse({
+      email: email,
+      password: password,
+    });
 
-    if (!validateEmail(trimmedEmail)) {
-      setError(t("validation.invalidEmail"));
+    if (!result.success) {
+      const firstError = result.error.issues[0];
+      const message = firstError.message.includes(".")
+        ? t(firstError.message as any)
+        : firstError.message;
+      setError(message);
       return;
     }
 
-    if (!password) {
-      setError(t("validation.passwordRequired"));
-      return;
-    }
+    const { email: trimmedEmail, password: trimmedPassword } = result.data;
 
     setError("");
 

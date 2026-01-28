@@ -11,12 +11,8 @@ import {
   Question,
   CreateSessionResponse,
 } from "../../types";
-import {
-  LuBriefcase,
-  LuClock,
-  LuTags,
-  LuFileText,
-} from "react-icons/lu";
+import { createSessionSchema } from "../../utils/validationSchemas";
+import { LuBriefcase, LuClock, LuTags, LuFileText } from "react-icons/lu";
 
 const CreateSessionForm = () => {
   const { t } = useTranslation();
@@ -42,12 +38,18 @@ const CreateSessionForm = () => {
   const handleCreateSession = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const { role, experience, topicsToFocus } = formData;
+    const result = createSessionSchema.safeParse(formData);
 
-    if (!role || !experience || !topicsToFocus) {
-      setError(t("validation.requiredFields"));
+    if (!result.success) {
+      const firstError = result.error.issues[0];
+      const message = firstError.message.includes(".")
+        ? t(firstError.message as any)
+        : firstError.message;
+      setError(message);
       return;
     }
+
+    const { role, experience, topicsToFocus } = result.data;
 
     setError("");
     setIsLoading(true);
@@ -61,7 +63,7 @@ const CreateSessionForm = () => {
           experience,
           topicsToFocus,
           numberOfQuestions: 10,
-        }
+        },
       );
 
       // Should generate an array: [{question, answer}, ...]
@@ -72,7 +74,7 @@ const CreateSessionForm = () => {
         {
           ...formData,
           questions: generatedQuestions,
-        }
+        },
       );
 
       if (response.data?.session?._id) {

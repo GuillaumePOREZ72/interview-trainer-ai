@@ -1,11 +1,11 @@
 import { useState, FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import Input from "../../components/inputs/Input";
-import { validateEmail } from "../../utils/helper";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import { AxiosError } from "axios";
 import { LuKeyRound } from "react-icons/lu";
+import { forgotPasswordSchema } from "../../utils/validationSchemas";
 
 interface ForgotPasswordProps {
   setCurrentPage: (page: any) => void;
@@ -21,12 +21,20 @@ const ForgotPassword = ({ setCurrentPage }: ForgotPasswordProps) => {
   const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const trimmedEmail = email.trim();
+    const result = forgotPasswordSchema.safeParse({
+      email: email,
+    });
 
-    if (!validateEmail(trimmedEmail)) {
-      setError(t("validation.invalidEmail"));
+    if (!result.success) {
+      const firstError = result.error.issues[0];
+      const message = firstError.message.includes(".")
+        ? t(firstError.message as any)
+        : firstError.message;
+      setError(message);
       return;
     }
+
+    const { email: trimmedEmail } = result.data;
 
     setError("");
     setMessage("");
