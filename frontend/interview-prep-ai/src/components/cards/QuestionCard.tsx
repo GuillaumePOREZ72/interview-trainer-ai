@@ -32,10 +32,21 @@ const QuestionCard = ({
     <div className="bg-white/80 backdrop-blur-sm rounded-xl mb-4 overflow-hidden py-4 px-5 shadow-lg hover:shadow-xl border border-border-primary  transition-all duration-300 group">
       <div className="flex items-start justify-between cursor-pointer">
         <div className="flex items-center gap-3 flex-1" onClick={toggleExpand}>
-          <div className="shrink-0 w-8 h-8 bg-linear-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/50 dark:to-purple-900/50 rounded-lg flex items-center justify-center mt-0.5">
-            <span className="text-sm font-bold text-primary">
-              {t("question.badge")}
-            </span>
+          <div className="relative shrink-0">
+            <div className="w-8 h-8 bg-linear-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/50 dark:to-purple-900/50 rounded-lg flex items-center justify-center mt-0.5">
+              <span className="text-sm font-bold text-primary">
+                {t("question.badge")}
+              </span>
+            </div>
+            {isPinned && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="absolute -top-1.5 -right-1.5 bg-primary text-white rounded-full p-1 border-2 border-white dark:border-gray-800 shadow-sm"
+              >
+                <LuPin className="w-2.5 h-2.5" />
+              </motion.div>
+            )}
           </div>
           <h3
             className="text-sm md:text-base font-medium text-black leading-relaxed flex-1"
