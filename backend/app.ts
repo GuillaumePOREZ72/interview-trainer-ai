@@ -50,7 +50,9 @@ export const createApp = (): Express => {
         if (whitelist.includes(origin)) {
           callback(null, true);
         } else {
-          logger.warn(`CORS blocked: ${origin} not in whitelist. Current whitelist: ${whitelist.join(', ')}`);
+          logger.warn(
+            `CORS blocked: ${origin} not in whitelist. Current whitelist: ${whitelist.join(", ")}`,
+          );
           callback(new Error(`CORS error: ${origin} is not allowed by CORS`));
         }
       }
@@ -94,7 +96,11 @@ export const createApp = (): Express => {
         directives: {
           defaultSrc: ["'self'"],
           scriptSrc: ["'self'"],
-          styleSrc: ["'self'", "https://fonts.googleapis.com"],
+          styleSrc: [
+            "'self'",
+            "'unsafe-inline'",
+            "https://fonts.googleapis.com",
+          ],
           imgSrc: ["'self'", "data:", "blob:", "https://api.dicebear.com"],
           connectSrc: ["'self'"],
           fontSrc: ["'self'", "https:", "data:", "https://fonts.gstatic.com"],
