@@ -44,10 +44,16 @@ const LandingPage = () => {
     <>
       <div className="w-full min-h-full bg-linear-to-br from-bg-primary via-indigo-50/30 to-purple-50/30 dark:from-bg-primary dark:via-indigo-950/30 dark:to-purple-950/30 relative overflow-hidden">
         {/* Animated gradient blobs */}
-        <div className="w-[500px] h-[500px] bg-linear-to-br from-indigo-200/30 to-purple-200/30 dark:from-indigo-900/30 dark:to-purple-900/30 blur-[80px] absolute top-0 left-0 animate-blob1" />
-        <div className="w-[400px] h-[400px] bg-linear-to-br from-purple-200/30 to-cyan-200/30 dark:from-purple-900/30 dark:to-cyan-900/30 blur-[80px] absolute top-20 right-0 animate-blob2" />
+        <div
+          aria-hidden="true"
+          className="w-[500px] h-[500px] bg-linear-to-br from-indigo-200/30 to-purple-200/30 dark:from-indigo-900/30 dark:to-purple-900/30 blur-[80px] absolute top-0 left-0 animate-blob1"
+        />
+        <div
+          aria-hidden="true"
+          className="w-[400px] h-[400px] bg-linear-to-br from-purple-200/30 to-cyan-200/30 dark:from-purple-900/30 dark:to-cyan-900/30 blur-[80px] absolute top-20 right-0 animate-blob2"
+        />
 
-        <div className="container mx-auto px-4 md:px-8 pt-6 pb-[200px] relative z-10">
+        <main className="container mx-auto px-4 md:px-8 pt-6 pb-[200px] relative z-10">
           {/* Header */}
           <header className="flex justify-between items-center mb-16">
             <div className="flex items-center gap-3">
@@ -186,7 +192,7 @@ const LandingPage = () => {
             <div className="w-full md:w-1/2 pr-4 mb-8 md:mb-0">
               <div className="flex items-center justify-left mb-4">
                 <div className="flex items-center gap-2 text-[13px] text-indigo-700 dark:text-indigo-300 font-semibold bg-indigo-100 dark:bg-indigo-900/50 px-3 py-1.5 rounded-full border border-indigo-200 dark:border-indigo-700">
-                  <LuSparkles /> {t("app.tagline")}
+                  <LuSparkles aria-hidden="true" /> {t("app.tagline")}
                 </div>
               </div>
               <h1 className="text-5xl text-text-primary font-semibold mb-6 leading-tight">
@@ -210,7 +216,7 @@ const LandingPage = () => {
               </button>
             </div>
           </div>
-        </div>
+        </main>
       </div>
 
       <div className="w-full min-h-full relative z-10">
@@ -280,9 +286,9 @@ const LandingPage = () => {
           </div>
         </div>
 
-        <div className="text-sm bg-bg-secondary text-text-secondary text-center p-5 mt-5 border-t border-border-primary">
+        <footer className="text-sm bg-bg-secondary text-text-secondary text-center p-5 mt-5 border-t border-border-primary">
           {t("landing.footer")}
-        </div>
+        </footer>
       </div>
       <Modal
         title={t("auth.modal.title")}

@@ -64,15 +64,14 @@ const LanguageSwitcher = ({ className = "" }: LanguageSwitcherProps) => {
       {isOpen && (
         <div
           className="absolute right-0 top-full mt-2 bg-white dark:bg-bg-secondary rounded-lg shadow-lg border border-border-primary min-w-[140px] z-50 overflow-hidden"
-          role="listbox"
+          role="menu"
           aria-label={t("language.select")}
         >
           {languages.map((lang) => (
             <button
               key={lang.code}
               onClick={() => changeLanguage(lang.code)}
-              role="option"
-              aria-selected={i18n.language?.split("-")[0] === lang.code}
+              role="menuitem"
               className={`w-full text-left px-4 py-2.5 text-sm hover:bg-bg-tertiary transition-colors flex items-center justify-between gap-2 ${
                 i18n.language?.split("-")[0] === lang.code
                   ? "text-primary font-semibold bg-primary/5"
@@ -81,7 +80,7 @@ const LanguageSwitcher = ({ className = "" }: LanguageSwitcherProps) => {
             >
               <span>{lang.label}</span>
               {i18n.language?.split("-")[0] === lang.code && (
-                <LuCheck className="w-4 h-4 text-primary" />
+                <LuCheck aria-hidden="true" className="w-4 h-4 text-primary" />
               )}
             </button>
           ))}

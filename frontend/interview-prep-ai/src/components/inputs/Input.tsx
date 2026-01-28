@@ -29,7 +29,10 @@ const Input = ({
   return (
     <div className="w-full">
       {label && (
-        <label htmlFor={id} className="block text-sm font-medium text-slate-700 mb-2">
+        <label
+          htmlFor={id}
+          className="block text-sm font-medium text-slate-700 mb-2"
+        >
           {label}
         </label>
       )}
@@ -49,6 +52,8 @@ const Input = ({
           <button
             type="button"
             onClick={togglePassword}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-pressed={showPassword}
             className="ml-2 text-slate-400 hover:text-primary transition-colors cursor-pointer"
           >
             {showPassword ? (
