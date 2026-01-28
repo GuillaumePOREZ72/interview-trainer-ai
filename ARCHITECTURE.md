@@ -1,8 +1,8 @@
 # 🏛️ Interview Trainer AI - Architectural Masterplan
 
-> **Status:** Active Development
-> **Version:** 1.3.0
-> **Date:** January 08, 2026
+> **Status:** Performance-Audited & Refactored
+> **Version:** 1.4.0
+> **Date:** January 28, 2026
 
 ## 1. 🔭 Vision & Core Philosophy
 
@@ -18,7 +18,7 @@
 - **Routing:** React Router 7
 - **Styling:** Tailwind CSS v4 + Framer Motion (for "Avant-Garde" micro-interactions)
 - **State:** React Context API (Theme, User) + Local State
-- **Internationalization:** i18next + react-i18next (English/French)
+- **Internationalization:** i18next + native **Intl.DateTimeFormat** (Zero-dependency dates)
 - **HTTP Client:** Axios (Singleton instance)
 
 ### **Backend (Server)**
@@ -42,14 +42,16 @@ User[User] -->|HTTPS| Client[Frontend_React19]
 Client -->|REST API| API[BackendAPI_Expressv5]
 
 subgraph Backend_Services
-    API -->|Auth| AuthC[Auth_Controller]
-    API -->|Business Logic| SessC[Session_Controller]
-    API -->|Inference| AIC[AI_Controller]
+    API -->|Route| AuthC[Auth_Controller]
+    AuthC -->|Delegate| AuthS[Auth_Service]
+    API -->|Route| SessC[Session_Controller]
+    SessC -->|Delegate| SessS[Session_Service]
+    API -->|Route| AIC[AI_Controller]
 end
 
 subgraph Data_Persistence
-    AuthC -->|Read/Write| DB[(MongoDB)]
-    SessC -->|Read/Write| DB
+    AuthS -->|Read/Write| DB[(MongoDB)]
+    SessS -->|Read/Write| DB
 end
 
 subgraph External_AI_Cloud
@@ -62,14 +64,15 @@ end
 
 ## 4. 🧠 Backend Architecture (Deep Dive)
 
-### **4.1 Controller-Service Pattern**
+### **4.1 Controller-Service-Repository Pattern**
 
-The backend is organized into distinct domains. While currently implementing a "Fat Controller" pattern, the logic is separated by feature domain.
+The backend has been refactored from "Fat Controllers" to a decoupled **Service Layer** architecture.
 
+- **`Services`**: Encapsulate all business logic, database interactions, and token orchestration.
+  - `AuthService`: Handles complex auth flows, token generation/revocation, and password resets.
+  - `SessionService`: Manages session lifecycles, question pinning, and note persistence.
+- **`Controllers`**: Lean components responsible for HTTP request validation and response mapping.
 - **`aiController`**: Orchestrates the prompt engineering and communication with Groq. It handles the non-deterministic nature of LLMs and enforces JSON structure.
-- **`sessionController`**: Manages the lifecycle of an interview (Creation -> Question Generation -> Storage).
-- **`questionController`**: Handles interaction with specific questions, including **Pinning** questions for review and adding personal **Notes**.
-- **`authController`**: Handles JWT issuance, hashing (Bcrypt), and cookie management.
 
 ### **4.2 The AI Pipeline (Groq Integration)**
 
@@ -138,7 +141,12 @@ We use `i18next` for robust bilingual support (FR/EN).
 
 - **Detection:** `i18next-browser-languagedetector` for auto-detecting user preference.
 - **Localization:** JSON resource files in `locales/{lang}/common.json`.
-- **Date Sync:** `moment.locale` is synchronized with `i18n.language` changes for consistent date formatting.
+- **Date Formatting:** Handled by a unified `formatDate` utility using the native **Intl.DateTimeFormat** API, eliminating heavy dependencies like `moment.js` and reducing bundle size by ~300KB.
+
+### **5.4 Optimization Strategies**
+
+- **Route-level Code Splitting:** Utilizes `React.lazy` and `Suspense` to split the application into granular chunks, reducing the initial load time significantly.
+- **Asset Optimization:** Critical assets (like the Logo) are converted to high-compression **WebP** formats to' minimize FCP (First Contentful Paint).
 
 ---
 
@@ -214,7 +222,8 @@ sequenceDiagram
 interviewprepai/
 ├── backend/                      # 🧠 The Brain
 │   ├── config/                   # DB, Logger, RateLimiters
-│   ├── controllers/              # Business Logic (AI, Auth, Session)
+│   ├── controllers/              # Request Handlers (Lean)
+│   ├── services/                 # Business Logic (Auth, Session)
 │   ├── middlewares/              # Auth protection, file upload
 │   ├── models/                   # Mongoose Schemas (User, Session, Question)
 │   ├── routes/                   # API Endpoint Definitions

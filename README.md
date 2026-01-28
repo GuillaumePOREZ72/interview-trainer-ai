@@ -1,7 +1,7 @@
 # 🧠 Interview Trainer AI
 
 > **Master your technical interviews with an AI-powered simulator.**
-> _Latency-optimized, Framework-agnostic, and Developer-focused._
+> _Performance-audited, Latency-optimized, and Service-oriented._
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-v20%2B-green.svg)
@@ -18,12 +18,12 @@ It features a modern "Avant-Garde" UI built with **React 19** & **Tailwind v4**,
 
 ## ⚡ Key Features
 
-- 🤖 **AI-Driven Simulations:** Dynamic question generation based on role (Frontend, Backend, DevOps) and seniority.
-- 🚀 **Groq LPU Integration:** Ultra-low latency inference for a fluid conversation flow.
+- 🤖 **AI-Driven Simulations:** Dynamic question generation based on role and seniority.
+- 🚀 **Performance Optimized:** Route-level code splitting and WebP asset optimization for instant loading.
 - ☁️ **Cloud Native Storage:** Profile images securely stored on **Cloudinary**.
-- 🔐 **Robust Security:** HttpOnly Cookies, JWT (Access + Refresh tokens), and Rate Limiting.
-- 📊 **Session Tracking:** Save your progress, review answers, and pin tricky questions.
-- 🌍 **Bilingual:** Native support for English 🇺🇸 and French 🇫🇷.
+- 🔐 **Robust Security:** HttpOnly Cookies, JWT (Access + Refresh tokens).
+- 📊 **Session Tracking:** Save progress, review answers, and **Pin** key questions.
+- 🌍 **Bilingual & Lightweight:** Dual language support with zero-dependency date formatting (Native Intl).
 
 ---
 
@@ -90,13 +90,11 @@ cd frontend/interview-prep-ai && npm run dev
 
 ---
 
-## 🏗️ Architecture
+The project follows a modular **Service-Controller** pattern with a strict separation of concerns, optimized for scalability and bundle size.
 
-The project follows a modular **Service-Controller** pattern with a strict separation of concerns.
-
-- **`aiController`**: Orchestrates non-deterministic LLM interactions.
-- **`sessionController`**: Manages interview lifecycles.
-- **`authController`**: Handles secure dual-token authentication.
+- **Services**: Encapsulate business logic and data orchestration.
+- **Controllers**: Lean request handlers.
+- **Optimizations**: Code-splitting, WebP assets, and native API usage (Intl).
 
 👉 **[Read the full ARCHITECTURE.md](./ARCHITECTURE.md)** for a deep dive into the system design, testing strategy (Pyramid), and deployment guidelines.
 
