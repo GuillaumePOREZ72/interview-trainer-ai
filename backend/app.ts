@@ -37,7 +37,7 @@ export const createApp = (): Express => {
 
   // Trust proxy for rate limiting in production (o2switch/reverse proxies)
   if (NODE_ENV === "production") {
-    app.set("trust proxy", 1);
+    app.set("trust proxy", true);
   }
 
   // CORS configuration
