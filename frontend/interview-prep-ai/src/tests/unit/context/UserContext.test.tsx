@@ -8,7 +8,7 @@
  * - Auto-fetch user profile on mount with existing token
  */
 import { render, screen, waitFor, act } from "@testing-library/react";
-import UserProvider, { UserContext } from "../../../context/useContext";
+import UserProvider, { UserContext } from "../../../context/UserContext";
 import { useContext } from "react";
 import { createMockUser, createMockAuthResponse } from "../../helpers/testUtils";
 

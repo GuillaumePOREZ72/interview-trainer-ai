@@ -8,7 +8,7 @@
 import { renderHook } from "@testing-library/react";
 import { ReactNode } from "react";
 import { useUser } from "../../../hooks/useUser";
-import UserProvider from "../../../context/useContext";
+import UserProvider from "../../../context/UserContext";
 
 // Mock axiosInstance
 jest.mock("../../../utils/axiosInstance", () => ({
@@ -79,4 +79,3 @@ describe("useUser Hook", () => {
     });
   });
 });
-

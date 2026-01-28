@@ -9,7 +9,7 @@
 import { ReactElement, ReactNode } from "react";
 import { render, RenderOptions, RenderResult } from "@testing-library/react";
 import { BrowserRouter, MemoryRouter } from "react-router-dom";
-import UserProvider from "../../context/useContext";
+import UserProvider from "../../context/UserContext";
 import { ThemeProvider } from "../../context/ThemeContext";
 import { User, Session, Question, AuthResponse } from "../../types";
 
@@ -27,7 +27,7 @@ interface CustomRenderOptions extends Omit<RenderOptions, "wrapper"> {
  */
 export function renderWithProviders(
   ui: ReactElement,
-  options: CustomRenderOptions = {}
+  options: CustomRenderOptions = {},
 ): RenderResult {
   const { initialRoute = "/", withRouter = true, ...renderOptions } = options;
 
@@ -55,7 +55,7 @@ export function renderWithProviders(
  */
 export function renderWithBrowserRouter(
   ui: ReactElement,
-  options: Omit<RenderOptions, "wrapper"> = {}
+  options: Omit<RenderOptions, "wrapper"> = {},
 ): RenderResult {
   const Wrapper = ({ children }: { children: ReactNode }) => (
     <BrowserRouter>
@@ -90,7 +90,7 @@ export function createMockUser(overrides: Partial<User> = {}): User {
  * Create a mock auth response
  */
 export function createMockAuthResponse(
-  overrides: Partial<AuthResponse> = {}
+  overrides: Partial<AuthResponse> = {},
 ): AuthResponse {
   return {
     user: createMockUser(),
@@ -101,7 +101,9 @@ export function createMockAuthResponse(
 /**
  * Create a mock question
  */
-export function createMockQuestion(overrides: Partial<Question> = {}): Question {
+export function createMockQuestion(
+  overrides: Partial<Question> = {},
+): Question {
   return {
     _id: `question-${Date.now()}`,
     question: "What is React?",
@@ -141,7 +143,7 @@ export function createMockSession(overrides: Partial<Session> = {}): Session {
  */
 export function setupAuthenticatedUser(
   token = "mock-access-token",
-  refreshToken = "mock-refresh-token"
+  refreshToken = "mock-refresh-token",
 ): void {
   document.cookie = `token=${token}; path=/`;
   document.cookie = `refreshToken=${refreshToken}; path=/`;
@@ -152,7 +154,8 @@ export function setupAuthenticatedUser(
  */
 export function clearAuthentication(): void {
   document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  document.cookie =
+    "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 }
 
 /**
@@ -160,7 +163,7 @@ export function clearAuthentication(): void {
  */
 export async function waitFor(
   condition: () => boolean,
-  timeout = 5000
+  timeout = 5000,
 ): Promise<void> {
   const start = Date.now();
   while (!condition() && Date.now() - start < timeout) {
@@ -170,4 +173,3 @@ export async function waitFor(
 
 // Re-export everything from @testing-library/react
 export * from "@testing-library/react";
-

@@ -10,7 +10,7 @@ import LandingPage from "./pages/LandingPage";
 import InterviewPrep from "./pages/interviewPrep/components/InterviewPrep";
 import Dashboard from "./pages/home/Dashboard";
 import ResetPassword from "./pages/auth/ResetPassword";
-import UserProvider from "./context/useContext";
+import UserProvider from "./context/UserContext";
 import { useUser } from "./hooks/useUser";
 import { ReactNode } from "react";
 import { ThemeProvider } from "./context/ThemeContext";

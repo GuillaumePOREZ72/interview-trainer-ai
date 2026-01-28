@@ -13,7 +13,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import Login from "../../../pages/auth/Login";
-import UserProvider from "../../../context/useContext";
+import UserProvider from "../../../context/UserContext";
 import { ThemeProvider } from "../../../context/ThemeContext";
 import { createMockAuthResponse } from "../../helpers/testUtils";
 
@@ -49,7 +49,7 @@ const renderLogin = (setCurrentPage = jest.fn()) => {
           <Login setCurrentPage={setCurrentPage} />
         </UserProvider>
       </ThemeProvider>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 };
 
@@ -66,13 +66,13 @@ describe("Login Component", () => {
       // With i18n mock, translation keys are returned as-is
       expect(screen.getByText("auth.login.title")).toBeInTheDocument();
       expect(
-        screen.getByPlaceholderText("auth.login.emailPlaceholder")
+        screen.getByPlaceholderText("auth.login.emailPlaceholder"),
       ).toBeInTheDocument();
       expect(
-        screen.getByPlaceholderText("auth.login.passwordPlaceholder")
+        screen.getByPlaceholderText("auth.login.passwordPlaceholder"),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: "auth.login.submit" })
+        screen.getByRole("button", { name: "auth.login.submit" }),
       ).toBeInTheDocument();
       expect(screen.getByText("auth.login.signupLink")).toBeInTheDocument();
     });
@@ -84,10 +84,10 @@ describe("Login Component", () => {
       const user = userEvent.setup();
 
       const emailInput = screen.getByPlaceholderText(
-        "auth.login.emailPlaceholder"
+        "auth.login.emailPlaceholder",
       );
       const passwordInput = screen.getByPlaceholderText(
-        "auth.login.passwordPlaceholder"
+        "auth.login.passwordPlaceholder",
       );
 
       // Clear any default value and type invalid email without @ symbol
@@ -111,7 +111,7 @@ describe("Login Component", () => {
       const user = userEvent.setup();
 
       const emailInput = screen.getByPlaceholderText(
-        "auth.login.emailPlaceholder"
+        "auth.login.emailPlaceholder",
       );
       const submitButton = screen.getByRole("button", {
         name: "auth.login.submit",
@@ -121,7 +121,7 @@ describe("Login Component", () => {
       await user.click(submitButton);
 
       expect(
-        screen.getByText("validation.passwordRequired")
+        screen.getByText("validation.passwordRequired"),
       ).toBeInTheDocument();
     });
   });
@@ -135,10 +135,10 @@ describe("Login Component", () => {
       const user = userEvent.setup();
 
       const emailInput = screen.getByPlaceholderText(
-        "auth.login.emailPlaceholder"
+        "auth.login.emailPlaceholder",
       );
       const passwordInput = screen.getByPlaceholderText(
-        "auth.login.passwordPlaceholder"
+        "auth.login.passwordPlaceholder",
       );
       const submitButton = screen.getByRole("button", {
         name: "auth.login.submit",
@@ -165,14 +165,14 @@ describe("Login Component", () => {
 
       await user.type(
         screen.getByPlaceholderText("auth.login.emailPlaceholder"),
-        "test@example.com"
+        "test@example.com",
       );
       await user.type(
         screen.getByPlaceholderText("auth.login.passwordPlaceholder"),
-        "wrongpassword"
+        "wrongpassword",
       );
       await user.click(
-        screen.getByRole("button", { name: "auth.login.submit" })
+        screen.getByRole("button", { name: "auth.login.submit" }),
       );
 
       await waitFor(() => {
@@ -188,14 +188,14 @@ describe("Login Component", () => {
 
       await user.type(
         screen.getByPlaceholderText("auth.login.emailPlaceholder"),
-        "test@example.com"
+        "test@example.com",
       );
       await user.type(
         screen.getByPlaceholderText("auth.login.passwordPlaceholder"),
-        "password123"
+        "password123",
       );
       await user.click(
-        screen.getByRole("button", { name: "auth.login.submit" })
+        screen.getByRole("button", { name: "auth.login.submit" }),
       );
 
       await waitFor(() => {
