@@ -15,109 +15,58 @@ const axiosInstance: AxiosInstance = axios.create({
   withCredentials: true, // Send cookies with requests
 });
 
-// Flag to prevent multiple refresh attempts
-let isRefreshing = false;
-// Queue of failed requests to retry after token refresh
-let failedQueue: Array<{
-  resolve: (token: string) => void;
-  reject: (error: AxiosError) => void;
-}> = [];
-
-const processQueue = (
-  error: AxiosError | null,
-  token: string | null = null
-) => {
-  failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else if (token) {
-      prom.resolve(token);
-    }
-  });
-  failedQueue = [];
-};
-
 // Request Interceptor
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const language = localStorage.getItem("i18nextLng") || "en";
-    (config.headers as any)["Accept-Language"] = language;
+axiosInstance.interceptors.request.use((config) => {
+  const language = localStorage.getItem("i18nextLng") || "en";
+  (config.headers as any)["Accept-Language"] = language;
 
-    // Let the browser set Content-Type automatically for FormData (multipart/form-data with boundary)
-    if (config.data instanceof FormData) {
-      delete config.headers["Content-Type"];
-    }
-
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+  // Let the browser set Content-Type automatically for FormData (multipart/form-data with boundary)
+  if (config.data instanceof FormData) {
+    delete (config.headers as any)["Content-Type"];
   }
-);
+  return config;
+});
+
+let refreshPromise: Promise<void> | null = null;
+
+const refresh = async () => {
+  await axiosInstance.post(API_PATHS.AUTH.REFRESH_TOKEN);
+};
 
 // Response Interceptor with automatic token refresh
 axiosInstance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (res) => res,
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
     };
 
     // If error is not 401 or request already retried, reject
-    if (error.response?.status !== 401 || originalRequest._retry) {
-      return Promise.reject(error);
-    }
+    if (!error.response || error.response.status !== 401) throw error;
+    if (!originalRequest || originalRequest._retry) throw error;
 
-    // Don't try to refresh if this is already a refresh token request
-    if (originalRequest.url === API_PATHS.AUTH.REFRESH_TOKEN) {
-      clearAuthTokens();
-      window.location.href = "/";
-      return Promise.reject(error);
-    }
-
-    // If already refreshing, queue this request
-    if (isRefreshing) {
-      return new Promise((resolve, reject) => {
-        failedQueue.push({ resolve, reject });
-      })
-        .then(() => {
-          return axiosInstance(originalRequest);
-        })
-        .catch((err) => {
-          return Promise.reject(err);
-        });
-    }
+    // If refresh itself fails, redirect to login
+    if (originalRequest.url === API_PATHS.AUTH.REFRESH_TOKEN) throw error;
 
     originalRequest._retry = true;
-    isRefreshing = true;
 
     try {
-      const response = await axiosInstance.post(
-        `${BASE_URL}${API_PATHS.AUTH.REFRESH_TOKEN}`
-      );
+      // ONe refresh at a time
+      if (!refreshPromise) {
+        refreshPromise = refresh().finally(() => {
+          refreshPromise = null;
+        });
+      }
+      await refreshPromise;
 
-      // Process queued requests
-      processQueue(null, "refreshed");
-
+      // Retry original request
       return axiosInstance(originalRequest);
-    } catch (refreshError) {
-      processQueue(refreshError as AxiosError, null);
-      clearAuthTokens();
-      window.location.href = "/";
-      return Promise.reject(refreshError);
-    } finally {
-      isRefreshing = false;
+    } catch (error) {
+      // Hard reset: user will be cleared on next /profile
+      window.location.href = "/"; // Redirect to home/login
+      throw error;
     }
-  }
+  },
 );
-
-// Helper function to clear auth tokens
-const clearAuthTokens = () => {
-  // Clear cookies by setting expired ones
-  document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-};
 
 export default axiosInstance;
