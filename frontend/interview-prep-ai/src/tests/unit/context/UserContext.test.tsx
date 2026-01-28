@@ -1,16 +1,19 @@
 /**
  * UserContext Unit Tests
  *
- * Tests the UserProvider and UserContext functionality:
- * - Initial state (no user, loading)
- * - updateUser() stores user and tokens
- * - clearUser() removes user and tokens
- * - Auto-fetch user profile on mount with existing token
+ * Updated for the new auth bootstrap strategy:
+ * - UserProvider hydrates user from localStorage on mount (no /profile call at startup)
+ * - updateUser() stores user in localStorage
+ * - clearUser() removes user from localStorage
  */
 import { render, screen, waitFor, act } from "@testing-library/react";
 import UserProvider, { UserContext } from "../../../context/UserContext";
 import { useContext } from "react";
-import { createMockUser, createMockAuthResponse } from "../../helpers/testUtils";
+import {
+  createMockUser,
+  createMockAuthResponse,
+} from "../../helpers/testUtils";
+import axiosInstance from "../../../utils/axiosInstance";
 
 // Mock axiosInstance
 jest.mock("../../../utils/axiosInstance", () => ({
@@ -25,7 +28,6 @@ jest.mock("../../../utils/axiosInstance", () => ({
   },
 }));
 
-import axiosInstance from "../../../utils/axiosInstance";
 const mockedAxios = axiosInstance as jest.Mocked<typeof axiosInstance>;
 
 // Test component to access context
@@ -52,97 +54,89 @@ describe("UserContext", () => {
   beforeEach(() => {
     localStorage.clear();
     jest.clearAllMocks();
+
+    // IMPORTANT: cookies are irrelevant now (bootstrap is localStorage-based),
+    // but we clear them anyway to avoid test leakage.
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie =
+      "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   });
 
   describe("Initial state", () => {
-    it("should start with loading=true and user=null when no token exists", async () => {
+    it("should end with loading=false and user=null when no cached user exists", async () => {
       render(
         <UserProvider>
           <TestConsumer />
-        </UserProvider>
+        </UserProvider>,
       );
 
-      // Initially loading, then should become false when no token found
       await waitFor(() => {
         expect(screen.getByTestId("loading").textContent).toBe("false");
       });
 
       expect(screen.getByTestId("user").textContent).toBe("null");
+
+      // New behavior: no automatic /profile call at startup
+      expect(mockedAxios.get).not.toHaveBeenCalled();
     });
 
-    it("should fetch user profile when token exists in cookie", async () => {
-      // Setup: valid token in cookie
-      document.cookie = "token=valid-token; path=/";
-
+    it("should hydrate user from localStorage on mount", async () => {
       const mockUser = createMockUser();
-      mockedAxios.get.mockResolvedValueOnce({ data: mockUser });
+      localStorage.setItem("user", JSON.stringify(mockUser));
 
       render(
         <UserProvider>
           <TestConsumer />
-        </UserProvider>
-      );
-
-      // Wait for user to be fetched
-      await waitFor(() => {
-        expect(screen.getByTestId("user").textContent).toBe("Test User");
-      });
-
-      // Note: axios call may not be mocked properly with cookies in jsdom
-      // expect(mockedAxios.get).toHaveBeenCalledWith("/api/auth/profile");
-    });
-
-    it("should clear tokens if profile fetch fails", async () => {
-      // Setup: invalid token in cookie
-      document.cookie = "token=invalid-token; path=/";
-
-      mockedAxios.get.mockRejectedValueOnce(new Error("Unauthorized"));
-
-      render(
-        <UserProvider>
-          <TestConsumer />
-        </UserProvider>
+        </UserProvider>,
       );
 
       await waitFor(() => {
         expect(screen.getByTestId("loading").textContent).toBe("false");
       });
 
-      // Since clearUser is called on fail, user should be null
+      expect(screen.getByTestId("user").textContent).toBe("Test User");
+      expect(mockedAxios.get).not.toHaveBeenCalled();
+    });
+
+    it("should fallback to user=null if localStorage contains invalid JSON", async () => {
+      localStorage.setItem("user", "{invalid-json");
+
+      render(
+        <UserProvider>
+          <TestConsumer />
+        </UserProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("loading").textContent).toBe("false");
+      });
+
       expect(screen.getByTestId("user").textContent).toBe("null");
+      expect(localStorage.getItem("user")).toBeNull(); // provider should clean it
     });
   });
 
   describe("updateUser", () => {
-    it("should update user and store tokens in localStorage", async () => {
-      const mockUser = createMockUser();
-
+    it("should update user and store user in localStorage", async () => {
       render(
         <UserProvider>
           <TestConsumer />
-        </UserProvider>
+        </UserProvider>,
       );
 
-      // Wait for initial load
       await waitFor(() => {
         expect(screen.getByTestId("loading").textContent).toBe("false");
       });
 
-      // Update the TestConsumer to use the mockUser
-      // Since updateUser is called with createMockAuthResponse().user, but to match, perhaps change TestConsumer
-      // For simplicity, update the expect to check if localStorage has a user object
-
-      // Click update user button
       await act(async () => {
         screen.getByText("Update User").click();
       });
 
-      // Check user is updated
       expect(screen.getByTestId("user").textContent).toBe("Test User");
 
-      // Check user is stored in localStorage
       const storedUser = localStorage.getItem("user");
       expect(storedUser).not.toBeNull();
+
       expect(JSON.parse(storedUser!)).toMatchObject({
         _id: "user-123",
         name: "Test User",
@@ -152,35 +146,29 @@ describe("UserContext", () => {
   });
 
   describe("clearUser", () => {
-    it("should clear user and remove data", async () => {
-      // Setup: user is logged in
-      document.cookie = "token=existing-token; path=/";
-      document.cookie = "refreshToken=existing-refresh; path=/";
-
+    it("should clear user and remove user from localStorage", async () => {
+      // Setup: cached user exists
       const mockUser = createMockUser();
       localStorage.setItem("user", JSON.stringify(mockUser));
-      mockedAxios.get.mockResolvedValueOnce({ data: mockUser });
 
       render(
         <UserProvider>
           <TestConsumer />
-        </UserProvider>
+        </UserProvider>,
       );
 
-      // Wait for user to be fetched
       await waitFor(() => {
-        expect(screen.getByTestId("user").textContent).toBe("Test User");
+        expect(screen.getByTestId("loading").textContent).toBe("false");
       });
 
-      // Click clear user button
+      // Hydrated from localStorage
+      expect(screen.getByTestId("user").textContent).toBe("Test User");
+
       await act(async () => {
         screen.getByText("Clear User").click();
       });
 
-      // Check user is cleared
       expect(screen.getByTestId("user").textContent).toBe("null");
-
-      // Check user data is removed from localStorage
       expect(localStorage.getItem("user")).toBeNull();
     });
   });

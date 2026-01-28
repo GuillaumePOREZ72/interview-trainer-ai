@@ -40,8 +40,11 @@ const UserProvider = ({ children }: UserProviderProps) => {
     try {
       const cached = localStorage.getItem("user");
       if (cached) {
-        setUser(JSON.parse(cached) as User);
+        setUser(JSON.parse(cached));
       }
+    } catch {
+      localStorage.removeItem("user");
+      setUser(null);
     } finally {
       setLoading(false);
     }
