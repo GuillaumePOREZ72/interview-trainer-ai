@@ -16,28 +16,30 @@ const app = createApp();
 describe("Auth Routes", () => {
   describe("POST /api/auth/register", () => {
     it("should register a new user successfully", async () => {
+      const email = `newuser_${Date.now()}_${Math.floor(Math.random() * 1000)}@example.com`;
       const response = await request(app).post("/api/auth/register").send({
         name: "New User",
-        email: "newuser@example.com",
+        email: email,
         password: "SecurePass123!",
       });
 
       expect(response.status).toBe(201);
-      expect(response.headers['set-cookie']).toBeDefined();
+      expect(response.headers["set-cookie"]).toBeDefined();
       expect(response.body).toHaveProperty("user");
-      expect(response.body.user.email).toBe("newuser@example.com");
+      expect(response.body.user.email).toBe(email);
       expect(response.body.user.name).toBe("New User");
       expect(response.body.user).not.toHaveProperty("password");
     });
 
     it("should return 400 if user already exists", async () => {
+      const email = `existing_${Date.now()}_${Math.floor(Math.random() * 1000)}@example.com`;
       // Create user first
-      await createTestUser({ email: "existing@example.com" });
+      await createTestUser({ email });
 
       // Try to register with same email
       const response = await request(app).post("/api/auth/register").send({
         name: "Another User",
-        email: "existing@example.com",
+        email: email,
         password: "SecurePass123!",
       });
 
@@ -59,7 +61,7 @@ describe("Auth Routes", () => {
       });
 
       expect(response.status).toBe(200);
-      expect(response.headers['set-cookie']).toBeDefined();
+      expect(response.headers["set-cookie"]).toBeDefined();
       expect(response.body).toHaveProperty("user");
       expect(response.body.user.email).toBe(defaultTestUser.email);
     });
@@ -123,7 +125,7 @@ describe("Auth Routes", () => {
 
       const response = await request(app)
         .post("/api/auth/refresh-token")
-        .set('Cookie', [`refreshToken=${refreshToken}`]);
+        .set("Cookie", [`refreshToken=${refreshToken}`]);
 
       expect(response.status).toBe(200);
       expect(response.body.message).toBe("Token refreshed");
@@ -141,7 +143,7 @@ describe("Auth Routes", () => {
     it("should return 401 with invalid refresh token", async () => {
       const response = await request(app)
         .post("/api/auth/refresh-token")
-        .set('Cookie', [`refreshToken=invalid-refresh-token`]);
+        .set("Cookie", [`refreshToken=invalid-refresh-token`]);
 
       expect(response.status).toBe(401);
       expect(response.body.message).toBe("Invalid or expired refresh token");

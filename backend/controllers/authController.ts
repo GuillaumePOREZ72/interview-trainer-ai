@@ -134,10 +134,10 @@ const refreshAccessToken = async (
 
     res.json({ message: "Token refreshed" });
   } catch (error) {
-    const errorMessage =
+    const originalError =
       error instanceof Error ? error.message : "Invalid refresh token";
-    logger.error(`Refresh token error: ${errorMessage}`);
-    res.status(401).json({ message: errorMessage });
+    logger.error(`Refresh token error: ${originalError}`);
+    res.status(401).json({ message: "Invalid or expired refresh token" });
   }
 };
 
