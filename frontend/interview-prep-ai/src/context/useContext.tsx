@@ -15,23 +15,28 @@ const UserProvider = ({ children }: UserProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Helper function to get cookie value
-  const getCookie = (name: string): string | null => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-    return null;
+  const updateUser = (userData: User) => {
+    localStorage.setItem("user", JSON.stringify(userData));
+    setUser(userData);
+    setLoading(false);
+  };
+
+  const clearUser = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+  };
+
+  const logout = async () => {
+    try {
+      await axiosInstance.post(API_PATHS.AUTH.LOGOUT);
+    } catch {
+      // même si le backend logout échoue, on veut quand même nettoyer le frontend
+    } finally {
+      clearUser();
+    }
   };
 
   useEffect(() => {
-    if (user) return;
-
-    const accessToken = getCookie("token");
-    if (!accessToken) {
-      setLoading(false);
-      return;
-    }
-
     const fetchUser = async () => {
       try {
         const response = await axiosInstance.get<User>(
@@ -45,24 +50,10 @@ const UserProvider = ({ children }: UserProviderProps) => {
       }
     };
     fetchUser();
-  }, [user]);
-
-  const updateUser = (userData: User) => {
-    localStorage.setItem("user", JSON.stringify(userData));
-    setUser(userData);
-    setLoading(false);
-  };
-
-  const clearUser = () => {
-    setUser(null);
-    localStorage.removeItem("user");
-    // Clear cookies by setting expired ones
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  };
+  }, []);
 
   return (
-    <UserContext.Provider value={{ user, loading, updateUser, clearUser }}>
+    <UserContext.Provider value={{ user, loading, updateUser, clearUser, logout }}>
       {children}
     </UserContext.Provider>
   );
