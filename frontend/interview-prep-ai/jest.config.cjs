@@ -43,6 +43,7 @@ module.exports = {
     // Path aliases
     "^@/(.*)$": "<rootDir>/src/$1",
     // API Paths mock (to avoid import.meta issues)
+    "^\\./apiPaths$": "<rootDir>/src/tests/__mocks__/apiPaths.js",
     "^.*/utils/apiPaths$": "<rootDir>/src/tests/__mocks__/apiPaths.js",
     "^.*/utils/apiPaths.ts$": "<rootDir>/src/tests/__mocks__/apiPaths.js",
     // Library mocks - redirect imports to mock files
