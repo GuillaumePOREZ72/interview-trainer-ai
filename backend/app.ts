@@ -107,7 +107,7 @@ export const createApp = (): Express => {
 
   // Apply rate limiting middleware (skip in test environment)
   if (NODE_ENV !== "test") {
-    app.use("/api/", limiter);
+    app.use("/api", limiter);
   }
 
   // Health check endpoint (Hidden at root, explicit at /api/health)

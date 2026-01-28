@@ -2,16 +2,19 @@ import { rateLimit } from "express-rate-limit";
 
 const limiter = rateLimit({
   windowMs: 60000, // 1 minute
-  limit: 60, // 60 requests per minute
+  limit: 300, // 300 requests per minute
   standardHeaders: "draft-8",
   legacyHeaders: false,
   message: {
     error:
-      "You have sent too many requests in a given amount of time. Please try again later.",
+      "Too many requests. Please try again later.",
   },
   skip: (req) => {
-    // Skip rate limiting for health check endpoint
-    return req.path === "/";
+    if (req.originalUrl.startsWith("/api/auth/profile")) return true;
+    if (req.originalUrl.startsWith("/api/auth/refresh-token")) return true; // optionnel, mais évite des cascades
+    if (req.originalUrl.startsWith("/api/health")) return true;
+    if (req.originalUrl.startsWith("/api/ping")) return true;
+    return false;
   },
 });
 
