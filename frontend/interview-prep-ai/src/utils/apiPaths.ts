@@ -11,6 +11,7 @@ export const API_PATHS = {
     GET_PROFILE: "/api/auth/profile", // Get logged-in user details
     FORGOT_PASSWORD: "/api/auth/forgotpassword", // Request password reset
     RESET_PASSWORD: "/api/auth/resetpassword", // Reset password with token
+    LOGOUT: "/api/auth/logout", // Logout user
   },
 
   AI: {

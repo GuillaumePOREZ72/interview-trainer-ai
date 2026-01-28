@@ -7,11 +7,11 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
-  const { user } = useUser();
+  const { user, loading } = useUser();
   return (
     <div>
       <Navbar />
-      {user && <div>{children}</div>}
+      {loading ? null : user ? <div>{children}</div> : null}
     </div>
   );
 };

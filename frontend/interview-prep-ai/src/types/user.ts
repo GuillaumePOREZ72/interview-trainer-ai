@@ -18,4 +18,5 @@ export interface UserContextType {
   loading: boolean;
   updateUser: (user: User) => void;
   clearUser: () => void;
+  logout: () => Promise<void>;
 }
