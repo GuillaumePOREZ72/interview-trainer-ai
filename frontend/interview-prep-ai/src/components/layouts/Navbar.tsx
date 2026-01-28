@@ -1,5 +1,5 @@
 import ProfileInfoCard from "../cards/ProfileInfoCard";
-import LOGO from "../../assets/logo.png";
+import LOGO from "../../assets/logo.webp";
 import { Link } from "react-router-dom";
 import { LuSun, LuMoon } from "react-icons/lu";
 import { useTheme } from "../../hooks/useTheme";

@@ -1,3 +1,4 @@
+import { lazy, Suspense, ReactNode } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -6,14 +7,18 @@ import {
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
-import LandingPage from "./pages/LandingPage";
-import InterviewPrep from "./pages/interviewPrep/components/InterviewPrep";
-import Dashboard from "./pages/home/Dashboard";
-import ResetPassword from "./pages/auth/ResetPassword";
 import UserProvider from "./context/UserContext";
 import { useUser } from "./hooks/useUser";
-import { ReactNode } from "react";
 import { ThemeProvider } from "./context/ThemeContext";
+import SpinnerLoader from "./components/loader/SpinnerLoader";
+
+// Lazy load pages
+const LandingPage = lazy(() => import("./pages/LandingPage"));
+const InterviewPrep = lazy(
+  () => import("./pages/interviewPrep/components/InterviewPrep"),
+);
+const Dashboard = lazy(() => import("./pages/home/Dashboard"));
+const ResetPassword = lazy(() => import("./pages/auth/ResetPassword"));
 
 interface ProtectedRoutesProps {
   children: ReactNode;
@@ -38,31 +43,39 @@ const App = () => {
     <ThemeProvider defaultTheme="system" storageKey="theme">
       <UserProvider>
         <Router>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route
-              path="/reset-password/:resetToken"
-              element={<ResetPassword />}
-            />
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center h-screen">
+                <SpinnerLoader />
+              </div>
+            }
+          >
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route
+                path="/reset-password/:resetToken"
+                element={<ResetPassword />}
+              />
 
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoutes>
-                  <Dashboard />
-                </ProtectedRoutes>
-              }
-            />
-            <Route
-              path="/interview-prep/:sessionId"
-              element={
-                <ProtectedRoutes>
-                  <InterviewPrep />
-                </ProtectedRoutes>
-              }
-            />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoutes>
+                    <Dashboard />
+                  </ProtectedRoutes>
+                }
+              />
+              <Route
+                path="/interview-prep/:sessionId"
+                element={
+                  <ProtectedRoutes>
+                    <InterviewPrep />
+                  </ProtectedRoutes>
+                }
+              />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
 
           <Toaster
             toastOptions={{ className: "", style: { fontSize: "13px" } }}

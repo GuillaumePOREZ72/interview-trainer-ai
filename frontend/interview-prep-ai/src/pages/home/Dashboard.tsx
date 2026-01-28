@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { LuPlus, LuSparkles } from "react-icons/lu";
 import { toast } from "react-hot-toast";
-import moment from "moment";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance";
@@ -12,7 +11,6 @@ import Modal from "../../components/Modal";
 import CreateSessionForm from "./CreateSessionForm";
 import DeleteAlertContent from "../../components/DeleteAlertContent";
 import { Session } from "../../types";
-import LanguageSwitcher from "../../components/LanguageSwitcher";
 
 interface DeleteAlertState {
   open: boolean;
@@ -34,7 +32,7 @@ const Dashboard = () => {
   const fetchAllSessions = async () => {
     try {
       const response = await axiosInstance.get<Session[]>(
-        API_PATHS.SESSION.GET_ALL
+        API_PATHS.SESSION.GET_ALL,
       );
       setSessions(response.data);
     } catch (error) {

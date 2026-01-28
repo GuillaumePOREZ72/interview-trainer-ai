@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import HERO_IMG from "../assets/hero-img.webp";
-import LOGO from "../assets/logo.png";
+import LOGO from "../assets/logo.webp";
 import { APP_FEATURES } from "../utils/data";
 import { useNavigate } from "react-router-dom";
 import { LuSparkles, LuMenu, LuX, LuHouse } from "react-icons/lu";
