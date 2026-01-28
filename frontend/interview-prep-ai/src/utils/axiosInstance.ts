@@ -72,7 +72,9 @@ axiosInstance.interceptors.response.use(
 
     // Don't try to refresh if this is already a refresh token request
     if (originalRequest.url?.endsWith(API_PATHS.AUTH.REFRESH_TOKEN)) {
-      window.location.href = "/";
+      if (window.location.pathname !== "/") {
+        window.location.href = "/";
+      }
       return Promise.reject(error);
     }
 
@@ -103,7 +105,9 @@ axiosInstance.interceptors.response.use(
       return axiosInstance(originalRequest);
     } catch (refreshError) {
       processQueue(refreshError as AxiosError, null);
-      window.location.href = "/";
+      if (window.location.pathname !== "/") {
+        window.location.href = "/";
+      }
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

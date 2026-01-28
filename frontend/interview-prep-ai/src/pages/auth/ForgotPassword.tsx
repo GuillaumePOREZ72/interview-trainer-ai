@@ -21,7 +21,9 @@ const ForgotPassword = ({ setCurrentPage }: ForgotPasswordProps) => {
   const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!validateEmail(email)) {
+    const trimmedEmail = email.trim();
+
+    if (!validateEmail(trimmedEmail)) {
       setError(t("validation.invalidEmail"));
       return;
     }
@@ -32,7 +34,7 @@ const ForgotPassword = ({ setCurrentPage }: ForgotPasswordProps) => {
 
     try {
       await axiosInstance.post(API_PATHS.AUTH.FORGOT_PASSWORD, {
-        email,
+        email: trimmedEmail,
       });
 
       setMessage(t("auth.forgotPassword.successMessage"));

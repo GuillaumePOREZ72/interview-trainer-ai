@@ -7,7 +7,7 @@ import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import { useUser } from "../../hooks/useUser";
 import { AxiosError } from "axios";
-import { AuthResponse } from "../../types";
+import { AuthResponse, User } from "../../types";
 import { LuSparkles } from "react-icons/lu";
 
 interface LoginProps {
@@ -26,7 +26,10 @@ const Login = ({ setCurrentPage }: LoginProps) => {
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!validateEmail(email)) {
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
+    if (!validateEmail(trimmedEmail)) {
       setError(t("validation.invalidEmail"));
       return;
     }
@@ -43,8 +46,8 @@ const Login = ({ setCurrentPage }: LoginProps) => {
       const response = await axiosInstance.post<{ user: User }>(
         API_PATHS.AUTH.LOGIN,
         {
-          email,
-          password,
+          email: trimmedEmail,
+          password: trimmedPassword,
         },
       );
 

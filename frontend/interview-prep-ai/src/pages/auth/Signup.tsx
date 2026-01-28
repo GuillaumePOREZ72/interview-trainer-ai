@@ -6,7 +6,7 @@ import { validateEmail } from "../../utils/helper";
 import { useUser } from "../../hooks/useUser";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
-import { AuthResponse } from "../../types";
+import { AuthResponse, User } from "../../types";
 import { AxiosError } from "axios";
 import { LuSparkles } from "react-icons/lu";
 
@@ -29,7 +29,11 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
   const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!fullName) {
+    const trimmedFullName = fullName.trim();
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedFullName) {
       setError(t("validation.fullNameRequired"));
       return;
     }
@@ -44,8 +48,13 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
       return;
     }
 
-    if (password.length < 8 || !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-      setError("Password must be at least 8 characters long and contain uppercase, lowercase, and a number");
+    if (
+      password.length < 8 ||
+      !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)
+    ) {
+      setError(
+        "Password must be at least 8 characters long and contain uppercase, lowercase, and a number",
+      );
       return;
     }
 
@@ -58,9 +67,9 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
       const response = await axiosInstance.post<{ user: User }>(
         API_PATHS.AUTH.REGISTER,
         {
-          name: fullName,
-          email,
-          password,
+          name: trimmedFullName,
+          email: trimmedEmail,
+          password: trimmedPassword,
         },
       );
 
