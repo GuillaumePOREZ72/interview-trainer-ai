@@ -37,23 +37,20 @@ const UserProvider = ({ children }: UserProviderProps) => {
   };
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axiosInstance.get<User>(
-          API_PATHS.AUTH.GET_PROFILE,
-        );
-        setUser(response.data);
-      } catch (error) {
-        clearUser();
-      } finally {
-        setLoading(false);
+    try {
+      const cached = localStorage.getItem("user");
+      if (cached) {
+        setUser(JSON.parse(cached) as User);
       }
-    };
-    fetchUser();
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, loading, updateUser, clearUser, logout }}>
+    <UserContext.Provider
+      value={{ user, loading, updateUser, clearUser, logout }}
+    >
       {children}
     </UserContext.Provider>
   );
