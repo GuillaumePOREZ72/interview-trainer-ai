@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
+import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../hooks/useTheme";
 import { useUser } from "../../hooks/useUser";
@@ -41,22 +42,11 @@ const ProfileInfoCard = ({
     if (onClose) onClose();
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
+  useOutsideClick(dropdownRef, () => {
     if (!compact) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
+      setIsOpen(false);
     }
-  }, [compact]);
+  });
 
   if (compact) {
     return (

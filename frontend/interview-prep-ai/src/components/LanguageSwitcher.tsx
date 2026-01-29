@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { LuGlobe, LuCheck } from "react-icons/lu";
+import { useOutsideClick } from "../hooks/useOutsideClick";
 
 interface Language {
   code: string;
@@ -30,20 +31,7 @@ const LanguageSwitcher = ({ className = "" }: LanguageSwitcherProps) => {
     setIsOpen(false);
   };
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  useOutsideClick(dropdownRef, () => setIsOpen(false));
 
   return (
     <div className="relative" ref={dropdownRef}>

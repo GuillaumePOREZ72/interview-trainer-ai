@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import HERO_IMG from "../assets/hero-img.webp";
 import LOGO from "../assets/logo.webp";
@@ -15,6 +15,7 @@ import ProfileInfoCard from "../components/cards/ProfileInfoCard";
 import { useTheme } from "../hooks/useTheme";
 import { LuSun, LuMoon } from "react-icons/lu";
 import LanguageSwitcher from "../components/LanguageSwitcher";
+import { useOutsideClick } from "../hooks/useOutsideClick";
 
 type AuthPage = "login" | "signup" | "forgotPassword";
 
@@ -27,6 +28,9 @@ const LandingPage = () => {
   const [openAuthModal, setOpenAuthModal] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<AuthPage>("login");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+  useOutsideClick(mobileMenuRef, () => setIsMobileMenuOpen(false));
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
@@ -116,6 +120,7 @@ const LandingPage = () => {
                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
                     transition={{ duration: 0.2 }}
                     className="absolute right-0 top-full mt-2 w-64 bg-white/90 dark:bg-bg-secondary/95 backdrop-blur-md rounded-2xl shadow-xl border border-border-primary p-4 flex flex-col gap-4 z-50"
+                    ref={mobileMenuRef}
                   >
                     {/* User Profile or Auth */}
                     {user ? (
