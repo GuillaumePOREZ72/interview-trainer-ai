@@ -20,7 +20,7 @@ It features a modern "Avant-Garde" UI built with **React 19** & **Tailwind v4**,
 
 - 🤖 **AI-Driven Simulations:** Dynamic question generation based on role and seniority.
 - 🚀 **Performance Optimized:** Route-level code splitting and WebP asset optimization for instant loading.
-- ☁️ **Cloud Native Storage:** Profile images securely stored on **Cloudinary**.
+- 🛡️ **Strict Data Validation:** Type-safe inputs via **Zod** (Frontend) and robust API validation (Backend).
 - 🔐 **Robust Security:** HttpOnly Cookies, JWT (Access + Refresh tokens).
 - 📊 **Session Tracking:** Save progress, review answers, and **Pin** key questions.
 - 🌍 **Bilingual & Lightweight:** Dual language support with zero-dependency date formatting (Native Intl).
@@ -33,14 +33,14 @@ It features a modern "Avant-Garde" UI built with **React 19** & **Tailwind v4**,
 
 - **Core:** React 19, Vite 7, React Router 7
 - **Styling:** Tailwind CSS v4, Framer Motion
+- **Validation:** **Zod**
 - **State:** Context API, Axios
 
 ### **Backend**
 
-- **Runtime:** Node.js (ESM), Express v5
-- **Database:** MongoDB, Mongoose v9
+- **Runtime:** Node.js (ESM), Express v4
+- **Database:** MongoDB, Mongoose v8
 - **AI:** Groq API (Llama/Mixtral models)
-- **Storage:** Cloudinary (via Multer)
 
 ---
 

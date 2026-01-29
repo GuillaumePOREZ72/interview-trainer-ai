@@ -1,8 +1,8 @@
 # 🏛️ Interview Trainer AI - Architectural Masterplan
 
 > **Status:** Performance-Audited & Refactored
-> **Version:** 1.4.0
-> **Date:** January 28, 2026
+> **Version:** 1.6.0
+> **Date:** January 29, 2026
 
 ## 1. 🔭 Vision & Core Philosophy
 
@@ -17,6 +17,7 @@
 - **Core:** React 19 + Vite 7 (ESM-first)
 - **Routing:** React Router 7
 - **Styling:** Tailwind CSS v4 + Framer Motion (for "Avant-Garde" micro-interactions)
+- **Validation:** **Zod** (Strict schema-based validation)
 - **State:** React Context API (Theme, User) + Local State
 - **Internationalization:** i18next + native **Intl.DateTimeFormat** (Zero-dependency dates)
 - **HTTP Client:** Axios (Singleton instance)
@@ -24,11 +25,10 @@
 ### **Backend (Server)**
 
 - **Runtime:** Node.js (ESM Mode)
-- **Framework:** Express v5 (Modern routing)
-- **Database:** MongoDB + Mongoose v9
+- **Framework:** Express v4 (Robust routing)
+- **Database:** MongoDB + Mongoose v8
 - **AI Engine:** **Groq** (LPU Inference) via OpenAI-compatible API
-- **File Storage:** Multer (Local uploads)
-- **Security:** Helmet, RateLimit, CORS, JWT (HttpOnly Cookies)
+- **Security:** Helmet, RateLimit, CORS, JWT (HttpOnly Cookies), **Express-Validator**
 
 ---
 
@@ -217,59 +217,58 @@ sequenceDiagram
 
 ## 7. 📂 Project Structure Map
 
-```textploads/ # 🖼️ Local storage for profile images
-│   ├── u
 interviewprepai/
-├── backend/                      # 🧠 The Brain
-│   ├── config/                   # DB, Logger, RateLimiters
-│   ├── controllers/              # Request Handlers (Lean)
-│   ├── services/                 # Business Logic (Auth, Session)
-│   ├── middlewares/              # Auth protection, file upload
-│   ├── models/                   # Mongoose Schemas (User, Session, Question)
-│   ├── routes/                   # API Endpoint Definitions
-│   ├── utils/                    # Prompts & Helper Functions
-│   ├── app.ts                    # Express application (testable)
-│   ├── server.ts                 # Server entry point
-│   │
-│   └── tests/                    # 🧪 Test Suite
-│       ├── setup.ts              # MongoDB Memory Server setup
-│       ├── globalSetup.ts        # Jest global setup
-│       ├── globalTeardown.ts     # Jest global teardown
-│       ├── helpers/
-│       │   └── testUtils.ts      # Test utilities & fixtures
-│       ├── unit/                 # Unit tests (isolated)
-│       │   ├── models/           # User, Session, Question tests
-│       │   ├── middlewares/      # authMiddleware tests
-│       │   └── utils/            # helper.test.ts
-│       └── integration/          # Integration tests (API)
-│           ├── routes/           # auth, session, question, ai, upload
-│           └── middleware/       # rateLimiter tests
+├── backend/ # 🧠 The Brain
+│ ├── config/ # DB, Logger, RateLimiters
+│ ├── controllers/ # Request Handlers (Lean)
+│ ├── services/ # Business Logic (Auth, Session)
+│ ├── middlewares/ # Auth protection
+│ ├── models/ # Mongoose Schemas (User, Session, Question)
+│ ├── routes/ # API Endpoint Definitions
+│ ├── utils/ # Prompts & Helper Functions
+│ ├── app.ts # Express application (testable)
+│ ├── server.ts # Server entry point
+│ │
+│ └── tests/ # 🧪 Test Suite
+│ ├── setup.ts # MongoDB Memory Server setup
+│ ├── globalSetup.ts # Jest global setup
+│ ├── globalTeardown.ts # Jest global teardown
+│ ├── helpers/
+│ │ └── testUtils.ts # Test utilities & fixtures
+│ ├── unit/ # Unit tests (isolated)
+│ │ ├── models/ # User, Session, Question tests
+│ │ ├── middlewares/ # authMiddleware tests
+│ │ └── utils/ # helper.test.ts
+│ └── integration/ # Integration tests (API)
+│ ├── routes/ # auth, session, question, ai, upload
+│ └── middleware/ # rateLimiter tests
 │
-└── frontend/interview-prep-ai/   # 💅 The Face
-    ├── src/
-    │   ├── components/           # UI Building Blocks
-    │   ├── context/              # Global State (Theme, User)
-    │   ├── hooks/                # Custom Logic (useUser)
-    │   ├── locales/              # 🌍 Translation files (en/fr)
-    │   ├── pages/                # Route Views
-    │   ├── utils/                # API Clients (axiosInstance) & Helpers
-    │   │
-    │   └── tests/                # 🧪 Frontend Test Suite
-    │       ├── setup.ts          # Jest setup with jest-dom
-    │       ├── helpers/
-    │       │   └── testUtils.tsx # Test utilities & wrappers
-    │       ├── __mocks__/
-    │       │   └── axiosMock.ts  # Axios mock for API calls
-    │       └── unit/             # Unit tests
-    │           ├── components/   # QuestionCard tests
-    │           ├── context/      # UserContext tests
-    │           ├── hooks/        # useUser tests
-    │           ├── pages/        # Login, CreateSessionForm tests
-    │           └── utils/        # axiosInstance tests
-    │
-    ├── jest.config.js            # Jest configuration
-    └── vite.config.ts            # Build Configuration
-```
+└── frontend/interview-prep-ai/ # 💅 The Face
+├── src/
+│ ├── components/ # UI Building Blocks
+│ ├── context/ # Global State (Theme, User)
+│ ├── hooks/ # Custom Logic (useUser)
+│ ├── locales/ # 🌍 Translation files (en/fr)
+│ ├── pages/ # Route Views
+│ ├── utils/ # API Clients (axiosInstance) & Helpers
+│ │
+│ └── tests/ # 🧪 Frontend Test Suite
+│ ├── setup.ts # Jest setup with jest-dom
+│ ├── helpers/
+│ │ └── testUtils.tsx # Test utilities & wrappers
+│ ├── **mocks**/
+│ │ └── axiosMock.ts # Axios mock for API calls
+│ └── unit/ # Unit tests
+│ ├── components/ # QuestionCard tests
+│ ├── context/ # UserContext tests
+│ ├── hooks/ # useUser tests
+│ ├── pages/ # Login, CreateSessionForm tests
+│ └── utils/ # axiosInstance tests
+│
+├── jest.config.js # Jest configuration
+└── vite.config.ts # Build Configuration
+
+````
 
 ---
 
@@ -312,7 +311,7 @@ graph TB
     style E2E fill:#f9f,stroke:#333,stroke-width:2px
     style INT fill:#ff9,stroke:#333,stroke-width:2px
     style UNIT fill:#9f9,stroke:#333,stroke-width:2px
-```
+````
 
 **Current Coverage: 143 tests total (all passing ✅)**
 
