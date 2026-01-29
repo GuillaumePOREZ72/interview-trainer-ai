@@ -217,58 +217,58 @@ sequenceDiagram
 
 ## 7. 📂 Project Structure Map
 
+```text
 interviewprepai/
-├── backend/ # 🧠 The Brain
-│ ├── config/ # DB, Logger, RateLimiters
-│ ├── controllers/ # Request Handlers (Lean)
-│ ├── services/ # Business Logic (Auth, Session)
-│ ├── middlewares/ # Auth protection
-│ ├── models/ # Mongoose Schemas (User, Session, Question)
-│ ├── routes/ # API Endpoint Definitions
-│ ├── utils/ # Prompts & Helper Functions
-│ ├── app.ts # Express application (testable)
-│ ├── server.ts # Server entry point
-│ │
-│ └── tests/ # 🧪 Test Suite
-│ ├── setup.ts # MongoDB Memory Server setup
-│ ├── globalSetup.ts # Jest global setup
-│ ├── globalTeardown.ts # Jest global teardown
-│ ├── helpers/
-│ │ └── testUtils.ts # Test utilities & fixtures
-│ ├── unit/ # Unit tests (isolated)
-│ │ ├── models/ # User, Session, Question tests
-│ │ ├── middlewares/ # authMiddleware tests
-│ │ └── utils/ # helper.test.ts
-│ └── integration/ # Integration tests (API)
-│ ├── routes/ # auth, session, question, ai, upload
-│ └── middleware/ # rateLimiter tests
+├── backend/                      # 🧠 The Brain
+│   ├── config/                   # DB, Logger, RateLimiters
+│   ├── controllers/              # Request Handlers (Lean)
+│   ├── services/                 # Business Logic (Auth, Session)
+│   ├── middlewares/              # Auth protection
+│   ├── models/                   # Mongoose Schemas (User, Session, Question)
+│   ├── routes/                   # API Endpoint Definitions
+│   ├── utils/                    # Prompts & Helper Functions
+│   ├── app.ts                    # Express application (testable)
+│   ├── server.ts                 # Server entry point
+│   │
+│   └── tests/                    # 🧪 Test Suite
+│       ├── setup.ts              # MongoDB Memory Server setup
+│       ├── globalSetup.ts        # Jest global setup
+│       ├── globalTeardown.ts     # Jest global teardown
+│       ├── helpers/
+│       │   └── testUtils.ts      # Test utilities & fixtures
+│       ├── unit/                 # Unit tests (isolated)
+│       │   ├── models/           # User, Session, Question tests
+│       │   ├── middlewares/      # authMiddleware tests
+│       │   └── utils/            # helper.test.ts
+│       └── integration/          # Integration tests (API)
+│           ├── routes/           # auth, session, question, ai, upload
+│           └── middleware/       # rateLimiter tests
 │
-└── frontend/interview-prep-ai/ # 💅 The Face
-├── src/
-│ ├── components/ # UI Building Blocks
-│ ├── context/ # Global State (Theme, User)
-│ ├── hooks/ # Custom Logic (useUser)
-│ ├── locales/ # 🌍 Translation files (en/fr)
-│ ├── pages/ # Route Views
-│ ├── utils/ # API Clients (axiosInstance) & Helpers
-│ │
-│ └── tests/ # 🧪 Frontend Test Suite
-│ ├── setup.ts # Jest setup with jest-dom
-│ ├── helpers/
-│ │ └── testUtils.tsx # Test utilities & wrappers
-│ ├── **mocks**/
-│ │ └── axiosMock.ts # Axios mock for API calls
-│ └── unit/ # Unit tests
-│ ├── components/ # QuestionCard tests
-│ ├── context/ # UserContext tests
-│ ├── hooks/ # useUser tests
-│ ├── pages/ # Login, CreateSessionForm tests
-│ └── utils/ # axiosInstance tests
-│
-├── jest.config.js # Jest configuration
-└── vite.config.ts # Build Configuration
-
-````
+└── frontend/interview-prep-ai/   # 💅 The Face
+    ├── src/
+    │   ├── components/           # UI Building Blocks
+    │   ├── context/              # Global State (Theme, User)
+    │   ├── hooks/                # Custom Logic (useUser)
+    │   ├── locales/              # 🌍 Translation files (en/fr)
+    │   ├── pages/                # Route Views
+    │   ├── utils/                # API Clients (axiosInstance) & Helpers
+    │   │
+    │   └── tests/                # 🧪 Frontend Test Suite
+    │       ├── setup.ts          # Jest setup with jest-dom
+    │       ├── helpers/
+    │       │   └── testUtils.tsx # Test utilities & wrappers
+    │       ├── __mocks__/
+    │       │   └── axiosMock.ts  # Axios mock for API calls
+    │       └── unit/             # Unit tests
+    │           ├── components/   # QuestionCard tests
+    │           ├── context/      # UserContext tests
+    │           ├── hooks/        # useUser tests
+    │           ├── pages/        # Login, CreateSessionForm tests
+    │           └── utils/        # axiosInstance tests
+    │
+    ├── jest.config.js            # Jest configuration
+    └── vite.config.ts            # Build Configuration
+```
 
 ---
 
@@ -311,7 +311,7 @@ graph TB
     style E2E fill:#f9f,stroke:#333,stroke-width:2px
     style INT fill:#ff9,stroke:#333,stroke-width:2px
     style UNIT fill:#9f9,stroke:#333,stroke-width:2px
-````
+```
 
 **Current Coverage: 143 tests total (all passing ✅)**
 
@@ -492,8 +492,7 @@ CLIENT_URL=http://localhost:5173
 **Pre-Deployment:**
 
 1.  **Architecture:** Ensure backend/frontend APIs match (`/api` prefix).
-2.  **Validation:** Run `node scripts/pre-deploy-check.js` in `backend/`.
-3.  **Secrets:** Generate strong keys via `node scripts/generate-secrets.js`.
+2.  **Validation:** Run all tests via `npm test` in `backend/` and `frontend/`.
 
 **Environment Variables (.env):**
 
@@ -508,11 +507,6 @@ GROQ_API_KEY=gsk_...
 JWT_SECRET=... (min 32 chars)
 REFRESH_TOKEN_SECRET=... (min 32 chars)
 WHITELIST_ORIGINS=https://gpdev.org,https://backend.gpdev.org
-
-# Cloudinary (Images)
-CLOUDINARY_CLOUD_NAME=...
-CLOUDINARY_API_KEY=...
-CLOUDINARY_API_SECRET=...
 ```
 
 ### **11.2 Troubleshooting Guide**
