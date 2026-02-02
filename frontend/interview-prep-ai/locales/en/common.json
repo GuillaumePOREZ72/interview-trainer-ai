@@ -167,7 +167,8 @@
   },
   "question": {
     "badge": "Q",
-    "learnMore": "Learn More"
+    "learnMore": "Learn More",
+    "practiceVoice": "Vocal Mode"
   },
   "profile": {
     "userAvatar": "User avatar"
@@ -189,5 +190,38 @@
   "theme": {
     "light": "Light",
     "dark": "Dark"
+  },
+  "vocal": {
+    "studioMode": "Studio Mode",
+    "practiceSession": "Practice Session",
+    "listening": "LISTENING... CLICK TO STOP",
+    "analyzing": "ANALYZING VOX...",
+    "ready": "READY TO RECORD",
+    "liveTranscription": "Live Transcription",
+    "browserNotSupported": {
+      "title": "Browser Not Supported",
+      "message": "Your browser does not support the Web Speech API. Please use a modern browser like Chrome or Edge.",
+      "goBack": "Go Back"
+    },
+    "errors": {
+      "micDenied": "Microphone access denied or error occurred.",
+      "noSpeech": "No speech detected.",
+      "analysisFailed": "Failed to analyze your response.",
+      "brave": "Brave often blocks this feature. Please use Chrome or Edge for Vocal Mode.",
+      "network": "Network error: Please check your internet connection.",
+      "sttError": "STT Error: {{error}}",
+      "rateLimit": "Too many requests. Please wait a moment."
+    },
+    "success": {
+      "analysis": "Analysis complete!"
+    },
+    "analysis": {
+      "title": "Vocal Analysis",
+      "accuracy": "Accuracy",
+      "sentiment": "Sentiment",
+      "confidence": "Confidence",
+      "transcript": "Your Transcript",
+      "fillerWords": "Filler Words"
+    }
   }
 }

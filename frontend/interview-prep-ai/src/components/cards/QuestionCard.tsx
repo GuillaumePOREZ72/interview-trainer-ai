@@ -18,6 +18,13 @@ interface QuestionCardProps {
   isOpen?: boolean;
   onTogglePin: () => void;
   onToggleOpen?: () => void;
+  vocalAnalysis?: {
+    accuracy: number;
+    fillerWords: string[];
+    sentiment: string;
+    confidence: number;
+  };
+  voiceTranscript?: string;
 }
 
 const QuestionCard = ({
@@ -29,6 +36,8 @@ const QuestionCard = ({
   onTogglePin,
   isOpen,
   onToggleOpen,
+  vocalAnalysis,
+  voiceTranscript,
 }: QuestionCardProps) => {
   const { t } = useTranslation();
 
@@ -115,7 +124,7 @@ const QuestionCard = ({
             >
               <LuMic className="w-3.5 h-3.5" />
               <span className="hidden md:inline">
-                {t("question.practiceVoice", "Vocal Mode")}
+                {t("question.practiceVoice")}
               </span>
             </button>
           </div>
@@ -146,7 +155,63 @@ const QuestionCard = ({
             transition={{ duration: 0.28, ease: [0.2, 0.8, 0.2, 1] }}
             className="overflow-hidden"
           >
-            <div className="pt-4">
+            <div className="pt-4 space-y-4">
+              {/* Vocal Analysis Section */}
+              {vocalAnalysis && (
+                <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-100 dark:border-indigo-800/50">
+                  <h4 className="flex items-center gap-2 text-sm font-semibold text-text-primary dark:text-indigo-100 mb-3">
+                    <LuMic className="w-4 h-4" />
+                    {t("vocal.analysis.title")}
+                  </h4>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                    <div className="bg-white dark:bg-gray-800 p-2 rounded-lg border border-indigo-100 dark:border-indigo-800/30 text-center">
+                      <div className="text-xs text-text-tertiary mb-1">
+                        {t("vocal.analysis.accuracy")}
+                      </div>
+                      <div className="font-bold text-indigo-600 dark:text-indigo-400">
+                        {Math.round(vocalAnalysis.accuracy)}%
+                      </div>
+                    </div>
+                    <div className="bg-white dark:bg-gray-800 p-2 rounded-lg border border-indigo-100 dark:border-indigo-800/30 text-center">
+                      <div className="text-xs text-text-tertiary mb-1">
+                        {t("vocal.analysis.sentiment")}
+                      </div>
+                      <div className="font-bold text-indigo-600 dark:text-indigo-400 capitalize">
+                        {vocalAnalysis.sentiment}
+                      </div>
+                    </div>
+                    <div className="bg-white dark:bg-gray-800 p-2 rounded-lg border border-indigo-100 dark:border-indigo-800/30 text-center">
+                      <div className="text-xs text-text-tertiary mb-1">
+                        {t("vocal.analysis.confidence")}
+                      </div>
+                      <div className="font-bold text-indigo-600 dark:text-indigo-400">
+                        {Math.round(vocalAnalysis.confidence * 100)}%
+                      </div>
+                    </div>
+                    <div className="bg-white dark:bg-gray-800 p-2 rounded-lg border border-indigo-100 dark:border-indigo-800/30 text-center">
+                      <div className="text-xs text-text-tertiary mb-1">
+                        {t("vocal.analysis.fillerWords")}
+                      </div>
+                      <div className="font-bold text-indigo-600 dark:text-indigo-400">
+                        {vocalAnalysis.fillerWords.length}
+                      </div>
+                    </div>
+                  </div>
+
+                  {voiceTranscript && (
+                    <div className="text-sm">
+                      <span className="font-medium text-text-primary dark:text-indigo-100 block mb-1">
+                        {t("vocal.analysis.transcript")}:
+                      </span>
+                      <p className="text-text-secondary italic">
+                        "{voiceTranscript}"
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="bg-bg-secondary rounded-xl p-4 border border-border-primary">
                 <AIResponsePreview content={answer} />
               </div>

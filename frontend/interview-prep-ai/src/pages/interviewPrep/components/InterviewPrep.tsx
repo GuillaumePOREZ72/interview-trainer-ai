@@ -211,6 +211,8 @@ const InterviewPrep = () => {
                           : (data._id || index).toString(),
                       )
                     }
+                    vocalAnalysis={data.vocalAnalysis}
+                    voiceTranscript={data.voiceTranscript}
                   />
 
                   {!isLoading && sessionData.questions.length === index + 1 && (

@@ -14,7 +14,7 @@ import compression from "compression";
 import helmet from "helmet";
 
 import { logger } from "./config/logger";
-import limiter from "./config/rateLimiter";
+import limiter, { vocalAnalysisLimiter } from "./config/rateLimiter";
 import authRoutes from "./routes/authRoutes";
 import sessionRoutes from "./routes/sessionRoutes";
 import questionRoutes from "./routes/questionRoutes";
@@ -174,7 +174,12 @@ export const createApp = (): Express => {
   app.use("/api/questions", questionRoutes);
   app.use("/api/ai/generate-questions", protect, generateInterviewQuestions);
   app.use("/api/ai/generate-explanation", protect, generateConceptExplanation);
-  app.use("/api/ai/analyze-vocal", protect, analyzeVocalResponse);
+  app.use(
+    "/api/ai/analyze-vocal",
+    protect,
+    vocalAnalysisLimiter,
+    analyzeVocalResponse,
+  );
 
   // Serve static files from React frontend in production
   if (NODE_ENV === "production") {

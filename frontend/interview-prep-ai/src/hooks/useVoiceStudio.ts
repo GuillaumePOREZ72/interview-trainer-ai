@@ -11,7 +11,14 @@ export type VoiceStudioState = "IDLE" | "LISTENING" | "THINKING" | "ERROR";
  * - Speech Recognition (STT) via Web Speech API
  * - Backend analysis orchestration
  */
-export const useVoiceStudio = (questionId: string, language: string = "en") => {
+// TFunction type from i18next
+import { TFunction } from "i18next";
+
+export const useVoiceStudio = (
+  questionId: string,
+  language: string = "en",
+  t: TFunction,
+) => {
   const [state, setState] = useState<VoiceStudioState>("IDLE");
   const [transcript, setTranscript] = useState("");
   const [interimTranscript, setInterimTranscript] = useState("");
@@ -20,7 +27,7 @@ export const useVoiceStudio = (questionId: string, language: string = "en") => {
   // Audio Context refs for visualization
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
-  const dataArrayRef = useRef<Uint8Array | null>(null);
+  const dataArrayRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
@@ -63,9 +70,18 @@ export const useVoiceStudio = (questionId: string, language: string = "en") => {
 
     recognition.onerror = (event: any) => {
       console.error("Speech recognition error", event.error);
-      if (event.error !== "no-speech") {
+
+      if (event.error === "network") {
         setState("ERROR");
-        toast.error(`STT Error: ${event.error}`);
+        // Special message for Brave or network issues
+        const isBrave = (navigator as any).brave !== undefined;
+        const msg = isBrave
+          ? t("vocal.errors.brave")
+          : t("vocal.errors.network");
+        toast.error(msg, { duration: 6000 });
+      } else if (event.error !== "no-speech") {
+        setState("ERROR");
+        toast.error(t("vocal.errors.sttError", { error: event.error }));
       }
     };
 
@@ -112,7 +128,7 @@ export const useVoiceStudio = (questionId: string, language: string = "en") => {
     } catch (err) {
       console.error("Failed to start listening:", err);
       setState("ERROR");
-      toast.error("Microphone access denied or error occurred.");
+      toast.error(t("vocal.errors.micDenied"));
     }
   };
 
@@ -136,7 +152,7 @@ export const useVoiceStudio = (questionId: string, language: string = "en") => {
 
     if (!fullTranscript) {
       setState("IDLE");
-      toast.error("No speech detected.");
+      toast.error(t("vocal.errors.noSpeech"));
       return;
     }
 
@@ -149,12 +165,19 @@ export const useVoiceStudio = (questionId: string, language: string = "en") => {
       });
 
       setState("IDLE");
-      toast.success("Analysis complete!");
+      toast.success(t("vocal.success.analysis"));
       return response.data;
-    } catch (err) {
+      toast.success(t("vocal.success.analysis"));
+      return response.data;
+    } catch (err: any) {
       console.error("Analysis failed:", err);
       setState("ERROR");
-      toast.error("Failed to analyze your response.");
+
+      if (err.response && err.response.status === 429) {
+        toast.error(t("vocal.errors.rateLimit"));
+      } else {
+        toast.error(t("vocal.errors.analysisFailed"));
+      }
       throw err;
     }
   };

@@ -15,6 +15,7 @@ import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import { Question } from "../../types";
 import SpinnerLoader from "../../components/loader/SpinnerLoader";
+import { useTranslation } from "react-i18next";
 
 const VoiceStudio = () => {
   const { sessionId, questionId } = useParams<{
@@ -24,6 +25,7 @@ const VoiceStudio = () => {
   const navigate = useNavigate();
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(true);
+  const { i18n, t } = useTranslation();
 
   const {
     state,
@@ -33,7 +35,7 @@ const VoiceStudio = () => {
     startListening,
     stopListening,
     getFrequencyData,
-  } = useVoiceStudio(questionId!, "en"); // Language could be dynamic based on session
+  } = useVoiceStudio(questionId!, i18n.language, t);
 
   useEffect(() => {
     const fetchQuestion = async () => {
@@ -90,14 +92,13 @@ const VoiceStudio = () => {
         <LuCircleAlert className="w-16 h-16 text-amber-500 mb-4" />
         <h2 className="text-2xl font-bold mb-2">Browser Not Supported</h2>
         <p className="text-gray-600 dark:text-gray-400 max-w-md">
-          Your browser does not support the Web Speech API. Please use a modern
-          browser like Chrome or Edge.
+          {t("vocal.browserNotSupported.message")}
         </p>
         <button
           onClick={() => navigate(-1)}
           className="mt-6 px-6 py-2 bg-indigo-600 text-white rounded-lg cursor-pointer"
         >
-          Go Back
+          {t("vocal.browserNotSupported.goBack")}
         </button>
       </div>
     );
@@ -120,7 +121,7 @@ const VoiceStudio = () => {
           <LuChevronLeft className="w-6 h-6 text-gray-500 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
         </button>
         <div className="bg-black/5 dark:bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-black/5 dark:border-white/10 text-[10px] md:text-xs font-bold text-gray-500 dark:text-gray-400 tracking-[0.2em] uppercase">
-          Studio Mode
+          {t("vocal.studioMode")}
         </div>
         <button
           onClick={() => navigate(`/interview-prep/${sessionId}`)}
@@ -139,7 +140,7 @@ const VoiceStudio = () => {
           className="text-center mb-12"
         >
           <span className="inline-block px-3 py-1 bg-indigo-500/10 text-indigo-500 rounded-full text-[10px] font-bold mb-4 border border-indigo-500/20 uppercase tracking-[0.3em]">
-            Practice Session
+            {t("vocal.practiceSession")}
           </span>
           <h1 className="text-2xl md:text-4xl font-bold text-gray-900 dark:text-white leading-tight px-4">
             {question?.question}
@@ -185,7 +186,7 @@ const VoiceStudio = () => {
                   exit={{ opacity: 0 }}
                   className="text-gray-500 dark:text-gray-400 font-bold text-sm tracking-wide animate-pulse"
                 >
-                  LISTENING... CLICK TO STOP
+                  {t("vocal.listening")}
                 </motion.p>
               ) : state === "THINKING" ? (
                 <motion.div
@@ -196,7 +197,7 @@ const VoiceStudio = () => {
                   className="flex items-center gap-3 text-indigo-500 font-bold text-sm tracking-wide"
                 >
                   <SpinnerLoader />
-                  <span>ANALYZING VOX...</span>
+                  <span>{t("vocal.analyzing")}</span>
                 </motion.div>
               ) : (
                 <motion.p
@@ -204,9 +205,9 @@ const VoiceStudio = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="text-gray-400 dark:text-gray-600 font-bold text-sm tracking-wide"
+                  className="text-gray-400 dark:text-gray-600 font-bold text-sm tracking-wide text-center"
                 >
-                  READY TO RECORD
+                  {t("vocal.ready")}
                 </motion.p>
               )}
             </AnimatePresence>
@@ -223,7 +224,7 @@ const VoiceStudio = () => {
             >
               <div className="flex items-center gap-2 mb-6 text-[10px] font-bold text-indigo-500 tracking-[0.2em] uppercase">
                 <LuMessageSquare className="w-4 h-4" />
-                Live Transcription
+                {t("vocal.liveTranscription")}
               </div>
               <p className="text-lg md:text-xl text-gray-800 dark:text-gray-200 leading-relaxed min-h-[80px]">
                 {transcript}

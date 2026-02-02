@@ -167,7 +167,8 @@
   },
   "question": {
     "badge": "Q",
-    "learnMore": "En savoir plus"
+    "learnMore": "En savoir plus",
+    "practiceVoice": "Mode Vocal"
   },
   "profile": {
     "userAvatar": "Avatar utilisateur"
@@ -189,5 +190,38 @@
   "theme": {
     "light": "Clair",
     "dark": "Sombre"
+  },
+  "vocal": {
+    "studioMode": "Mode Studio",
+    "practiceSession": "Session d'entraînement",
+    "listening": "ÉCOUTE... CLIQUEZ POUR ARRÊTER",
+    "analyzing": "ANALYSE VOCALE...",
+    "ready": "PRÊT À ENREGISTRER",
+    "liveTranscription": "Transcription en direct",
+    "browserNotSupported": {
+      "title": "Navigateur non supporté",
+      "message": "Votre navigateur ne supporte pas l'API Web Speech. Veuillez utiliser un navigateur moderne comme Chrome ou Edge.",
+      "goBack": "Retour"
+    },
+    "errors": {
+      "micDenied": "Accès au micro refusé ou erreur survenue.",
+      "noSpeech": "Aucune parole détectée.",
+      "analysisFailed": "Échec de l'analyse de votre réponse.",
+      "brave": "Brave bloque souvent cette fonctionnalité. Veuillez utiliser Chrome ou Edge pour le mode vocal.",
+      "network": "Erreur réseau : Vérifiez votre connexion internet.",
+      "sttError": "Erreur STT : {{error}}",
+      "rateLimit": "Trop de demandes. Veuillez patienter un instant."
+    },
+    "success": {
+      "analysis": "Analyse terminée !"
+    },
+    "analysis": {
+      "title": "Analyse Vocale",
+      "accuracy": "Précision",
+      "sentiment": "Sentiment",
+      "confidence": "Confiance",
+      "transcript": "Votre Transcription",
+      "fillerWords": "Mots de remplissage"
+    }
   }
 }
