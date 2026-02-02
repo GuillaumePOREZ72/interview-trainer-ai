@@ -22,6 +22,7 @@ import { protect } from "./middlewares/authMiddleware";
 import {
   generateConceptExplanation,
   generateInterviewQuestions,
+  analyzeVocalResponse,
 } from "./controllers/aiController";
 
 /**
@@ -173,6 +174,7 @@ export const createApp = (): Express => {
   app.use("/api/questions", questionRoutes);
   app.use("/api/ai/generate-questions", protect, generateInterviewQuestions);
   app.use("/api/ai/generate-explanation", protect, generateConceptExplanation);
+  app.use("/api/ai/analyze-vocal", protect, analyzeVocalResponse);
 
   // Serve static files from React frontend in production
   if (NODE_ENV === "production") {

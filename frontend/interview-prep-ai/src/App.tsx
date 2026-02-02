@@ -19,6 +19,7 @@ const InterviewPrep = lazy(
 );
 const Dashboard = lazy(() => import("./pages/home/Dashboard"));
 const ResetPassword = lazy(() => import("./pages/auth/ResetPassword"));
+const VoiceStudio = lazy(() => import("./pages/vocal/VoiceStudio"));
 
 interface ProtectedRoutesProps {
   children: ReactNode;
@@ -62,6 +63,14 @@ const App = () => {
                 element={
                   <ProtectedRoutes>
                     <Dashboard />
+                  </ProtectedRoutes>
+                }
+              />
+              <Route
+                path="/interview-prep/:sessionId/vocal/:questionId"
+                element={
+                  <ProtectedRoutes>
+                    <VoiceStudio />
                   </ProtectedRoutes>
                 }
               />

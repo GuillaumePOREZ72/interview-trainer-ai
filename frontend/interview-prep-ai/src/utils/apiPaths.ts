@@ -17,6 +17,7 @@ export const API_PATHS = {
   AI: {
     GENERATE_QUESTIONS: "/api/ai/generate-questions", // Generate interview questions and answers using Groq
     GENERATE_EXPLANATION: "/api/ai/generate-explanation", // Generate concept explanation using Groq
+    ANALYZE_VOCAL: "/api/ai/analyze-vocal", // Analyze vocal response transcript
   },
 
   SESSION: {

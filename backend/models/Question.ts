@@ -9,7 +9,7 @@ export interface IQuestion extends Document {
   voiceTranscript?: string;
   vocalAnalysis?: {
     accuracy: number; // score de 0 à 100
-    filledWords: string[]; // Liste des "euh", "enfin", "voilà" détectés
+    fillerWords: string[]; // Liste des "euh", "enfin", "voilà" détectés
     sentiment: string; // "confiant", "hésitant", "stressé", etc."
     confidence: number; // score de certitude du STT
   };
@@ -27,7 +27,7 @@ const questionSchema = new Schema<IQuestion>(
     voiceTranscript: String,
     vocalAnalysis: {
       accuracy: { type: Number, default: 0 },
-      filledWords: [String],
+      fillerWords: [String],
       sentiment: String,
       confidence: { type: Number, default: 0 },
     },

@@ -92,4 +92,32 @@ const conceptExplainPrompt = (
   }
   `;
 
-export { questionAnswerPrompt, conceptExplainPrompt };
+const vocalAnalysisPrompt = (
+  transcript: string,
+  originalQuestion: string,
+  language: string = "en",
+): string => `
+  Analyze this interview response transcript.
+  ${getLanguageInstruction(language)}
+
+  Context:
+  - Question: "${originalQuestion}"
+  - Candidate Transcript: "${transcript}"
+
+  Task:
+  - Evaluate the technical accuracy of the response relative to the question.
+  - Identify specific filler words or speech patterns (e.g., "uhm", "like", "du coup", "enfin").
+  - Determine the candidate's sentiment and confidence level.
+
+  Return ONLY a valid JSON object. No preamble, no post-text, and NO markdown code blocks around the JSON.
+
+  Format:
+  {
+    "accuracy": (number 0-100),
+    "fillerWords": (array of strings),
+    "sentiment": (one of: "confident", "neutral", "uncertain"),
+    "confidence": (number 0-1 from transcript clarity)
+  }
+  `;
+
+export { questionAnswerPrompt, conceptExplainPrompt, vocalAnalysisPrompt };

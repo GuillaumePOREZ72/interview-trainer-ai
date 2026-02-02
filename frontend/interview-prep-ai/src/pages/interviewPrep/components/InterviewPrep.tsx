@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { LuCircleAlert, LuListCollapse, LuSparkles } from "react-icons/lu";
 import SpinnerLoader from "../../../components/loader/SpinnerLoader";
@@ -22,6 +22,7 @@ import { AxiosError } from "axios";
 
 const InterviewPrep = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
+  const navigate = useNavigate();
 
   const [sessionData, setSessionData] = useState<Session | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>("");
@@ -30,7 +31,7 @@ const InterviewPrep = () => {
   const [explanation, setExplanation] = useState<ExplanationResponse | null>(
     null,
   );
-  const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null);  
+  const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isUpdateLoader, setIsUpdateLoader] = useState<boolean>(false);
@@ -191,24 +192,27 @@ const InterviewPrep = () => {
                   layout
                   layoutId={`question-${data._id || index}`}
                 >
-                    <QuestionCard
-                      question={data.question}
-                      answer={data.answer}
-                      onLearnMore={() =>
-                        generateConceptExplanation(data.question)
-                      }
-                      isPinned={data.isPinned || false}
-                      onTogglePin={() => toggleQuestionPinStatus(data._id!)}
-                      isOpen={activeQuestionId === (data._id || index).toString()}
-                      onToggleOpen={() =>
-                        setActiveQuestionId(
-                          activeQuestionId === (data._id || index).toString()
-                            ? null
-                            : (data._id || index).toString(),
-                        )
-                      }
-                    />
-                  
+                  <QuestionCard
+                    question={data.question}
+                    answer={data.answer}
+                    onLearnMore={() =>
+                      generateConceptExplanation(data.question)
+                    }
+                    onVocalMode={() =>
+                      navigate(`/interview-prep/${sessionId}/vocal/${data._id}`)
+                    }
+                    isPinned={data.isPinned || false}
+                    onTogglePin={() => toggleQuestionPinStatus(data._id!)}
+                    isOpen={activeQuestionId === (data._id || index).toString()}
+                    onToggleOpen={() =>
+                      setActiveQuestionId(
+                        activeQuestionId === (data._id || index).toString()
+                          ? null
+                          : (data._id || index).toString(),
+                      )
+                    }
+                  />
+
                   {!isLoading && sessionData.questions.length === index + 1 && (
                     <div className="flex items-center justify-center mt-8">
                       <button

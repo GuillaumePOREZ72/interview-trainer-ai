@@ -2,6 +2,8 @@ import { conceptExplainPrompt, questionAnswerPrompt } from "../utils/prompts";
 import { cleanAndParseJSON } from "../utils/helper";
 import { Request, Response } from "express";
 import { logger } from "../config/logger";
+import Question from "../models/Question";
+import VocalAnalysisService from "../services/vocalAnalysisService";
 
 interface GenerateQuestionsRequest extends Request {
   body: {
@@ -175,4 +177,55 @@ const generateConceptExplanation = async (
   }
 };
 
-export { generateInterviewQuestions, generateConceptExplanation };
+interface AnalyzeVocalRequest extends Request {
+  body: {
+    questionId: string;
+    transcript: string;
+    language?: string;
+  };
+}
+
+const analyzeVocalResponse = async (
+  req: AnalyzeVocalRequest,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { questionId, transcript, language = "en" } = req.body;
+
+    if (!questionId || !transcript) {
+      res
+        .status(400)
+        .json({ message: "Question ID and transcript are required" });
+      return;
+    }
+
+    const question = await Question.findById(questionId);
+    if (!question) {
+      res.status(404).json({ message: "Question not found" });
+      return;
+    }
+
+    // Call our refactored service
+    const analysis = await VocalAnalysisService.analyzeVocalTranscript(
+      transcript,
+      question.question,
+      language,
+    );
+
+    // Persist the results in the database
+    question.voiceTranscript = transcript;
+    question.vocalAnalysis = analysis;
+    await question.save();
+
+    res.status(200).json(question);
+  } catch (error) {
+    logger.error("❌ AI Vocal Analysis Error:", error);
+    res.status(500).json({ message: "Failed to analyze vocal response" });
+  }
+};
+
+export {
+  generateInterviewQuestions,
+  generateConceptExplanation,
+  analyzeVocalResponse,
+};

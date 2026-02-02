@@ -1,5 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { LuChevronDown, LuPin, LuPinOff, LuSparkles } from "react-icons/lu";
+import {
+  LuChevronDown,
+  LuPin,
+  LuPinOff,
+  LuSparkles,
+  LuMic,
+} from "react-icons/lu";
 import AIResponsePreview from "../../pages/interviewPrep/components/AIResponsePreview";
 import { useTranslation } from "react-i18next";
 
@@ -7,6 +13,7 @@ interface QuestionCardProps {
   question: string;
   answer: string;
   onLearnMore: () => void;
+  onVocalMode: () => void;
   isPinned: boolean;
   isOpen?: boolean;
   onTogglePin: () => void;
@@ -17,6 +24,7 @@ const QuestionCard = ({
   question,
   answer,
   onLearnMore,
+  onVocalMode,
   isPinned,
   onTogglePin,
   isOpen,
@@ -93,6 +101,21 @@ const QuestionCard = ({
               <LuSparkles className="w-3.5 h-3.5" />
               <span className="hidden md:inline">
                 {t("question.learnMore")}
+              </span>
+            </button>
+
+            {/* Vocal Mode Button */}
+            <button
+              className="flex items-center gap-1.5 text-xs text-white font-medium bg-linear-to-r from-indigo-500 to-indigo-700 px-3 py-1.5 rounded-lg hover:shadow-lg hover:shadow-indigo-500/30 transition-all duration-200 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                onVocalMode();
+              }}
+              title="Practice with Voice"
+            >
+              <LuMic className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">
+                {t("question.practiceVoice", "Vocal Mode")}
               </span>
             </button>
           </div>
