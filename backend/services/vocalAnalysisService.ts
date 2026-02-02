@@ -65,7 +65,7 @@ class VocalAnalysisService {
         throw new Error("No response choices returned from AI");
       }
 
-      // Extraction and parsing via the helper 
+      // Extraction and parsing via the helper
       const result = cleanAndParseJSON(
         data.choices[0].message.content,
       ) as VocalAnalysisResult;

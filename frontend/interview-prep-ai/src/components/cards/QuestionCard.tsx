@@ -158,8 +158,8 @@ const QuestionCard = ({
             <div className="pt-4 space-y-4">
               {/* Vocal Analysis Section */}
               {vocalAnalysis && (
-                <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-100 dark:border-indigo-800/50">
-                  <h4 className="flex items-center gap-2 text-sm font-semibold text-text-primary dark:text-indigo-100 mb-3">
+                <div className="bg-white dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800/50">
+                  <h4 className="flex items-center gap-2 text-sm font-semibold text-custom-primary dark:text-indigo-100 mb-3">
                     <LuMic className="w-4 h-4" />
                     {t("vocal.analysis.title")}
                   </h4>
@@ -201,7 +201,7 @@ const QuestionCard = ({
 
                   {voiceTranscript && (
                     <div className="text-sm">
-                      <span className="font-medium text-text-primary dark:text-indigo-100 block mb-1">
+                      <span className="font-medium text-custom-primary dark:text-indigo-100 block mb-1">
                         {t("vocal.analysis.transcript")}:
                       </span>
                       <p className="text-text-secondary italic">

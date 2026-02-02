@@ -97,7 +97,7 @@ const vocalAnalysisPrompt = (
   originalQuestion: string,
   language: string = "en",
 ): string => `
-  Analyze this interview response transcript.
+  You are a technical interview evaluator. Analyze this candidate's vocal response.
   ${getLanguageInstruction(language)}
 
   Context:
@@ -105,18 +105,28 @@ const vocalAnalysisPrompt = (
   - Candidate Transcript: "${transcript}"
 
   Task:
-  - Evaluate the technical accuracy of the response relative to the question.
-  - Identify specific filler words or speech patterns (e.g., "uhm", "like", "du coup", "enfin").
-  - Determine the candidate's sentiment and confidence level.
+  1. Evaluate the technical accuracy of the response (0-100 scale).
+     - 0-30: Incorrect or irrelevant answer
+     - 30-60: Partially correct, missing key points
+     - 60-80: Good answer with minor gaps
+     - 80-100: Excellent, comprehensive answer
+  
+  2. Identify ONLY filler words actually present in the transcript (e.g., "uhm", "like", "euh", "du coup", "enfin").
+     - Return ONLY the words themselves, no explanations.
+     - If none found, return an empty array [].
+  
+  3. Determine sentiment: "confident", "neutral", or "uncertain".
+  
+  4. Assess confidence level (0.0 to 1.0) based on speech clarity and coherence.
 
-  Return ONLY a valid JSON object. No preamble, no post-text, and NO markdown code blocks around the JSON.
-
-  Format:
+  CRITICAL: Return ONLY a valid JSON object. No explanations, no markdown, no extra text.
+  
+  Required format (strict):
   {
-    "accuracy": (number 0-100),
-    "fillerWords": (array of strings),
-    "sentiment": (one of: "confident", "neutral", "uncertain"),
-    "confidence": (number 0-1 from transcript clarity)
+    "accuracy": 75,
+    "fillerWords": ["euh", "du coup"],
+    "sentiment": "confident",
+    "confidence": 0.8
   }
   `;
 

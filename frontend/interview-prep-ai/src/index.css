@@ -63,7 +63,9 @@
     background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
     overflow-x: hidden;
-    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease; /* Smooth transition */
   }
 }
 
@@ -193,5 +195,18 @@ pre {
 
   .gradient-border {
     @apply border border-transparent bg-gradient-to-r from-primary to-secondary bg-clip-border;
+  }
+
+  /* Text color utilities using CSS variables */
+  .text-custom-primary {
+    color: var(--text-primary-val);
+  }
+
+  .text-custom-secondary {
+    color: var(--text-secondary-val);
+  }
+
+  .text-custom-tertiary {
+    color: var(--text-tertiary-val);
   }
 }
