@@ -111,7 +111,7 @@ export const createApp = (): Express => {
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          scriptSrc: ["'self'"], // ✅ Supprimé 'unsafe-inline'
+          scriptSrc: ["'self'", "'unsafe-inline'"], // ✅ Supprimé 'unsafe-inline'
           styleSrc: [
             "'self'",
             "'unsafe-inline'", // Nécessaire pour Tailwind mais à restreindre si possible
