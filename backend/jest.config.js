@@ -6,7 +6,6 @@ const config = {
   // Test environment
   testEnvironment: "node",
 
-
   // Module name mapper for ESM imports with .js extension
   moduleNameMapper: {
     "^(\\.{1,2}/.*)\\.js$": "$1",
@@ -22,6 +21,11 @@ const config = {
       },
     ],
   },
+
+  // Transform node_modules that use ESM (like uuid)
+  transformIgnorePatterns: [
+    "node_modules/(?!(uuid)/)"
+  ],
 
   // Setup files
   setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],
@@ -66,4 +70,3 @@ const config = {
 };
 
 export default config;
-
