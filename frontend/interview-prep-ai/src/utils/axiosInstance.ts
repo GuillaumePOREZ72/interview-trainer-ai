@@ -71,10 +71,10 @@ axiosInstance.interceptors.response.use(
     }
 
     // Don't try to refresh if this is already a refresh token request
-    if (originalRequest.url?.endsWith(API_PATHS.AUTH.REFRESH_TOKEN)) {
-      if (window.location.pathname !== "/") {
-        window.location.href = "/";
-      }
+    // OR if this is a login/register request (401 means invalid credentials, not expired token)
+    if (originalRequest.url?.endsWith(API_PATHS.AUTH.REFRESH_TOKEN) ||
+        originalRequest.url?.endsWith(API_PATHS.AUTH.LOGIN) ||
+        originalRequest.url?.endsWith(API_PATHS.AUTH.REGISTER)) {
       return Promise.reject(error);
     }
 
