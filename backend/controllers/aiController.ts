@@ -4,6 +4,14 @@ import { Request, Response } from "express";
 import { logger } from "../config/logger";
 import Question from "../models/Question";
 import VocalAnalysisService from "../services/vocalAnalysisService";
+import { body, validationResult } from "express-validator";
+
+const validateAIInput = [
+  body("role").trim().isLength({ min: 1, max: 100 }).escape(),
+  body("experience").isIn(["junior", "mid", "senior", "lead"]),
+  body("topicsToFocus").trim().isLength({ min: 1, max: 500 }).escape(),
+  body("numberOfQuestions").isInt({ min: 1, max: 20 }),
+];
 
 interface GenerateQuestionsRequest extends Request {
   body: {

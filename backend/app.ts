@@ -19,6 +19,13 @@ import authRoutes from "./routes/authRoutes";
 import sessionRoutes from "./routes/sessionRoutes";
 import questionRoutes from "./routes/questionRoutes";
 import { protect } from "./middlewares/authMiddleware";
+import { correlationMiddleware } from "./middlewares/correlationMiddleware";
+import { auditAllRequests } from "./middlewares/auditMiddleware";
+import {
+  validateGenerateQuestions,
+  validateGenerateExplanation,
+  validateVocalAnalysis,
+} from "./middlewares/aiValidationMiddleware";
 import {
   generateConceptExplanation,
   generateInterviewQuestions,
@@ -41,26 +48,30 @@ export const createApp = (): Express => {
     app.set("trust proxy", true);
   }
 
-  // CORS configuration
+  // Correlation ID middleware (doit être en premier pour tracer toutes les requêtes)
+  app.use(correlationMiddleware);
+
+  // CORS configuration - Toujours valider la whitelist, même en développement
   const corsOptions: cors.CorsOptions = {
     origin(origin, callback) {
-      if (NODE_ENV === "development" || NODE_ENV === "test" || !origin) {
+      const whitelist = process.env.WHITELIST_ORIGINS?.split(",") || [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://localhost:8000",
+      ];
+      
+      if (!origin || whitelist.includes(origin)) {
         callback(null, true);
       } else {
-        const whitelist = process.env.WHITELIST_ORIGINS?.split(",") || [];
-        if (whitelist.includes(origin)) {
-          callback(null, true);
-        } else {
-          logger.warn(
-            `CORS blocked: ${origin} not in whitelist. Current whitelist: ${whitelist.join(", ")}`,
-          );
-          callback(new Error(`CORS error: ${origin} is not allowed by CORS`));
-        }
+        logger.warn(
+          `CORS blocked: ${origin} not in whitelist. Current whitelist: ${whitelist.join(", ")}`,
+        );
+        callback(new Error(`CORS error: ${origin} is not allowed by CORS`));
       }
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Request-ID"],
   };
   app.use(cors(corsOptions));
 
@@ -69,10 +80,14 @@ export const createApp = (): Express => {
   app.use(express.urlencoded({ extended: true, limit: "10mb" }));
   app.use(cookieParser());
 
+  // ✅ Audit middleware pour les requêtes sensibles
+  app.use(auditAllRequests);
+
   // Diagnostic middleware for production (do not log request bodies)
   if (NODE_ENV === "production") {
     app.use((req, res, next) => {
       logger.info(`🔍 [${req.method}] ${req.url}`, {
+        correlationId: req.correlationId,
         headers: {
           "content-type": req.headers["content-type"],
           "content-length": req.headers["content-length"],
@@ -89,26 +104,31 @@ export const createApp = (): Express => {
     }),
   );
 
-  // Security headers with a robust CSP
+  // ✅ Security headers avec CSP renforcé
   app.use(
     helmet({
       crossOriginResourcePolicy: { policy: "cross-origin" },
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          scriptSrc: ["'self'", "'unsafe-inline'"],
+          scriptSrc: ["'self'"], // ✅ Supprimé 'unsafe-inline'
           styleSrc: [
             "'self'",
-            "'unsafe-inline'",
+            "'unsafe-inline'", // Nécessaire pour Tailwind mais à restreindre si possible
             "https://fonts.googleapis.com",
           ],
           imgSrc: ["'self'", "data:", "blob:", "https://api.dicebear.com"],
-          connectSrc: ["'self'"],
+          connectSrc: ["'self'", "https://api.groq.com"], // ✅ Restreint aux domaines nécessaires
           fontSrc: ["'self'", "https:", "data:", "https://fonts.gstatic.com"],
           objectSrc: ["'none'"],
-          upgradeInsecureRequests: null,
+          upgradeInsecureRequests: NODE_ENV === "production" ? [] : null,
         },
       },
+      hsts: NODE_ENV === "production" ? {
+        maxAge: 31536000, // 1 an
+        includeSubDomains: true,
+        preload: true,
+      } : undefined,
     }),
   );
 
@@ -123,24 +143,34 @@ export const createApp = (): Express => {
       message: "Interview Trainer AI Backend is running.",
       version: "v1",
       status: "healthy",
+      correlationId: req.correlationId,
     });
   });
 
   // Simple ping to verify Node.js is receiving requests
   app.get("/api/ping", (req, res) => {
-    logger.info("🏓 PING received! Node.js is handling this request.");
-    res.json({ pong: true, timestamp: new Date().toISOString() });
+    logger.info("🏓 PING received! Node.js is handling this request.", {
+      correlationId: req.correlationId,
+    });
+    res.json({ 
+      pong: true, 
+      timestamp: new Date().toISOString(),
+      correlationId: req.correlationId,
+    });
   });
 
   // POST test to verify POST requests work
   app.post("/api/ping-post", (req, res) => {
     // Avoid logging request body in production
-    logger.info("🏓 POST PING received!");
+    logger.info("🏓 POST PING received!", {
+      correlationId: req.correlationId,
+    });
     res.json({
       pong: true,
       method: "POST",
       body: req.body,
       timestamp: new Date().toISOString(),
+      correlationId: req.correlationId,
     });
   });
 
@@ -149,11 +179,13 @@ export const createApp = (): Express => {
     logger.info("📬 Raw POST received!", {
       contentType: req.headers["content-type"],
       contentLength: req.headers["content-length"],
+      correlationId: req.correlationId,
     });
     res.json({
       received: true,
       contentType: req.headers["content-type"],
       contentLength: req.headers["content-length"],
+      correlationId: req.correlationId,
     });
   });
 
@@ -163,6 +195,7 @@ export const createApp = (): Express => {
       return res.json({
         status: "healthy",
         message: "Interview Prep AI Backend is running.",
+        correlationId: req.correlationId,
       });
     }
     next();
@@ -172,12 +205,25 @@ export const createApp = (): Express => {
   app.use("/api/auth", authRoutes);
   app.use("/api/sessions", sessionRoutes);
   app.use("/api/questions", questionRoutes);
-  app.use("/api/ai/generate-questions", protect, generateInterviewQuestions);
-  app.use("/api/ai/generate-explanation", protect, generateConceptExplanation);
+  
+  // ✅ AI Routes avec validation des entrées
+  app.use(
+    "/api/ai/generate-questions",
+    protect,
+    validateGenerateQuestions,
+    generateInterviewQuestions
+  );
+  app.use(
+    "/api/ai/generate-explanation",
+    protect,
+    validateGenerateExplanation,
+    generateConceptExplanation
+  );
   app.use(
     "/api/ai/analyze-vocal",
     protect,
     vocalAnalysisLimiter,
+    validateVocalAnalysis,
     analyzeVocalResponse,
   );
 
@@ -245,6 +291,7 @@ export const createApp = (): Express => {
       const meta: any = {
         url: req.url,
         method: req.method,
+        correlationId: req.correlationId,
       };
       if (NODE_ENV === "development") {
         meta.stack = err.stack;
@@ -255,6 +302,7 @@ export const createApp = (): Express => {
       res.status(500).json({
         message: "Internal server error",
         error: NODE_ENV === "development" ? err.message : undefined,
+        correlationId: req.correlationId,
       });
     },
   );
@@ -264,8 +312,12 @@ export const createApp = (): Express => {
     logger.warn("⚠️  Route not found", {
       url: req.url,
       method: req.method,
+      correlationId: req.correlationId,
     });
-    res.status(404).json({ message: "Route not found" });
+    res.status(404).json({ 
+      message: "Route not found",
+      correlationId: req.correlationId,
+    });
   });
 
   return app;

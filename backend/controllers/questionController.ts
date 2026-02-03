@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { logger } from "../config/logger";
 import SessionService from "../services/SessionService";
+import Session from "../models/Session";
+import Question from "../models/Question";
 
 interface AddQuestionsRequest extends Request {
   body: {
@@ -16,9 +18,25 @@ export const addQuestionsToSession = async (
 ): Promise<void> => {
   try {
     const { sessionId, questions } = req.body;
+    const userId = req.user?._id;
+
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
 
     if (!sessionId || !questions || !Array.isArray(questions)) {
       res.status(400).json({ message: "Invalid input data" });
+      return;
+    }
+
+    // Vérification de propriété : l'utilisateur doit posséder la session
+    const session = await Session.findOne({ _id: sessionId, user: userId });
+    if (!session) {
+      logger.warn(
+        `Unauthorized attempt to add questions: User ${userId} tried to access session ${sessionId}`,
+      );
+      res.status(403).json({ message: "Not authorized to modify this session" });
       return;
     }
 
@@ -28,7 +46,7 @@ export const addQuestionsToSession = async (
     );
 
     logger.info(
-      `➕ ${createdQuestions.length} questions added to session: ${sessionId}`,
+      `➕ ${createdQuestions.length} questions added to session: ${sessionId} by user: ${userId}`,
     );
     res.status(201).json(createdQuestions);
   } catch (error) {
@@ -47,12 +65,33 @@ export const togglePinQuestion = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const question = await SessionService.togglePinQuestion(req.params.id);
+    const userId = req.user?._id;
+
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    // Vérification de propriété : la question doit appartenir à une session de l'utilisateur
+    const question = await Question.findById(req.params.id).populate({
+      path: "session",
+      match: { user: userId },
+    });
+
+    if (!question || !(question.session as any)) {
+      logger.warn(
+        `Unauthorized attempt to toggle pin: User ${userId} tried to access question ${req.params.id}`,
+      );
+      res.status(403).json({ message: "Not authorized to modify this question" });
+      return;
+    }
+
+    const updatedQuestion = await SessionService.togglePinQuestion(req.params.id);
 
     logger.info(
-      `📌 Question ${question.isPinned ? "pinned" : "unpinned"}: ${req.params.id}`,
+      `📌 Question ${updatedQuestion.isPinned ? "pinned" : "unpinned"}: ${req.params.id} by user: ${userId}`,
     );
-    res.status(200).json({ success: true, question });
+    res.status(200).json({ success: true, question: updatedQuestion });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Server Error";
@@ -70,13 +109,34 @@ export const updateQuestionNote = async (
 ): Promise<void> => {
   try {
     const { note } = req.body;
-    const question = await SessionService.updateQuestionNote(
+    const userId = req.user?._id;
+
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    // Vérification de propriété : la question doit appartenir à une session de l'utilisateur
+    const question = await Question.findById(req.params.id).populate({
+      path: "session",
+      match: { user: userId },
+    });
+
+    if (!question || !(question.session as any)) {
+      logger.warn(
+        `Unauthorized attempt to update note: User ${userId} tried to access question ${req.params.id}`,
+      );
+      res.status(403).json({ message: "Not authorized to modify this question" });
+      return;
+    }
+
+    const updatedQuestion = await SessionService.updateQuestionNote(
       req.params.id,
       note,
     );
 
-    logger.info(`📝 Note updated for question: ${req.params.id}`);
-    res.status(200).json({ success: true, question });
+    logger.info(`📝 Note updated for question: ${req.params.id} by user: ${userId}`);
+    res.status(200).json({ success: true, question: updatedQuestion });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Server Error";

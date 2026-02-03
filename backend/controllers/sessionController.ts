@@ -79,7 +79,10 @@ export const getSessionById = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const session = await Session.findById(req.params.id)
+    const session = await Session.findOne({
+      _id: req.params.id,
+      user: req.user?._id,
+    })
       .populate({
         path: "questions",
         options: { sort: { isPinned: -1, createdAt: 1 } },
