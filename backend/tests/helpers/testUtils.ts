@@ -66,6 +66,27 @@ export interface TestQuestionData {
 }
 
 // ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+/**
+ * Generate a unique email for testing
+ * Prevents duplicate key errors when multiple tests create users
+ */
+let testUserCounter = 0;
+export const generateUniqueEmail = (): string => {
+  testUserCounter++;
+  return `testuser_${Date.now()}_${testUserCounter}@example.com`;
+};
+
+/**
+ * Reset the test counter (useful in beforeAll)
+ */
+export const resetTestCounter = (): void => {
+  testUserCounter = 0;
+};
+
+// ============================================================================
 // DEFAULT TEST DATA - Realistic test fixtures
 // ============================================================================
 
@@ -124,7 +145,12 @@ export const defaultTestQuestion: TestQuestionData = {
 export const createTestUser = async (
   userData: Partial<TestUserData> = {}
 ): Promise<AuthenticatedUser> => {
-  const data = { ...defaultTestUser, ...userData };
+  // Generate unique email if not provided
+  const data = { 
+    ...defaultTestUser, 
+    email: generateUniqueEmail(),
+    ...userData 
+  };
 
   // Hash password (same as registration flow)
   const salt = await bcrypt.genSalt(10);
@@ -168,7 +194,11 @@ export const registerTestUser = async (
   app: Express,
   userData: Partial<TestUserData> = {}
 ): Promise<request.Response> => {
-  const data = { ...defaultTestUser, ...userData };
+  const data = { 
+    ...defaultTestUser, 
+    email: generateUniqueEmail(),
+    ...userData 
+  };
 
   return request(app).post("/api/auth/register").send(data);
 };

@@ -6,13 +6,22 @@ import { Request, Response, NextFunction } from "express";
  * Protection contre XSS et injection de prompts
  */
 
+// Helper pour détecter les caractères HTML interdits (XSS)
+const containsHTML = (value: string): boolean => {
+  return /[<>]/.test(value);
+};
+
 export const validateGenerateQuestions = [
   body("role")
     .trim()
     .isLength({ min: 1, max: 100 })
     .withMessage("Role must be between 1 and 100 characters")
-    .escape() // Sanitization XSS - convertit <, >, &, ', " en entités HTML
     .custom((value) => {
+      // Rejeter les tentatives XSS (caractères HTML interdits)
+      if (containsHTML(value)) {
+        throw new Error("Invalid characters detected: HTML tags not allowed");
+      }
+      
       // Rejeter les tentatives d'injection de prompts
       const suspiciousPatterns = [
         /ignore\s+previous/i,
@@ -30,7 +39,8 @@ export const validateGenerateQuestions = [
         }
       }
       return true;
-    }),
+    })
+    .escape(), // Sanitization XSS après validation
 
   body("experience")
     .isIn(["junior", "mid", "senior", "lead", "Junior", "Mid", "Senior", "Lead"])
@@ -40,8 +50,12 @@ export const validateGenerateQuestions = [
     .trim()
     .isLength({ min: 1, max: 500 })
     .withMessage("Topics must be between 1 and 500 characters")
-    .escape()
     .custom((value) => {
+      // Rejeter les tentatives XSS (caractères HTML interdits)
+      if (containsHTML(value)) {
+        throw new Error("Invalid characters detected: HTML tags not allowed");
+      }
+      
       // Vérifier les tentatives d'injection
       const suspiciousPatterns = [
         /ignore\s+previous/i,
@@ -57,7 +71,8 @@ export const validateGenerateQuestions = [
         }
       }
       return true;
-    }),
+    })
+    .escape(),
 
   body("numberOfQuestions")
     .isInt({ min: 1, max: 20 })
@@ -82,8 +97,12 @@ export const validateGenerateExplanation = [
     .trim()
     .isLength({ min: 1, max: 1000 })
     .withMessage("Question must be between 1 and 1000 characters")
-    .escape()
     .custom((value) => {
+      // Rejeter les tentatives XSS (caractères HTML interdits)
+      if (containsHTML(value)) {
+        throw new Error("Invalid characters detected: HTML tags not allowed");
+      }
+      
       // Vérifier les tentatives d'injection
       const suspiciousPatterns = [
         /ignore\s+previous/i,
@@ -99,7 +118,8 @@ export const validateGenerateExplanation = [
         }
       }
       return true;
-    }),
+    })
+    .escape(),
 
   // Middleware de gestion des erreurs
   (req: Request, res: Response, next: NextFunction) => {
@@ -124,6 +144,13 @@ export const validateVocalAnalysis = [
     .trim()
     .isLength({ min: 1, max: 5000 })
     .withMessage("Transcript must be between 1 and 5000 characters")
+    .custom((value) => {
+      // Rejeter les tentatives XSS (caractères HTML interdits)
+      if (containsHTML(value)) {
+        throw new Error("Invalid characters detected: HTML tags not allowed");
+      }
+      return true;
+    })
     .escape(),
 
   body("language")
