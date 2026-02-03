@@ -12,29 +12,29 @@ declare global {
   }
 }
 
-// Middleware to protect routes - Standardisé sur Bearer tokens uniquement
+// Middleware to protect routes - Supporte Bearer tokens et Cookies
 export const protect = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    // Standardisé : Utiliser uniquement Bearer token dans le header
-    const authHeader = req.headers.authorization;
+    // Récupérer le token du header Bearer ou des cookies
+    let token: string | undefined;
     
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      logger.warn("Authentication failed: No Bearer token provided", {
-        ip: req.ip,
-        correlationId: req.correlationId,
-      });
-      res.status(401).json({ message: "Not authorized, Bearer token required" });
-      return;
+    // Essayer d'abord le header Bearer
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
+    }
+    
+    // Fallback sur les cookies si pas de Bearer
+    if (!token && req.cookies?.token) {
+      token = req.cookies.token;
     }
 
-    const token = authHeader.split(" ")[1];
-
     if (!token) {
-      logger.warn("Authentication failed: Empty token", {
+      logger.warn("Authentication failed: No token provided", {
         ip: req.ip,
         correlationId: req.correlationId,
       });
