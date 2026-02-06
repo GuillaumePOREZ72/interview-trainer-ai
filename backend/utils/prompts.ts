@@ -130,4 +130,206 @@ const vocalAnalysisPrompt = (
   }
   `;
 
-export { questionAnswerPrompt, conceptExplainPrompt, vocalAnalysisPrompt };
+// MOCK INTERVIEW PROMPTS
+
+const getLanguageInstructionMock = (language: string): string => {
+  return language.startsWith("fr")
+    ? "LANGUE: Français. Génère tout le contenu en français."
+    : "LANG: English. Generate all content in English.";
+};
+
+/**
+ * 1. generateInitialQuestion - First interview question
+ * Optimized for token efficiency (~150-200 tokens)
+ */
+const mockInterviewInitialQuestionPrompt = (
+  role: string,
+  experience: string,
+  interviewType: "technical" | "behavioral",
+  topicsToFocus: string,
+  language: string = "en",
+): string => `
+You are an expert interviewer conducting a ${interviewType} interview.
+${getLanguageInstructionMock(language)}
+
+CONTEXT:
+- Role: ${role}
+- Experience: ${experience}
+- Focus: ${topicsToFocus}
+
+TASK:
+Generate ONE opening interview question that:
+1. Assesses core competencies for the role
+2. Matches ${experience} level difficulty
+3. ${interviewType === "technical" ? "Tests practical knowledge with real-world scenarios" : "Evaluates soft skills and past experiences"}
+4. Is open-ended to encourage detailed response
+
+OUTPUT JSON:
+{
+  "question": "The interview question",
+  "category": "${interviewType}",
+  "difficulty": "${experience}",
+  "expectedDuration": "3-5 minutes",
+  "keyPointsToAssess": ["point1", "point2", "point3"]
+}
+`;
+
+/**
+ * 2. generateFollowUpQuestion - Contextual follow-up
+ * Optimized for token efficiency (~200-250 tokens)
+ */
+const mockInterviewFollowUpPrompt = (
+  previousResponse: string,
+  originalQuestion: string,
+  questionHistory: string[],
+  language: string = "en",
+): string => `
+You are an expert interviewer conducting a dynamic interview.
+${getLanguageInstructionMock(language)}
+
+CONTEXT:
+- Original Question: "${originalQuestion.substring(0, 200)}"
+- Candidate Response: "${previousResponse.substring(0, 500)}"
+- Previous Questions Asked: ${questionHistory.length > 0 ? JSON.stringify(questionHistory.slice(-3)) : "[First follow-up]"}
+
+TASK:
+Generate ONE contextual follow-up question that:
+1. Probes deeper into gaps or unclear areas from the response
+2. OR challenges the candidate to justify their approach
+3. OR asks for specific examples/clarification
+4. Maintains natural conversation flow
+
+OUTPUT JSON:
+{
+  "question": "The follow-up question",
+  "type": "probing|challenge|clarification|extension",
+  "rationale": "Brief reason for asking this (1 sentence)",
+  "difficultyAdjustment": 0
+}
+`;
+
+/**
+ * 3. analyzeResponse - Score and feedback
+ * Optimized for token efficiency (~250-300 tokens)
+ */
+const mockInterviewAnalysisPrompt = (
+  userResponse: string,
+  question: string,
+  interviewType: "technical" | "behavioral",
+  language: string = "en",
+): string => `
+You are an expert interview evaluator.
+${getLanguageInstructionMock(language)}
+
+CONTEXT:
+- Question: "${question.substring(0, 300)}"
+- Type: ${interviewType}
+- Response: "${userResponse.substring(0, 800)}"
+
+TASK:
+Evaluate the response on these criteria:
+
+SCORING (0-100 each):
+1. relevance: How well did they answer the specific question?
+2. clarity: Was the communication clear and structured?
+3. depth: Did they demonstrate deep understanding?
+4. examples: Did they provide concrete examples? (0 if none)
+
+OVERALL: Calculate weighted average
+
+OUTPUT JSON:
+{
+  "scores": {
+    "relevance": 0-100,
+    "clarity": 0-100,
+    "depth": 0-100,
+    "examples": 0-100
+  },
+  "overallScore": 0-100,
+  "feedback": {
+    "strengths": ["strength1", "strength2"],
+    "improvements": ["improvement1", "improvement2"],
+    "actionableTip": "One specific tip for next question (1 sentence)"
+  },
+  "followUpSuggested": true|false
+}
+`;
+
+/**
+ * 4. generateSessionReport - Final summary
+ * Optimized for token efficiency (~300-350 tokens)
+ */
+const mockInterviewSessionReportPrompt = (
+  sessionData: {
+    role: string;
+    experience: string;
+    interviewType: string;
+    totalQuestions: number;
+    averageScore: number;
+    responses: Array<{
+      question: string;
+      score: number;
+      strengths: string[];
+      improvements: string[];
+    }>;
+  },
+  language: string = "en",
+): string => `
+You are an expert career coach summarizing a mock interview session.
+${getLanguageInstructionMock(language)}
+
+SESSION DATA:
+- Role: ${sessionData.role}
+- Level: ${sessionData.experience}
+- Type: ${sessionData.interviewType}
+- Questions: ${sessionData.totalQuestions}
+- Average Score: ${sessionData.averageScore}/100
+
+PERFORMANCE SUMMARY:
+${JSON.stringify(
+  sessionData.responses.map((r, i) => ({
+    q: i + 1,
+    score: r.score,
+    strengths: r.strengths.slice(0, 2),
+    improvements: r.improvements.slice(0, 2),
+  })),
+)}
+
+TASK:
+Generate comprehensive session report with:
+1. Overall performance summary (2-3 sentences)
+2. Key strengths demonstrated across session
+3. Priority areas for improvement
+4. Specific action items (3-5 bullet points)
+5. Readiness assessment for real interview
+
+OUTPUT JSON:
+{
+  "summary": "Overall assessment paragraph",
+  "overallScore": ${sessionData.averageScore},
+  "percentile": "above average|average|below average",
+  "strengths": ["strength1", "strength2", "strength3"],
+  "improvementAreas": ["area1", "area2"],
+  "actionItems": [
+    {"priority": "high|medium|low", "action": "specific task", "timeframe": "1 week|1 month"}
+  ],
+  "readiness": {
+    "level": "ready|nearly ready|needs practice",
+    "confidence": 0.0-1.0,
+    "recommendation": "Next steps advice"
+  },
+  "topResponse": "Brief highlight of best answer",
+  "focusForNext": "What to focus on in next practice"
+}
+`;
+
+// Export all prompts
+export {
+  questionAnswerPrompt,
+  conceptExplainPrompt,
+  vocalAnalysisPrompt,
+  mockInterviewInitialQuestionPrompt,
+  mockInterviewFollowUpPrompt,
+  mockInterviewAnalysisPrompt,
+  mockInterviewSessionReportPrompt,
+};
