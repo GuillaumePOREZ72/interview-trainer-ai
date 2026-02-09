@@ -144,23 +144,34 @@ const getLanguageInstructionMock = (language: string): string => {
  */
 const mockInterviewInitialQuestionPrompt = (
   role: string,
-  experience: string,
+  experience: number,
   interviewType: "technical" | "behavioral",
   topicsToFocus: string,
   language: string = "en",
-): string => `
+): string => {
+  // Determine experience level based on years
+  const getExperienceLevel = (years: number): string => {
+    if (years < 2) return "junior";
+    if (years < 5) return "mid-level";
+    if (years < 8) return "senior";
+    return "lead/principal";
+  };
+
+  const experienceLevel = getExperienceLevel(experience);
+
+  return `
 You are an expert interviewer conducting a ${interviewType} interview.
 ${getLanguageInstructionMock(language)}
 
 CONTEXT:
 - Role: ${role}
-- Experience: ${experience}
+- Experience: ${experience} years (${experienceLevel})
 - Focus: ${topicsToFocus}
 
 TASK:
 Generate ONE opening interview question that:
 1. Assesses core competencies for the role
-2. Matches ${experience} level difficulty
+2. Matches ${experienceLevel} level difficulty
 3. ${interviewType === "technical" ? "Tests practical knowledge with real-world scenarios" : "Evaluates soft skills and past experiences"}
 4. Is open-ended to encourage detailed response
 
@@ -168,11 +179,12 @@ OUTPUT JSON:
 {
   "question": "The interview question",
   "category": "${interviewType}",
-  "difficulty": "${experience}",
+  "difficulty": "${experienceLevel}",
   "expectedDuration": "3-5 minutes",
   "keyPointsToAssess": ["point1", "point2", "point3"]
 }
 `;
+};
 
 /**
  * 2. generateFollowUpQuestion - Contextual follow-up
@@ -262,7 +274,7 @@ OUTPUT JSON:
 const mockInterviewSessionReportPrompt = (
   sessionData: {
     role: string;
-    experience: string;
+    experience: number;
     interviewType: string;
     totalQuestions: number;
     averageScore: number;
@@ -274,13 +286,24 @@ const mockInterviewSessionReportPrompt = (
     }>;
   },
   language: string = "en",
-): string => `
+): string => {
+  // Determine experience level based on years
+  const getExperienceLevel = (years: number): string => {
+    if (years < 2) return "junior";
+    if (years < 5) return "mid-level";
+    if (years < 8) return "senior";
+    return "lead/principal";
+  };
+
+  const experienceLevel = getExperienceLevel(sessionData.experience);
+
+  return `
 You are an expert career coach summarizing a mock interview session.
 ${getLanguageInstructionMock(language)}
 
 SESSION DATA:
 - Role: ${sessionData.role}
-- Level: ${sessionData.experience}
+- Experience: ${sessionData.experience} years (${experienceLevel})
 - Type: ${sessionData.interviewType}
 - Questions: ${sessionData.totalQuestions}
 - Average Score: ${sessionData.averageScore}/100
@@ -322,6 +345,7 @@ OUTPUT JSON:
   "focusForNext": "What to focus on in next practice"
 }
 `;
+};
 
 // Export all prompts
 export {

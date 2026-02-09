@@ -21,10 +21,19 @@ export const startInterview = async (req: Request, res: Response) => {
     const userId = req.user?._id;
 
     // Validation
-    if (!role || !experience || !topicsToFocus) {
+    if (!role || experience === undefined || experience === null || !topicsToFocus) {
       return res.status(400).json({
         success: false,
         message: "Missing required fields: role, experience, topicsToFocus",
+      });
+    }
+
+    // Parse experience as number
+    const experienceNum = Number(experience);
+    if (isNaN(experienceNum) || experienceNum < 0 || experienceNum > 50) {
+      return res.status(400).json({
+        success: false,
+        message: "Experience must be a number between 0 and 50",
       });
     }
 
@@ -32,7 +41,7 @@ export const startInterview = async (req: Request, res: Response) => {
     const session = await MockInterviewSession.create({
       user: userId,
       role,
-      experience,
+      experience: experienceNum,
       topicsToFocus,
       language,
       status: "active",

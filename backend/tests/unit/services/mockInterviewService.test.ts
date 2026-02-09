@@ -20,7 +20,7 @@ describe("🎤 MockInterviewService", () => {
     testSession = await MockInterviewSession.create({
       user: testUser.user._id,
       role: "Frontend Developer",
-      experience: "senior",
+      experience: 5,
       topicsToFocus: "React, TypeScript",
       language: "en",
       status: "active",
@@ -228,7 +228,7 @@ describe("🎤 MockInterviewService", () => {
       const emptySession = await MockInterviewSession.create({
         user: testUser.user._id,
         role: "Developer",
-        experience: "junior",
+        experience: 1,
         topicsToFocus: "JS",
         language: "en",
         status: "active",

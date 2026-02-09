@@ -35,11 +35,10 @@ router.post(
       .isLength({ max: 100 })
       .withMessage("Role must be at most 100 characters"),
     body("experience")
-      .trim()
       .notEmpty()
-      .withMessage("Experience level is required")
-      .isIn(["junior", "mid", "senior"])
-      .withMessage("Experience must be junior, mid, or senior"),
+      .withMessage("Experience is required")
+      .isInt({ min: 0, max: 50 })
+      .withMessage("Experience must be a number between 0 and 50 years"),
     body("topicsToFocus")
       .isArray({ min: 1, max: 10 })
       .withMessage("topicsToFocus must be an array with 1-10 items"),

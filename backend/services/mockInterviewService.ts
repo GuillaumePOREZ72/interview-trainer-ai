@@ -21,6 +21,7 @@ import {
   mockInterviewAnalysisPrompt,
   mockInterviewSessionReportPrompt,
 } from "../utils/prompts";
+import { cleanAndParseJSON } from "../utils/helper";
 
 /**
  * Mock Interview Service
@@ -123,10 +124,10 @@ class MockInterviewService {
         throw new Error("Empty response from Groq");
       }
 
-      // Try to parse JSON response
+      // Parse JSON response using cleanAndParseJSON helper
       let question: string;
       try {
-        const parsed = JSON.parse(content);
+        const parsed = cleanAndParseJSON(content) as { question?: string };
         question = parsed.question || content;
       } catch {
         question = content;
@@ -383,9 +384,9 @@ class MockInterviewService {
       return "Tell me about yourself";
     }
 
-    // Try to parse JSON response
+    // Parse JSON response using cleanAndParseJSON helper
     try {
-      const parsed = JSON.parse(content);
+      const parsed = cleanAndParseJSON(content) as { question?: string };
       return parsed.question || content;
     } catch {
       return content;
@@ -400,35 +401,45 @@ class MockInterviewService {
     suggestions: string[];
   } {
     try {
-      // Try to extract JSON from response
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        
-        // Handle new format (with scores and feedback)
-        if (parsed.scores && parsed.overallScore !== undefined) {
-          return {
-            accuracy: parsed.overallScore,
-            fillerWords: [], // New format doesn't track filler words
-            sentiment: "neutral", // Default sentiment
-            confidence: parsed.scores.clarity || 70, // Use clarity as confidence
-            suggestions: [
-              ...(parsed.feedback?.strengths?.map((s: string) => `Strength: ${s}`) || []),
-              ...(parsed.feedback?.improvements || []),
-              parsed.feedback?.actionableTip,
-            ].filter(Boolean),
-          };
-        }
-        
-        // Handle old format (direct properties)
+      // Use cleanAndParseJSON helper for robust parsing
+      const parsed = cleanAndParseJSON(text) as {
+        scores?: { clarity?: number; relevance?: number; depth?: number; examples?: number };
+        overallScore?: number;
+        feedback?: {
+          strengths?: string[];
+          improvements?: string[];
+          actionableTip?: string;
+        };
+        accuracy?: number;
+        fillerWords?: string[];
+        sentiment?: string;
+        confidence?: number;
+        suggestions?: string[];
+      };
+      
+      // Handle new format (with scores and feedback)
+      if (parsed.scores && parsed.overallScore !== undefined) {
         return {
-          accuracy: parsed.accuracy ?? 70,
-          fillerWords: parsed.fillerWords ?? [],
-          sentiment: parsed.sentiment ?? "neutral",
-          confidence: parsed.confidence ?? 70,
-          suggestions: parsed.suggestions ?? ["Continue practicing"],
+          accuracy: parsed.overallScore,
+          fillerWords: [], // New format doesn't track filler words
+          sentiment: "neutral", // Default sentiment
+          confidence: parsed.scores.clarity || 70, // Use clarity as confidence
+          suggestions: [
+            ...(parsed.feedback?.strengths?.map((s: string) => `Strength: ${s}`) || []),
+            ...(parsed.feedback?.improvements || []),
+            parsed.feedback?.actionableTip,
+          ].filter(Boolean) as string[],
         };
       }
+      
+      // Handle old format (direct properties)
+      return {
+        accuracy: parsed.accuracy ?? 70,
+        fillerWords: parsed.fillerWords ?? [],
+        sentiment: parsed.sentiment ?? "neutral",
+        confidence: parsed.confidence ?? 70,
+        suggestions: parsed.suggestions ?? ["Continue practicing"],
+      };
     } catch (e) {
       logger.warn("Failed to parse analysis JSON, using defaults");
     }
@@ -442,12 +453,18 @@ class MockInterviewService {
     };
   }
 
-  private parseReportResponse(text: string): any {
+  private parseReportResponse(text: string): { strengths: string[]; improvementAreas: string[] } {
     try {
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
-      }
+      // Use cleanAndParseJSON helper for robust parsing
+      const parsed = cleanAndParseJSON(text) as {
+        strengths?: string[];
+        improvementAreas?: string[];
+      };
+      
+      return {
+        strengths: parsed.strengths ?? ["Good participation"],
+        improvementAreas: parsed.improvementAreas ?? ["Response structure"],
+      };
     } catch (e) {
       logger.warn("Failed to parse report JSON, using defaults");
     }
