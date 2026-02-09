@@ -364,3 +364,154 @@ export const generateMockExplanationResponse = () => ({
   explanation:
     "A closure is a function that captures variables from its lexical scope...",
 });
+
+// ============================================================================
+// MOCK INTERVIEW HELPERS - For testing mock interview feature
+// ============================================================================
+
+/**
+ * Generate mock Groq API response for mock interview initial question
+ *
+ * USE CASE: Mocking Groq API response for mock interview question generation
+ */
+export const generateMockGroqQuestionResponse = () => ({
+  question: "What is the difference between let and const in JavaScript?",
+  category: "technical",
+  difficulty: "junior",
+  expectedDuration: "2-3 minutes",
+  keyPointsToAssess: ["Variable declaration", "Scope understanding", "Best practices"],
+});
+
+/**
+ * Generate mock Groq API response for mock interview analysis
+ *
+ * USE CASE: Mocking Groq API response for response analysis
+ */
+export const generateMockGroqAnalysisResponse = () => ({
+  scores: {
+    relevance: 85,
+    clarity: 80,
+    depth: 75,
+    examples: 90,
+  },
+  overallScore: 82,
+  feedback: {
+    strengths: ["Good technical knowledge", "Clear explanation"],
+    improvements: ["Could provide more examples"],
+    actionableTip: "Practice with real-world scenarios",
+  },
+  followUpSuggested: true,
+});
+
+/**
+ * Generate mock Groq API response for mock interview session report
+ *
+ * USE CASE: Mocking Groq API response for final report generation
+ */
+export const generateMockGroqReportResponse = () => ({
+  summary: "Good performance overall",
+  overallScore: 82,
+  percentile: "above average",
+  strengths: ["Technical knowledge", "Communication"],
+  improvementAreas: ["Depth of examples"],
+  actionItems: [
+    { priority: "medium", action: "Practice more", timeframe: "1 week" },
+  ],
+  readiness: {
+    level: "nearly ready",
+    confidence: 0.75,
+    recommendation: "Keep practicing",
+  },
+  topResponse: "Your hooks explanation was excellent",
+  focusForNext: "Add more concrete examples",
+});
+
+/**
+ * Create a mock interview session directly in the database
+ *
+ * USE CASE: When you need a mock interview session for testing
+ *
+ * @param userId - The user ID who owns this session
+ * @param sessionData - Optional partial session data to override defaults
+ * @returns Promise with the created mock interview session
+ */
+export const createMockInterviewSession = async (
+  userId: string,
+  sessionData: Partial<any> = {}
+) => {
+  const MockInterviewSession = (await import("../../models/MockInterviewSession.js")).default;
+  
+  return MockInterviewSession.create({
+    user: userId,
+    role: sessionData.role || "Frontend Developer",
+    experience: sessionData.experience || 5,
+    topicsToFocus: sessionData.topicsToFocus || "React, TypeScript",
+    language: sessionData.language || "en",
+    status: sessionData.status || "active",
+    questions: sessionData.questions || [],
+    currentQuestionIndex: sessionData.currentQuestionIndex || 0,
+    completedAt: sessionData.completedAt,
+    ...sessionData
+  });
+};
+
+/**
+ * Audio fixtures generator for mock interview tests
+ *
+ * USE CASE: Generate fake audio files for testing file uploads
+ */
+export const audioFixtures = {
+  /**
+   * Generate fake WebM audio file
+   */
+  generateWebM: (filename: string, sizeKB: number, dir: string): string => {
+    const fs = require("fs");
+    const path = require("path");
+    const filePath = path.join(dir, filename);
+    const header = Buffer.from([0x1A, 0x45, 0xDF, 0xA3]); // WebM magic number
+    const dummyData = Buffer.alloc(sizeKB * 1024 - header.length, 0);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(filePath, Buffer.concat([header, dummyData]));
+    return filePath;
+  },
+
+  /**
+   * Generate fake MP3 audio file
+   */
+  generateMP3: (filename: string, sizeKB: number, dir: string): string => {
+    const fs = require("fs");
+    const path = require("path");
+    const filePath = path.join(dir, filename);
+    // Minimal valid MP3 frame header
+    const header = Buffer.from([0xFF, 0xFB, 0x90, 0x00]);
+    const dummyData = Buffer.alloc(sizeKB * 1024 - header.length, 0);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(filePath, Buffer.concat([header, dummyData]));
+    return filePath;
+  },
+
+  /**
+   * Generate invalid file (text file pretending to be audio)
+   */
+  generateInvalid: (filename: string, dir: string): string => {
+    const fs = require("fs");
+    const path = require("path");
+    const filePath = path.join(dir, filename);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(filePath, "This is not an audio file");
+    return filePath;
+  },
+
+  /**
+   * Cleanup audio fixtures
+   */
+  cleanup: (files: string[], dir: string): void => {
+    const fs = require("fs");
+    files.forEach((file) => {
+      if (fs.existsSync(file)) fs.unlinkSync(file);
+    });
+    if (fs.existsSync(dir) && fs.readdirSync(dir).length === 0) {
+      fs.rmdirSync(dir);
+    }
+  },
+};
