@@ -51,7 +51,11 @@ describe("🎤 GET /api/mock-interview/history", () => {
       const response = await authenticatedRequest(app, token)
         .get("/api/mock-interview/history");
 
-      // ASSERT
+      // Debug: log response if not 200
+      if (response.status !== 200) {
+        console.log('History error response:', response.status, response.body);
+      }
+
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.sessions).toHaveLength(3);

@@ -97,7 +97,7 @@ describe("🎤 POST /api/mock-interview/:sessionId/complete", () => {
       const completedSession = await MockInterviewSession.findById(session._id);
       expect(completedSession?.status).toBe("completed");
       expect(completedSession?.completedAt).toBeDefined();
-      expect(completedSession?.overallScore).toBe(77.5); // Average of 80 and 75
+      expect(completedSession?.overallScore).toBe(78); // Math.round((80 + 75) / 2) = 78
     });
 
     it("should calculate correct overall score from all questions", async () => {

@@ -331,12 +331,7 @@ class MockInterviewService {
       };
     } catch (error) {
       logger.error(`Error generating report: ${error}`);
-      return {
-        overallScore: 70,
-        feedback: ["Continuez à pratiquer !"],
-        strengths: ["Participation active"],
-        improvementAreas: ["Structure des réponses"],
-      };
+      throw new Error("Failed to generate session report");
     }
   }
 
@@ -345,11 +340,16 @@ class MockInterviewService {
   // ============================================================================
 
   private async callGroqForQuestion(session: IMockInterviewSession): Promise<string> {
+    // Convert topics array to comma-separated string for the prompt
+    const topicsString = Array.isArray(session.topicsToFocus) 
+      ? session.topicsToFocus.join(", ")
+      : session.topicsToFocus;
+    
     const prompt = mockInterviewInitialQuestionPrompt(
       session.role,
       session.experience,
       "technical",
-      session.topicsToFocus,
+      topicsString,
       session.language
     );
 

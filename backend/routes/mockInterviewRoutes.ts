@@ -3,8 +3,8 @@
  * API endpoints for mock interview sessions
  */
 
-import { Router } from "express";
-import { body, param, query } from "express-validator";
+import { Router, Request, Response, NextFunction } from "express";
+import { body, param, query, validationResult } from "express-validator";
 import {
   startInterview,
   submitAnswer,
@@ -17,6 +17,15 @@ import { protect } from "../middlewares/authMiddleware";
 import { uploadAudio, handleUploadError } from "../middlewares/uploadMiddleware";
 
 const router: Router = Router();
+
+// Validation error handler middleware
+const handleValidationErrors = (req: Request, res: Response, next: NextFunction) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  next();
+};
 
 // Validation middleware
 const validateSessionId = param("sessionId")
@@ -51,6 +60,7 @@ router.post(
       .isIn(["fr", "en"])
       .withMessage("Language must be 'fr' or 'en'"),
   ],
+  handleValidationErrors,
   startInterview
 );
 
@@ -99,13 +109,6 @@ router.get(
 router.get(
   "/history",
   protect,
-  [
-    query("limit")
-      .optional()
-      .isInt({ min: 1, max: 100 })
-      .toInt()
-      .withMessage("Limit must be between 1 and 100"),
-  ],
   getHistory
 );
 

@@ -69,7 +69,7 @@ export interface IMockInterviewSession extends Document {
   // Interview configuration
   role: string; // Job role (e.g., "Frontend Developer")
   experience: number; // Years of experience (e.g., 3, 5, 10)
-  topicsToFocus: string; // Topics to focus on
+  topicsToFocus: string[]; // Topics to focus on
   language: string; // "fr" or "en"
   
   // Session state
@@ -177,7 +177,7 @@ const MockInterviewSessionSchema = new Schema<IMockInterviewSession>(
     // Configuration
     role: { type: String, required: true },
     experience: { type: Number, required: true },
-    topicsToFocus: { type: String, required: true },
+    topicsToFocus: [{ type: String, required: true }],
     language: { type: String, default: "en" },
 
     // State

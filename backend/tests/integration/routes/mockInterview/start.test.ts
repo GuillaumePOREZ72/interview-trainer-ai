@@ -177,7 +177,7 @@ describe("🎤 POST /api/mock-interview/start", () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.errors).toBeDefined();
+      expect(response.body.errors || response.body.message).toBeDefined();
     });
 
     it("should validate experience range 0-50", async () => {

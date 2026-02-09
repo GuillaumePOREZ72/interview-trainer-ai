@@ -441,14 +441,23 @@ export const createMockInterviewSession = async (
 ) => {
   const MockInterviewSession = (await import("../../models/MockInterviewSession.js")).default;
   
+  // Default questions if not provided
+  const defaultQuestions = [
+    {
+      questionIndex: 0,
+      questionText: "What is React?",
+      ttsAudioPath: "/audio/q1.mp3",
+    }
+  ];
+  
   return MockInterviewSession.create({
     user: userId,
     role: sessionData.role || "Frontend Developer",
     experience: sessionData.experience || 5,
-    topicsToFocus: sessionData.topicsToFocus || "React, TypeScript",
+    topicsToFocus: sessionData.topicsToFocus || ["React", "TypeScript"],
     language: sessionData.language || "en",
     status: sessionData.status || "active",
-    questions: sessionData.questions || [],
+    questions: sessionData.questions !== undefined ? sessionData.questions : defaultQuestions,
     currentQuestionIndex: sessionData.currentQuestionIndex || 0,
     completedAt: sessionData.completedAt,
     ...sessionData

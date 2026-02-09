@@ -355,7 +355,21 @@ export const getSession = async (req: Request, res: Response) => {
 export const getHistory = async (req: Request, res: Response) => {
   try {
     const userId = req.user?._id;
-    const limit = parseInt(req.query.limit as string) || 10;
+    
+    if (!userId) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+    
+    let limit = 10;
+    const limitParam = req.query.limit;
+
+    if (limitParam !== undefined) {
+      const parsed = parseInt(limitParam as string, 10);
+      if (isNaN(parsed) || parsed < 1 || parsed > 100) {
+        return res.status(400).json({ message: "Limit must be an integer between 1 and 100" });
+      }
+      limit = parsed;
+    }
 
     const sessions = await MockInterviewSession.find({
       user: userId,
@@ -365,16 +379,11 @@ export const getHistory = async (req: Request, res: Response) => {
       .limit(limit)
       .select("role experience overallScore completedAt startedAt");
 
-    res.json({
-      success: true,
-      sessions,
-    });
+    res.status(200).json({ success: true, sessions });
   } catch (error) {
+    console.error('History error details:', error);
     logger.error(`Get history error: ${error}`);
-    res.status(500).json({
-      success: false,
-      message: "Failed to get history",
-    });
+    res.status(500).json({ message: "Failed to get history", error: String(error) });
   }
 };
 
