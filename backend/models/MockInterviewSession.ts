@@ -90,6 +90,15 @@ export interface IMockInterviewSession extends Document {
   feedback: string[]; // List of actionable feedback items
   strengths: string[]; // Identified strengths
   improvementAreas: string[]; // Areas to improve
+  
+  // Virtual properties
+  durationMinutes: number | null;
+  hasFollowUpQuestions: boolean;
+  
+  // Instance methods
+  getCurrentQuestion(): IQuestionResponse | undefined;
+  isComplete(): boolean;
+  getProgress(): number;
 }
 
 // ============================================================================

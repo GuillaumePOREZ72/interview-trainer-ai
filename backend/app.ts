@@ -18,6 +18,7 @@ import limiter, { vocalAnalysisLimiter } from "./config/rateLimiter";
 import authRoutes from "./routes/authRoutes";
 import sessionRoutes from "./routes/sessionRoutes";
 import questionRoutes from "./routes/questionRoutes";
+import mockInterviewRoutes from "./routes/mockInterviewRoutes";
 import { protect } from "./middlewares/authMiddleware";
 import { correlationMiddleware } from "./middlewares/correlationMiddleware";
 import { auditAllRequests } from "./middlewares/auditMiddleware";
@@ -205,6 +206,7 @@ export const createApp = (): Express => {
   app.use("/api/auth", authRoutes);
   app.use("/api/sessions", sessionRoutes);
   app.use("/api/questions", questionRoutes);
+  app.use("/api/mock-interview", mockInterviewRoutes);
   
   // ✅ AI Routes avec validation des entrées
   app.use(

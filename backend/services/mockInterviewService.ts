@@ -15,10 +15,12 @@ import MockInterviewSession, {
   IQuestionResponse,
 } from "../models/MockInterviewSession";
 import ttsService from "./ttsService";
-import { generateInterviewQuestions } from "../utils/prompts";
-import { Groq } from "groq-sdk";
-
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+import {
+  mockInterviewInitialQuestionPrompt,
+  mockInterviewFollowUpPrompt,
+  mockInterviewAnalysisPrompt,
+  mockInterviewSessionReportPrompt,
+} from "../utils/prompts";
 
 /**
  * Mock Interview Service
@@ -75,30 +77,59 @@ class MockInterviewService {
     try {
       logger.info(`Generating follow-up for session ${session._id}`);
 
-      const prompt = this.buildFollowUpPrompt(
-        session,
+      const questionHistory = session.questions.map(q => q.questionText);
+      const prompt = mockInterviewFollowUpPrompt(
         responseText,
-        originalQuestion
+        originalQuestion,
+        questionHistory,
+        session.language
       );
 
-      const completion = await groq.chat.completions.create({
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are an expert technical interviewer. Analyze the candidate's response and ask a relevant follow-up question that probes deeper into their knowledge.",
+      const response = await fetch(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
           },
-          { role: "user", content: prompt },
-        ],
-        model: "qwen/qwen3-32b",
-        temperature: 0.7,
-        max_tokens: 200,
-      });
+          body: JSON.stringify({
+            model: "qwen/qwen3-32b",
+            messages: [
+              {
+                role: "system",
+                content:
+                  "You are an expert technical interviewer. Analyze the candidate's response and ask a relevant follow-up question that probes deeper into their knowledge.",
+              },
+              { role: "user", content: prompt },
+            ],
+            temperature: 0.7,
+            max_tokens: 200,
+          }),
+        }
+      );
 
-      const question = completion.choices[0]?.message?.content?.trim() || "";
+      if (!response.ok) {
+        throw new Error(`Groq API error: ${response.status}`);
+      }
+
+      const data = (await response.json()) as {
+        choices: Array<{ message: { content: string } }>;
+      };
+
+      const content = data.choices[0]?.message?.content?.trim() || "";
       
-      if (!question) {
+      if (!content) {
         throw new Error("Empty response from Groq");
+      }
+
+      // Try to parse JSON response
+      let question: string;
+      try {
+        const parsed = JSON.parse(content);
+        question = parsed.question || content;
+      } catch {
+        question = content;
       }
 
       // Generate TTS for follow-up
@@ -137,23 +168,46 @@ class MockInterviewService {
     try {
       logger.info(`Analyzing response (${language})`);
 
-      const prompt = this.buildAnalysisPrompt(responseText, questionText, language);
+      const prompt = mockInterviewAnalysisPrompt(
+        responseText,
+        questionText,
+        "technical",
+        language
+      );
 
-      const completion = await groq.chat.completions.create({
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are an expert interview coach. Analyze the candidate's response objectively.",
+      const response = await fetch(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
           },
-          { role: "user", content: prompt },
-        ],
-        model: "qwen/qwen3-32b",
-        temperature: 0.3,
-        max_tokens: 500,
-      });
+          body: JSON.stringify({
+            model: "qwen/qwen3-32b",
+            messages: [
+              {
+                role: "system",
+                content:
+                  "You are an expert interview coach. Analyze the candidate's response objectively.",
+              },
+              { role: "user", content: prompt },
+            ],
+            temperature: 0.3,
+            max_tokens: 500,
+          }),
+        }
+      );
 
-      const analysisText = completion.choices[0]?.message?.content || "";
+      if (!response.ok) {
+        throw new Error(`Groq API error: ${response.status}`);
+      }
+
+      const data = (await response.json()) as {
+        choices: Array<{ message: { content: string } }>;
+      };
+
+      const analysisText = data.choices[0]?.message?.content || "";
       
       // Parse the analysis (expecting JSON)
       const analysis = this.parseAnalysisResponse(analysisText);
@@ -215,22 +269,57 @@ class MockInterviewService {
         : 0;
 
       // Generate AI-powered summary
-      const prompt = this.buildReportPrompt(session, overallScore);
-      
-      const completion = await groq.chat.completions.create({
-        messages: [
-          {
-            role: "system",
-            content: "You are an expert career coach. Provide actionable interview feedback.",
-          },
-          { role: "user", content: prompt },
-        ],
-        model: "qwen/qwen3-32b",
-        temperature: 0.5,
-        max_tokens: 800,
-      });
+      const responses = session.questions.map(q => ({
+        question: q.questionText,
+        score: q.analysis?.accuracy || 0,
+        strengths: q.analysis?.suggestions.slice(0, 2) || [],
+        improvements: q.analysis?.suggestions.slice(2, 4) || [],
+      }));
 
-      const reportText = completion.choices[0]?.message?.content || "";
+      const prompt = mockInterviewSessionReportPrompt(
+        {
+          role: session.role,
+          experience: session.experience,
+          interviewType: "technical",
+          totalQuestions: session.questions.length,
+          averageScore: overallScore,
+          responses,
+        },
+        session.language
+      );
+      
+      const response = await fetch(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: "qwen/qwen3-32b",
+            messages: [
+              {
+                role: "system",
+                content: "You are an expert career coach. Provide actionable interview feedback.",
+              },
+              { role: "user", content: prompt },
+            ],
+            temperature: 0.5,
+            max_tokens: 800,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Groq API error: ${response.status}`);
+      }
+
+      const data = (await response.json()) as {
+        choices: Array<{ message: { content: string } }>;
+      };
+
+      const reportText = data.choices[0]?.message?.content || "";
       const report = this.parseReportResponse(reportText);
 
       return {
@@ -255,105 +344,90 @@ class MockInterviewService {
   // ============================================================================
 
   private async callGroqForQuestion(session: IMockInterviewSession): Promise<string> {
-    const prompt = `
-      Generate a professional interview question for a ${session.experience} level ${session.role}.
-      Focus on: ${session.topicsToFocus}
-      Language: ${session.language === "fr" ? "French" : "English"}
-      
-      The question should:
-      - Be relevant to the role and experience level
-      - Test both technical knowledge and problem-solving
-      - Be open-ended to allow detailed response
-      - Be suitable for a 30-second verbal answer
-      
-      Return ONLY the question text, nothing else.
-    `;
+    const prompt = mockInterviewInitialQuestionPrompt(
+      session.role,
+      session.experience,
+      "technical",
+      session.topicsToFocus,
+      session.language
+    );
 
-    const completion = await groq.chat.completions.create({
-      messages: [{ role: "user", content: prompt }],
-      model: "qwen/qwen3-32b",
-      temperature: 0.8,
-      max_tokens: 150,
-    });
-
-    return completion.choices[0]?.message?.content?.trim() || "Tell me about yourself";
-  }
-
-  private buildFollowUpPrompt(
-    session: IMockInterviewSession,
-    responseText: string,
-    originalQuestion: string
-  ): string {
-    return `
-      Original Question: "${originalQuestion}"
-      Candidate's Response: "${responseText.substring(0, 500)}"
-      
-      Generate a follow-up question that:
-      1. Probes deeper into a specific point from their answer
-      2. Tests their depth of knowledge
-      3. Is relevant to ${session.role} position
-      
-      Language: ${session.language === "fr" ? "French" : "English"}
-    `;
-  }
-
-  private buildAnalysisPrompt(
-    responseText: string,
-    questionText: string,
-    language: string
-  ): string {
-    return `
-      Question: "${questionText}"
-      Candidate's Answer: "${responseText.substring(0, 800)}"
-      
-      Analyze this interview response and provide:
-      1. Accuracy score (0-100)
-      2. List of filler words used ("um", "uh", "like", etc.)
-      3. Sentiment (positive/neutral/negative)
-      4. Confidence score (0-100)
-      5. 3 specific suggestions for improvement
-      
-      Return as JSON:
+    const response = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
       {
-        "accuracy": number,
-        "fillerWords": string[],
-        "sentiment": string,
-        "confidence": number,
-        "suggestions": string[]
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "qwen/qwen3-32b",
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.8,
+          max_tokens: 150,
+        }),
       }
-      
-      Language: ${language === "fr" ? "French" : "English"}
-    `;
+    );
+
+    if (!response.ok) {
+      throw new Error(`Groq API error: ${response.status}`);
+    }
+
+    const data = (await response.json()) as {
+      choices: Array<{ message: { content: string } }>;
+    };
+
+    const content = data.choices[0]?.message?.content?.trim();
+    
+    if (!content) {
+      return "Tell me about yourself";
+    }
+
+    // Try to parse JSON response
+    try {
+      const parsed = JSON.parse(content);
+      return parsed.question || content;
+    } catch {
+      return content;
+    }
   }
 
-  private buildReportPrompt(session: IMockInterviewSession, overallScore: number): string {
-    return `
-      Interview Summary:
-      - Role: ${session.role}
-      - Experience Level: ${session.experience}
-      - Overall Score: ${overallScore}/100
-      - Questions Answered: ${session.questions.length}
-      
-      Provide a brief interview report with:
-      1. Key strengths (3 points)
-      2. Areas for improvement (3 points)
-      
-      Format as JSON:
-      {
-        "strengths": string[],
-        "improvementAreas": string[]
-      }
-      
-      Language: ${session.language === "fr" ? "French" : "English"}
-    `;
-  }
-
-  private parseAnalysisResponse(text: string): any {
+  private parseAnalysisResponse(text: string): {
+    accuracy: number;
+    fillerWords: string[];
+    sentiment: string;
+    confidence: number;
+    suggestions: string[];
+  } {
     try {
       // Try to extract JSON from response
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
+        const parsed = JSON.parse(jsonMatch[0]);
+        
+        // Handle new format (with scores and feedback)
+        if (parsed.scores && parsed.overallScore !== undefined) {
+          return {
+            accuracy: parsed.overallScore,
+            fillerWords: [], // New format doesn't track filler words
+            sentiment: "neutral", // Default sentiment
+            confidence: parsed.scores.clarity || 70, // Use clarity as confidence
+            suggestions: [
+              ...(parsed.feedback?.strengths?.map((s: string) => `Strength: ${s}`) || []),
+              ...(parsed.feedback?.improvements || []),
+              parsed.feedback?.actionableTip,
+            ].filter(Boolean),
+          };
+        }
+        
+        // Handle old format (direct properties)
+        return {
+          accuracy: parsed.accuracy ?? 70,
+          fillerWords: parsed.fillerWords ?? [],
+          sentiment: parsed.sentiment ?? "neutral",
+          confidence: parsed.confidence ?? 70,
+          suggestions: parsed.suggestions ?? ["Continue practicing"],
+        };
       }
     } catch (e) {
       logger.warn("Failed to parse analysis JSON, using defaults");

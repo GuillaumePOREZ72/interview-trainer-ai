@@ -7,6 +7,10 @@ import mockInterviewService from "../../../services/mockInterviewService";
 import MockInterviewSession from "../../../models/MockInterviewSession";
 import { createTestUser } from "../../helpers/testUtils";
 
+// Mock global fetch
+const mockFetch = jest.fn();
+global.fetch = mockFetch as any;
+
 describe("🎤 MockInterviewService", () => {
   let testUser: any;
   let testSession: any;
@@ -21,15 +25,30 @@ describe("🎤 MockInterviewService", () => {
       language: "en",
       status: "active",
     });
+    
+    // Reset fetch mock
+    mockFetch.mockClear();
   });
 
   afterEach(async () => {
     await MockInterviewSession.deleteMany({});
+    mockFetch.mockClear();
   });
 
   describe("Question Generation", () => {
     it("should generate initial question", async () => {
-      // Mock Groq call
+      // Mock successful fetch response
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [{
+            message: {
+              content: JSON.stringify({ question: "What is React Virtual DOM?" })
+            }
+          }]
+        })
+      });
+
       const question = await mockInterviewService.generateInitialQuestion(testSession);
       
       expect(question).toBeTruthy();
@@ -38,6 +57,17 @@ describe("🎤 MockInterviewService", () => {
     });
 
     it("should store TTS in session cache when available", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [{
+            message: {
+              content: JSON.stringify({ question: "What is React Virtual DOM?" })
+            }
+          }]
+        })
+      });
+
       await mockInterviewService.generateInitialQuestion(testSession);
       
       const updatedSession = await MockInterviewSession.findById(testSession._id);
@@ -47,6 +77,17 @@ describe("🎤 MockInterviewService", () => {
 
   describe("Follow-up Generation", () => {
     it("should generate contextual follow-up", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [{
+            message: {
+              content: JSON.stringify({ question: "Can you give an example of useEffect?" })
+            }
+          }]
+        })
+      });
+
       const followUp = await mockInterviewService.generateFollowUpQuestion(
         testSession,
         "I use React hooks for state management",
@@ -58,9 +99,11 @@ describe("🎤 MockInterviewService", () => {
     });
 
     it("should return fallback on error", async () => {
-      // Force error by passing invalid session
+      // Mock fetch to fail
+      mockFetch.mockRejectedValueOnce(new Error("Network error"));
+
       const fallback = await mockInterviewService.generateFollowUpQuestion(
-        null as any,
+        testSession,
         "response",
         "question"
       );
@@ -71,6 +114,31 @@ describe("🎤 MockInterviewService", () => {
 
   describe("Response Analysis", () => {
     it("should analyze response and return scores", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [{
+            message: {
+              content: JSON.stringify({
+                scores: {
+                  relevance: 85,
+                  clarity: 80,
+                  depth: 75,
+                  examples: 90
+                },
+                overallScore: 82,
+                feedback: {
+                  strengths: ["Good technical knowledge"],
+                  improvements: ["Could provide more examples"],
+                  actionableTip: "Practice with real scenarios"
+                },
+                followUpSuggested: true
+              })
+            }
+          }]
+        })
+      });
+
       const analysis = await mockInterviewService.analyzeResponse(
         "I use useState and useEffect for managing component state",
         "How do you manage state in React?",
@@ -88,6 +156,9 @@ describe("🎤 MockInterviewService", () => {
     });
 
     it("should return default analysis on error", async () => {
+      // Mock fetch to fail
+      mockFetch.mockRejectedValueOnce(new Error("API error"));
+
       const analysis = await mockInterviewService.analyzeResponse(
         "",
         "question",
@@ -116,6 +187,33 @@ describe("🎤 MockInterviewService", () => {
 
       await testSession.save();
 
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [{
+            message: {
+              content: JSON.stringify({
+                summary: "Good performance overall",
+                overallScore: 80,
+                percentile: "above average",
+                strengths: ["Strong technical knowledge", "Clear communication"],
+                improvementAreas: ["More examples needed"],
+                actionItems: [
+                  { priority: "medium", action: "Practice more scenarios", timeframe: "1 week" }
+                ],
+                readiness: {
+                  level: "nearly ready",
+                  confidence: 0.75,
+                  recommendation: "Keep practicing"
+                },
+                topResponse: "Your explanation of hooks was excellent",
+                focusForNext: "Focus on providing more concrete examples"
+              })
+            }
+          }]
+        })
+      });
+
       const report = await mockInterviewService.generateSessionReport(testSession);
 
       expect(report).toHaveProperty("overallScore");
@@ -135,6 +233,31 @@ describe("🎤 MockInterviewService", () => {
         language: "en",
         status: "active",
         questions: [],
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [{
+            message: {
+              content: JSON.stringify({
+                summary: "No responses to evaluate",
+                overallScore: 0,
+                percentile: "below average",
+                strengths: [],
+                improvementAreas: ["Complete the interview"],
+                actionItems: [],
+                readiness: {
+                  level: "needs practice",
+                  confidence: 0.0,
+                  recommendation: "Try the interview again"
+                },
+                topResponse: "",
+                focusForNext: "Answer all questions"
+              })
+            }
+          }]
+        })
       });
 
       const report = await mockInterviewService.generateSessionReport(emptySession);
