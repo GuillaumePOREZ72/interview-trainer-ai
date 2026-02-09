@@ -3,10 +3,10 @@
  * Core business logic for interview sessions
  * Handles question generation, follow-ups, analysis, and scoring
  * 
- * AI Model: Qwen 3 (32B) via Groq
+ * AI Model: qwen/qwen3-32b via Groq
+ * - Same model as existing AI services (aiController.ts)
  * - Superior performance for technical interviews
  * - Excellent French language support
- * - Consistent with existing app architecture
  */
 
 import { logger } from "../config/logger";
@@ -90,7 +90,7 @@ class MockInterviewService {
           },
           { role: "user", content: prompt },
         ],
-        model: "qwen-qwq-32b",
+        model: "qwen/qwen3-32b",
         temperature: 0.7,
         max_tokens: 200,
       });
@@ -148,7 +148,7 @@ class MockInterviewService {
           },
           { role: "user", content: prompt },
         ],
-        model: "qwen-qwq-32b",
+        model: "qwen/qwen3-32b",
         temperature: 0.3,
         max_tokens: 500,
       });
@@ -225,7 +225,7 @@ class MockInterviewService {
           },
           { role: "user", content: prompt },
         ],
-        model: "qwen-qwq-32b",
+        model: "qwen/qwen3-32b",
         temperature: 0.5,
         max_tokens: 800,
       });
@@ -271,7 +271,7 @@ class MockInterviewService {
 
     const completion = await groq.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
-      model: "qwen-qwq-32b",
+      model: "qwen/qwen3-32b",
       temperature: 0.8,
       max_tokens: 150,
     });
