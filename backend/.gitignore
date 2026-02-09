@@ -5,3 +5,6 @@ logs/
 dist/
 uploads/*
 !uploads/.gitkeep
+# audio files
+/uploads/audio/*
+!/uploads/audio/.gitkeep
