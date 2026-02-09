@@ -32,6 +32,10 @@ import {
   generateInterviewQuestions,
   analyzeVocalResponse,
 } from "./controllers/aiController";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./config/swagger";
+// Import swagger documentation files (required for swagger-jsdoc to scan them)
+import "./docs/mockInterview.swagger";
 
 /**
  * Constants
@@ -207,7 +211,14 @@ export const createApp = (): Express => {
   app.use("/api/sessions", sessionRoutes);
   app.use("/api/questions", questionRoutes);
   app.use("/api/mock-interview", mockInterviewRoutes);
-  
+
+  // ✅ Swagger Documentation (accessible à /api-docs)
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    explorer: true,
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: "InterviewPrepAI API Documentation",
+  }));
+
   // ✅ AI Routes avec validation des entrées
   app.use(
     "/api/ai/generate-questions",
