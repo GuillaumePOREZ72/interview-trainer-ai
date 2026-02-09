@@ -58,7 +58,7 @@ describe("🎤 POST /api/mock-interview/:sessionId/answer", () => {
       const response = await authenticatedRequest(app, token)
         .post(`/api/mock-interview/${session._id}/answer`)
         .field("transcript", "I use React hooks for state management")
-        .attach("audio", testAudioWebm);
+        .attach("audio", testAudioWebm, { contentType: "audio/webm" });
 
       // ASSERT
       expect(response.status).toBe(200);
@@ -95,7 +95,7 @@ describe("🎤 POST /api/mock-interview/:sessionId/answer", () => {
       const response = await authenticatedRequest(app, token)
         .post(`/api/mock-interview/${session._id}/answer`)
         .field("transcript", "test")
-        .attach("audio", testAudioMp3);
+        .attach("audio", testAudioMp3, { contentType: "audio/mpeg" });
 
       expect(response.status).toBe(200);
     });

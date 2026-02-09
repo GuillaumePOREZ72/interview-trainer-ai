@@ -357,16 +357,16 @@ export const getHistory = async (req: Request, res: Response) => {
     const userId = req.user?._id;
     
     if (!userId) {
-      return res.status(401).json({ message: "Not authorized" });
+      return res.status(401).json({ success: false, message: "Not authorized" });
     }
     
     let limit = 10;
     const limitParam = req.query.limit;
 
-    if (limitParam !== undefined) {
+    if (limitParam !== undefined && limitParam !== "") {
       const parsed = parseInt(limitParam as string, 10);
       if (isNaN(parsed) || parsed < 1 || parsed > 100) {
-        return res.status(400).json({ message: "Limit must be an integer between 1 and 100" });
+        return res.status(400).json({ success: false, message: "Limit must be an integer between 1 and 100" });
       }
       limit = parsed;
     }
@@ -381,9 +381,8 @@ export const getHistory = async (req: Request, res: Response) => {
 
     res.status(200).json({ success: true, sessions });
   } catch (error) {
-    console.error('History error details:', error);
     logger.error(`Get history error: ${error}`);
-    res.status(500).json({ message: "Failed to get history", error: String(error) });
+    res.status(500).json({ success: false, message: "Failed to get history" });
   }
 };
 
