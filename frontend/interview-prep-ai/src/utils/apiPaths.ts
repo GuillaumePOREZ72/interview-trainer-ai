@@ -32,4 +32,13 @@ export const API_PATHS = {
     PIN: (id: string) => `/api/questions/${id}/pin`, // Pin or Unpin a question
     UPDATE_NOTE: (id: string) => `/api/questions/${id}/note`, // Update/Add a note to a question
   },
+
+  MOCK_INTERVIEW: {
+    START: "/api/mock-interview/start", // Start new mock interview
+    ANSWER: (sessionId: string) => `/api/mock-interview/${sessionId}/answer`, // Submit audio answer
+    STREAM: (sessionId: string) => `/api/mock-interview/${sessionId}/stream`, // SSE stream for real-time updates
+    COMPLETE: (sessionId: string) => `/api/mock-interview/${sessionId}/complete`, // Complete interview
+    GET_SESSION: (sessionId: string) => `/api/mock-interview/${sessionId}`, // Get session details
+    HISTORY: "/api/mock-interview/history", // Get completed interviews history
+  },
 };
