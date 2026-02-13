@@ -388,7 +388,8 @@ class MockInterviewService {
     }
 
     // Nettoyer le contenu - enlever les balises <think> et leur contenu
-    let cleanContent = content.replace(/<think>.*?<\/think>/gs, '').trim();
+    // Utiliser [\s\S] pour matcher tous les caractères y compris les sauts de ligne
+    let cleanContent = content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
     
     logger.info(`Clean content: ${cleanContent.substring(0, 200)}...`);
     

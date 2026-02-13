@@ -118,7 +118,7 @@ const AudioReferenceSchema = new Schema<IAudioReference>(
 
 const UserResponseSchema = new Schema(
   {
-    transcript: { type: String, required: true },
+    transcript: { type: String, required: false, default: "" },
     audioFile: { type: AudioReferenceSchema, required: false },
     answeredAt: { type: Date, default: Date.now },
   },
