@@ -175,9 +175,13 @@ Generate ONE opening interview question that:
 3. ${interviewType === "technical" ? "Tests practical knowledge with real-world scenarios" : "Evaluates soft skills and past experiences"}
 4. Is open-ended to encourage detailed response
 
+IMPORTANT: 
+- Output ONLY the JSON object, no explanations, no markdown, no <think> tags
+- The question should be professional and directly usable
+
 OUTPUT JSON:
 {
-  "question": "The interview question",
+  "question": "The interview question text here",
   "category": "${interviewType}",
   "difficulty": "${experienceLevel}",
   "expectedDuration": "3-5 minutes",

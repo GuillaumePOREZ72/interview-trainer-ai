@@ -385,7 +385,13 @@ class MockInterviewService {
     }
 
     // Nettoyer le contenu - enlever les balises <think> et leur contenu
-    const cleanContent = content.replace(/<think>.*?<\/think>/gs, '').trim();
+    let cleanContent = content.replace(/<think>.*?<\/think>/gs, '').trim();
+    
+    // Extraire uniquement le JSON de la réponse (entre accolades)
+    const jsonMatch = cleanContent.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      cleanContent = jsonMatch[0];
+    }
     
     if (!cleanContent) {
       return "Tell me about yourself";
@@ -394,11 +400,23 @@ class MockInterviewService {
     // Parse JSON response using cleanAndParseJSON helper
     try {
       const parsed = cleanAndParseJSON(cleanContent) as { question?: string };
-      return parsed.question || cleanContent;
-    } catch {
-      // Si ce n'est pas du JSON, retourner le texte nettoyé
-      return cleanContent;
+      if (parsed.question) {
+        return parsed.question;
+      }
+    } catch (e) {
+      logger.warn("Failed to parse question JSON, using fallback");
     }
+    
+    // Fallback: si pas de JSON valide, essayer d'extraire une question du texte
+    const lines = cleanContent.split('\n').filter(line => line.trim());
+    const questionLine = lines.find(line => 
+      line.includes('?') && 
+      !line.includes('{') && 
+      !line.includes('}') &&
+      line.length > 20
+    );
+    
+    return questionLine || "Tell me about yourself";
   }
 
   private parseAnalysisResponse(text: string): {

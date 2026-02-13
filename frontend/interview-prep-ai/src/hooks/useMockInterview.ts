@@ -42,7 +42,7 @@ interface UseMockInterviewReturn {
   // Actions
   startInterview: (data: StartInterviewRequest) => Promise<void>;
   startRecording: () => Promise<void>;
-  stopRecording: () => Promise<void>;
+    stopRecording: (sessionId?: string) => Promise<void>;
   completeInterview: () => Promise<void>;
   reset: () => void;
   
@@ -379,8 +379,14 @@ export const useMockInterview = (
   /**
    * Stop recording and submit answer
    */
-  const stopRecording = useCallback(async () => {
-    if (state !== "recording" || !session) return;
+  const stopRecording = useCallback(async (sessionId?: string) => {
+    if (state !== "recording") return;
+    
+    const currentSessionId = sessionId || session?._id;
+    if (!currentSessionId) {
+      toast.error("No session available");
+      return;
+    }
 
     setState("uploading");
 
@@ -421,7 +427,7 @@ export const useMockInterview = (
 
       // Submit answer
       await axiosInstance.post<SubmitAnswerResponse>(
-        API_PATHS.MOCK_INTERVIEW.ANSWER(session._id),
+        API_PATHS.MOCK_INTERVIEW.ANSWER(currentSessionId),
         formData
       );
 
