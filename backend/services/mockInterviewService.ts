@@ -388,8 +388,21 @@ class MockInterviewService {
     }
 
     // Nettoyer le contenu - enlever les balises <think> et leur contenu
-    // Utiliser [\s\S] pour matcher tous les caractères y compris les sauts de ligne
-    let cleanContent = content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+    // Le contenu peut être sur plusieurs lignes
+    let cleanContent = content;
+    
+    // Supprimer tout ce qui est entre <think> et </think> (insensible à la casse)
+    const thinkRegex = /<think[\s\S]*?<\/think>/gi;
+    cleanContent = cleanContent.replace(thinkRegex, '').trim();
+    
+    // Si ça ne marche pas, essayer avec une approche différente
+    if (cleanContent.includes('<think')) {
+      const thinkStart = cleanContent.indexOf('<think');
+      const thinkEnd = cleanContent.indexOf('</think>');
+      if (thinkEnd > thinkStart) {
+        cleanContent = (cleanContent.substring(0, thinkStart) + cleanContent.substring(thinkEnd + 8)).trim();
+      }
+    }
     
     logger.info(`Clean content: ${cleanContent.substring(0, 200)}...`);
     
@@ -425,11 +438,32 @@ class MockInterviewService {
     }
     
     // Fallback: chercher une ligne avec un point d'interrogation
+    // Ignorer les lignes qui ressemblent à du raisonnement
     const lines = cleanContent.split('\n').map(l => l.trim()).filter(l => l);
+    const reasoningKeywords = ['okay', 'let\'s', 'first', 'the user', 'i need', 'they should', 'since', 'because', 'therefore'];
+    
     for (const line of lines) {
-      if (line.includes('?') && line.length > 10 && !line.startsWith('{') && !line.startsWith('}')) {
+      const lowerLine = line.toLowerCase();
+      const isReasoning = reasoningKeywords.some(kw => lowerLine.includes(kw));
+      
+      if (line.includes('?') && 
+          line.length > 15 && 
+          line.length < 300 && 
+          !line.startsWith('{') && 
+          !line.startsWith('}') &&
+          !isReasoning) {
         logger.info(`Found question line: ${line}`);
-        return line.replace(/^["']|["']$/g, ''); // Enlever guillemets
+        return line.replace(/^["']|["']$/g, '').trim(); // Enlever guillemets
+      }
+    }
+    
+    // Si on ne trouve rien, chercher n'importe quelle ligne avec ? qui n'est pas du raisonnement
+    for (const line of lines) {
+      const lowerLine = line.toLowerCase();
+      const isReasoning = reasoningKeywords.some(kw => lowerLine.includes(kw));
+      
+      if (line.includes('?') && !isReasoning && line.length > 10) {
+        return line.replace(/^["']|["']$/g, '').trim();
       }
     }
     

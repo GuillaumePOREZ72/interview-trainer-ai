@@ -134,8 +134,8 @@ const vocalAnalysisPrompt = (
 
 const getLanguageInstructionMock = (language: string): string => {
   return language.startsWith("fr")
-    ? "LANGUE: Français. Génère tout le contenu en français."
-    : "LANG: English. Generate all content in English.";
+    ? "CRITICAL - LANGUAGE: The question MUST be in FRENCH. Do not write in English. Write the interview question in French language only."
+    : "LANGUAGE: English. Write the interview question in English.";
 };
 
 /**
@@ -175,13 +175,16 @@ Generate ONE opening interview question that:
 3. ${interviewType === "technical" ? "Tests practical knowledge with real-world scenarios" : "Evaluates soft skills and past experiences"}
 4. Is open-ended to encourage detailed response
 
-IMPORTANT: 
-- Output ONLY the JSON object, no explanations, no markdown, no <think> tags
-- The question should be professional and directly usable
+CRITICAL INSTRUCTIONS:
+- DO NOT include any reasoning, thinking, or explanation
+- DO NOT use <think> tags
+- DO NOT write any text outside the JSON
+- Output ONLY a valid JSON object
+- The "question" field MUST contain the actual interview question
 
-OUTPUT JSON:
+OUTPUT FORMAT (valid JSON only):
 {
-  "question": "The interview question text here",
+  "question": "Your interview question here",
   "category": "${interviewType}",
   "difficulty": "${experienceLevel}",
   "expectedDuration": "3-5 minutes",
