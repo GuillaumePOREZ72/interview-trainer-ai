@@ -293,7 +293,8 @@
       "completedDescription": "Vous avez répondu à toutes les questions. Consultez votre rapport pour voir vos résultats.",
       "viewReport": "Voir le rapport",
       "finishEarly": "Terminer maintenant",
-      "loadSession": "Erreur lors du chargement de la session"
+      "loadSession": "Erreur lors du chargement de la session",
+      "loadingQuestion": "Chargement de la question..."
     }
   },
   "validation": {

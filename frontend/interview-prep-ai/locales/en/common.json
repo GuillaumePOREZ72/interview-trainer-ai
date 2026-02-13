@@ -294,7 +294,8 @@
       "completedDescription": "You have answered all questions. View your report to see your results.",
       "viewReport": "View Report",
       "finishEarly": "Finish now",
-      "loadSession": "Error loading session"
+      "loadSession": "Error loading session",
+      "loadingQuestion": "Loading question..."
     }
   },
   "validation": {

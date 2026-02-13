@@ -125,7 +125,7 @@ const MockInterviewSession = () => {
 
           {/* Question Card */}
           <AnimatePresence mode="wait">
-            {state === "question" && (
+            {(state === "setup" || state === "question") && (
               <motion.div
                 key="question"
                 initial={{ opacity: 0, y: 20 }}
@@ -152,13 +152,14 @@ const MockInterviewSession = () => {
                 </div>
 
                 <h2 className="text-2xl font-bold text-text-primary mb-8 leading-relaxed">
-                  {currentQuestion?.text || sessionData.questions[sessionData.currentQuestionIndex]?.questionText}
+                  {sessionData.questions[sessionData.currentQuestionIndex]?.questionText || currentQuestion?.text || t("mockInterview.session.loadingQuestion")}
                 </h2>
 
                 <div className="flex justify-center">
                   <button
                     onClick={startRecording}
                     className="btn-primary flex items-center gap-3 text-lg px-8 py-4"
+                    disabled={!sessionData.questions[sessionData.currentQuestionIndex]?.questionText}
                   >
                     <LuMic className="w-6 h-6" />
                     {t("mockInterview.session.recordButton")}
