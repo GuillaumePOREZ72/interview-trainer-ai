@@ -193,7 +193,11 @@
     "edit": "Modifier",
     "close": "Fermer",
     "yesDelete": "Oui, supprimer",
-    "back": "Retour"
+    "back": "Retour",
+    "add": "Ajouter",
+    "years": "ans",
+    "french": "Français",
+    "english": "Anglais"
   },
   "language": {
     "en": "EN",
@@ -236,5 +240,58 @@
       "transcript": "Votre Transcription",
       "fillerWords": "Mots de remplissage"
     }
+  },
+  "mockInterview": {
+    "setup": {
+      "title": "Configurer l'entretien vocal",
+      "subtitle": "Configurez votre simulation d'entretien pour une pratique personnalisée",
+      "connecting": "Connexion en cours...",
+      "role": {
+        "label": "Poste visé",
+        "placeholder": "Ex: Développeur Frontend, Product Manager..."
+      },
+      "experience": {
+        "label": "Années d'expérience"
+      },
+      "topics": {
+        "label": "Sujets à aborder",
+        "placeholder": "Ajoutez un sujet (React, Node.js, etc.)",
+        "help": "{{count}}/{{max}} sujets ajoutés"
+      },
+      "language": {
+        "label": "Langue de l'entretien"
+      },
+      "startButton": "Démarrer l'entretien",
+      "starting": "Démarrage...",
+      "topicsMaxReached": "Vous avez atteint la limite de 10 sujets",
+      "topicAlreadyAdded": "Ce sujet est déjà dans la liste",
+      "validationError": "Veuillez corriger les erreurs dans le formulaire"
+    },
+    "errors": {
+      "browserNotSupported": "Votre navigateur ne supporte pas cette fonctionnalité",
+      "micDenied": "Accès au microphone refusé",
+      "startFailed": "Impossible de démarrer l'entretien",
+      "submitFailed": "Erreur lors de l'envoi de la réponse",
+      "connectionLost": "Connexion perdue"
+    },
+    "success": {
+      "started": "Entretien démarré !",
+      "answerSubmitted": "Réponse envoyée",
+      "completed": "Entretien terminé !"
+    }
+  },
+  "validation": {
+    "invalidEmail": "Veuillez entrer une adresse e-mail valide.",
+    "passwordRequired": "Veuillez entrer le mot de passe",
+    "fullNameRequired": "Veuillez entrer votre nom complet",
+    "requiredFields": "Veuillez remplir tous les champs obligatoires",
+    "passwordMismatch": "Les mots de passe ne correspondent pas",
+    "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
+    "roleRequired": "Le poste est requis",
+    "roleTooLong": "Le poste ne doit pas dépasser 100 caractères",
+    "experienceMin": "L'expérience ne peut pas être négative",
+    "experienceMax": "L'expérience ne peut pas dépasser 50 ans",
+    "topicsRequired": "Au moins un sujet est requis",
+    "topicsMax": "Vous ne pouvez pas ajouter plus de 10 sujets"
   }
 }

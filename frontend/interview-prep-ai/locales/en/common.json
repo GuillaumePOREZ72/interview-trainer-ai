@@ -194,7 +194,11 @@
     "edit": "Edit",
     "close": "Close",
     "yesDelete": "Yes, Delete",
-    "back": "Back"
+    "back": "Back",
+    "add": "Add",
+    "years": "years",
+    "french": "French",
+    "english": "English"
   },
   "language": {
     "en": "EN",
@@ -237,5 +241,58 @@
       "transcript": "Your Transcript",
       "fillerWords": "Filler Words"
     }
+  },
+  "mockInterview": {
+    "setup": {
+      "title": "Setup Voice Interview",
+      "subtitle": "Configure your interview simulation for personalized practice",
+      "connecting": "Connecting...",
+      "role": {
+        "label": "Target Role",
+        "placeholder": "Ex: Frontend Developer, Product Manager..."
+      },
+      "experience": {
+        "label": "Years of Experience"
+      },
+      "topics": {
+        "label": "Topics to Cover",
+        "placeholder": "Add a topic (React, Node.js, etc.)",
+        "help": "{{count}}/{{max}} topics added"
+      },
+      "language": {
+        "label": "Interview Language"
+      },
+      "startButton": "Start Interview",
+      "starting": "Starting...",
+      "topicsMaxReached": "You have reached the limit of 10 topics",
+      "topicAlreadyAdded": "This topic is already in the list",
+      "validationError": "Please correct the errors in the form"
+    },
+    "errors": {
+      "browserNotSupported": "Your browser does not support this feature",
+      "micDenied": "Microphone access denied",
+      "startFailed": "Failed to start the interview",
+      "submitFailed": "Error submitting your answer",
+      "connectionLost": "Connection lost"
+    },
+    "success": {
+      "started": "Interview started!",
+      "answerSubmitted": "Answer submitted",
+      "completed": "Interview completed!"
+    }
+  },
+  "validation": {
+    "invalidEmail": "Please enter a valid email address.",
+    "passwordRequired": "Please enter the password",
+    "fullNameRequired": "Please enter full name",
+    "requiredFields": "Please fill all the required fields",
+    "passwordMismatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "roleRequired": "Role is required",
+    "roleTooLong": "Role must not exceed 100 characters",
+    "experienceMin": "Experience cannot be negative",
+    "experienceMax": "Experience cannot exceed 50 years",
+    "topicsRequired": "At least one topic is required",
+    "topicsMax": "You cannot add more than 10 topics"
   }
 }
