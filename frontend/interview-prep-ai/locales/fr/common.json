@@ -308,6 +308,7 @@
     "experienceMin": "L'expérience ne peut pas être négative",
     "experienceMax": "L'expérience ne peut pas dépasser 50 ans",
     "topicsRequired": "Au moins un sujet est requis",
-    "topicsMax": "Vous ne pouvez pas ajouter plus de 10 sujets"
+    "topicsMax": "Vous ne pouvez pas ajouter plus de 10 sujets",
+    "invalidField": "Ce champ est invalide"
   }
 }

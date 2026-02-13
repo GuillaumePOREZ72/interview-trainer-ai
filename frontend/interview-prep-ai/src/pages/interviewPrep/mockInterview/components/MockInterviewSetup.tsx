@@ -45,14 +45,20 @@ const MockInterviewSetup = () => {
   const [isConnecting, setIsConnecting] = useState(false);
 
   const validateField = (field: keyof typeof formData, value: any) => {
-    const result = mockInterviewSchema.safeParse({ ...formData, [field]: value });
-    if (!result.success) {
-      const fieldError = result.error.errors.find((e) => e.path[0] === field);
-      setErrors((prev) => ({ ...prev, [field]: fieldError?.message || "" }));
-      return false;
-    } else {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-      return true;
+    try {
+      const result = mockInterviewSchema.safeParse({ ...formData, [field]: value });
+      if (!result.success) {
+        // Zod error issues are in result.error.issues
+        const fieldError = result.error.issues.find((e: any) => e.path[0] === field);
+        setErrors((prev) => ({ ...prev, [field]: fieldError?.message || t("validation.invalidField") }));
+        return false;
+      } else {
+        setErrors((prev) => ({ ...prev, [field]: "" }));
+        return true;
+      }
+    } catch (err) {
+      console.error("Validation error:", err);
+      return true; // Allow on validation error
     }
   };
 
@@ -87,7 +93,7 @@ const MockInterviewSetup = () => {
     const result = mockInterviewSchema.safeParse(formData);
     if (!result.success) {
       const newErrors: Partial<Record<keyof typeof formData, string>> = {};
-      result.error.errors.forEach((error) => {
+      result.error.issues.forEach((error: any) => {
         const field = error.path[0] as keyof typeof formData;
         newErrors[field] = error.message;
       });
