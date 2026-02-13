@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { LuPlus, LuSparkles } from "react-icons/lu";
+import { LuPlus, LuSparkles, LuFileText, LuMic } from "react-icons/lu";
 import { toast } from "react-hot-toast";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import { useNavigate } from "react-router-dom";
@@ -17,17 +17,35 @@ interface DeleteAlertState {
   data: Session | null;
 }
 
+type ModalView = "choice" | "createSession";
+
 const Dashboard = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [openCreateModal, setOpenCreateModal] = useState<boolean>(false);
+  const [modalView, setModalView] = useState<ModalView>("choice");
   const [sessions, setSessions] = useState<Session[]>([]);
 
   const [openDeleteAlert, setOpenDeleteAlert] = useState<DeleteAlertState>({
     open: false,
     data: null,
   });
+
+  const handleCloseModal = () => {
+    setOpenCreateModal(false);
+    // Reset to choice view after a short delay to avoid flickering
+    setTimeout(() => setModalView("choice"), 300);
+  };
+
+  const handleSelectQuestions = () => {
+    setModalView("createSession");
+  };
+
+  const handleSelectMockInterview = () => {
+    handleCloseModal();
+    navigate("/mock-interview/setup");
+  };
 
   const fetchAllSessions = async () => {
     try {
@@ -131,13 +149,71 @@ const Dashboard = () => {
 
       <Modal
         isOpen={openCreateModal}
-        onClose={() => {
-          setOpenCreateModal(false);
-        }}
+        onClose={handleCloseModal}
         hideHeader
       >
-        <div>
-          <CreateSessionForm />
+        <div className="p-2">
+          {modalView === "choice" ? (
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-text-primary mb-2">
+                {t("dashboard.modal.choiceTitle")}
+              </h2>
+              <p className="text-text-secondary mb-8">
+                {t("dashboard.modal.choiceSubtitle")}
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Option 1: Questions & Answers */}
+                <button
+                  onClick={handleSelectQuestions}
+                  className="flex flex-col items-center p-6 rounded-xl border-2 border-border-primary bg-bg-secondary hover:border-primary hover:shadow-lg hover:shadow-primary/10 transition-all duration-200 group"
+                >
+                  <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                    <LuFileText className="w-7 h-7 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-text-primary mb-2">
+                    {t("dashboard.modal.questionsOption.title")}
+                  </h3>
+                  <p className="text-sm text-text-secondary text-center">
+                    {t("dashboard.modal.questionsOption.description")}
+                  </p>
+                </button>
+
+                {/* Option 2: Mock Interview */}
+                <button
+                  onClick={handleSelectMockInterview}
+                  className="flex flex-col items-center p-6 rounded-xl border-2 border-border-primary bg-bg-secondary hover:border-secondary hover:shadow-lg hover:shadow-secondary/10 transition-all duration-200 group"
+                >
+                  <div className="w-14 h-14 rounded-full bg-secondary/10 flex items-center justify-center mb-4 group-hover:bg-secondary/20 transition-colors">
+                    <LuMic className="w-7 h-7 text-secondary" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-text-primary mb-2">
+                    {t("dashboard.modal.mockInterviewOption.title")}
+                  </h3>
+                  <p className="text-sm text-text-secondary text-center">
+                    {t("dashboard.modal.mockInterviewOption.description")}
+                  </p>
+                </button>
+              </div>
+
+              <button
+                onClick={handleCloseModal}
+                className="mt-6 text-text-tertiary hover:text-text-secondary transition-colors text-sm"
+              >
+                {t("common.cancel")}
+              </button>
+            </div>
+          ) : (
+            <div>
+              <button
+                onClick={() => setModalView("choice")}
+                className="mb-4 text-sm text-text-tertiary hover:text-text-secondary flex items-center gap-1 transition-colors"
+              >
+                ← {t("common.back")}
+              </button>
+              <CreateSessionForm />
+            </div>
+          )}
         </div>
       </Modal>
 

@@ -119,6 +119,10 @@
     "pinStatusUpdated": "Statut d'épingle de la question mis à jour",
     "questionsAdded": "Questions ajoutées !"
   },
+  "common": {
+    "cancel": "Annuler",
+    "back": "Retour"
+  },
   "dashboard": {
     "title": "Vos sessions",
     "sessions": "d'entretien",
@@ -134,6 +138,18 @@
     "deleteModal": {
       "title": "Supprimer la session",
       "content": "Êtes-vous sûr de vouloir supprimer cette session ? Cette action est irréversible et toutes les questions associées seront définitivement supprimées."
+    },
+    "modal": {
+      "choiceTitle": "Nouvelle préparation",
+      "choiceSubtitle": "Choisissez le mode qui vous convient le mieux",
+      "questionsOption": {
+        "title": "Générer Questions/Réponses",
+        "description": "Créez une session avec des questions et réponses détaillées générées par l'IA"
+      },
+      "mockInterviewOption": {
+        "title": "Simuler Entretien Vocal",
+        "description": "Pratiquez avec un entretien vocal interactif et recevez un feedback personnalisé de l'IA"
+      }
     }
   },
   "createSession": {
