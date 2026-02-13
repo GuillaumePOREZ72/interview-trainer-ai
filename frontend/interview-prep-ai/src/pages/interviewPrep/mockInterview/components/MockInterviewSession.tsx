@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { LuMic, LuMicOff, LuSkipForward, LuStopCircle, LuVolume2, LuLoader } from "react-icons/lu";
+import { LuMic, LuMicOff, LuSkipForward, LuSquare, LuVolume2, LuLoader } from "react-icons/lu";
 import DashboardLayout from "../../../../components/layouts/DashboardLayout";
 import VoiceWave from "../../../../components/vocal/VoiceWave";
 import SpinnerLoader from "../../../../components/loader/SpinnerLoader";
@@ -197,7 +197,7 @@ const MockInterviewSession = () => {
                     onClick={() => stopRecording(sessionId)}
                     className="flex items-center gap-2 px-6 py-3 bg-danger text-white rounded-lg hover:bg-danger/90 transition-colors"
                   >
-                    <LuStopCircle className="w-5 h-5" />
+                    <LuSquare className="w-5 h-5" />
                     {t("mockInterview.session.stopButton")}
                   </button>
                 </div>
