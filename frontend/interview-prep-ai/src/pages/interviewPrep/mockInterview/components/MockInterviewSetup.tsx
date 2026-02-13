@@ -4,11 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { toast } from "react-hot-toast";
 import { LuBriefcase, LuCalendar, LuTags, LuLanguages, LuMic, LuArrowRight } from "react-icons/lu";
-import DashboardLayout from "../../../components/layouts/DashboardLayout";
-import Input from "../../../components/inputs/Input";
-import SpinnerLoader from "../../../components/loader/SpinnerLoader";
-import { useMockInterview } from "../../../hooks/useMockInterview";
-import { StartInterviewRequest } from "../../../types";
+import DashboardLayout from "../../../../components/layouts/DashboardLayout";
+import Input from "../../../../components/inputs/Input";
+import SpinnerLoader from "../../../../components/loader/SpinnerLoader";
+import { useMockInterview } from "../../../../hooks/useMockInterview";
+import { StartInterviewRequest } from "../../../../types";
 
 const mockInterviewSchema = z.object({
   role: z.string().min(1, "roleRequired").max(100, "roleTooLong"),
