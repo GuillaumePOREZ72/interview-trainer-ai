@@ -380,43 +380,60 @@ class MockInterviewService {
 
     const content = data.choices[0]?.message?.content?.trim();
     
+    logger.info(`Groq response content: ${content.substring(0, 200)}...`);
+    
     if (!content) {
+      logger.warn("Empty content from Groq, using fallback");
       return "Tell me about yourself";
     }
 
     // Nettoyer le contenu - enlever les balises <think> et leur contenu
     let cleanContent = content.replace(/<think>.*?<\/think>/gs, '').trim();
     
-    // Extraire uniquement le JSON de la réponse (entre accolades)
-    const jsonMatch = cleanContent.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      cleanContent = jsonMatch[0];
-    }
+    logger.info(`Clean content: ${cleanContent.substring(0, 200)}...`);
     
     if (!cleanContent) {
+      logger.warn("Content empty after cleaning, using fallback");
       return "Tell me about yourself";
     }
 
-    // Parse JSON response using cleanAndParseJSON helper
+    // Essayer de parser le JSON directement
     try {
-      const parsed = cleanAndParseJSON(cleanContent) as { question?: string };
+      const parsed = JSON.parse(cleanContent) as { question?: string };
       if (parsed.question) {
+        logger.info(`Successfully parsed question: ${parsed.question}`);
         return parsed.question;
       }
     } catch (e) {
-      logger.warn("Failed to parse question JSON, using fallback");
+      // JSON parsing failed, try extracting
+      logger.warn("Direct JSON parsing failed, trying extraction");
     }
     
-    // Fallback: si pas de JSON valide, essayer d'extraire une question du texte
-    const lines = cleanContent.split('\n').filter(line => line.trim());
-    const questionLine = lines.find(line => 
-      line.includes('?') && 
-      !line.includes('{') && 
-      !line.includes('}') &&
-      line.length > 20
-    );
+    // Extraire le JSON entre accolades si markdown ou autre
+    const jsonMatch = cleanContent.match(/\{[\s\S]*?\}/);
+    if (jsonMatch) {
+      try {
+        const parsed = JSON.parse(jsonMatch[0]) as { question?: string };
+        if (parsed.question) {
+          logger.info(`Extracted and parsed question: ${parsed.question}`);
+          return parsed.question;
+        }
+      } catch (e) {
+        logger.warn("JSON extraction failed");
+      }
+    }
     
-    return questionLine || "Tell me about yourself";
+    // Fallback: chercher une ligne avec un point d'interrogation
+    const lines = cleanContent.split('\n').map(l => l.trim()).filter(l => l);
+    for (const line of lines) {
+      if (line.includes('?') && line.length > 10 && !line.startsWith('{') && !line.startsWith('}')) {
+        logger.info(`Found question line: ${line}`);
+        return line.replace(/^["']|["']$/g, ''); // Enlever guillemets
+      }
+    }
+    
+    logger.warn("Could not find valid question, using fallback");
+    return "Tell me about yourself";
   }
 
   private parseAnalysisResponse(text: string): {

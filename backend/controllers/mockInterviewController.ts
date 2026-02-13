@@ -169,8 +169,9 @@ export const submitAnswer = async (req: Request, res: Response) => {
       message: "Answer received. Analyzing...",
       sessionId: session._id,
     });
-  } catch (error) {
+  } catch (error: any) {
     logger.error(`Submit answer error: ${error}`);
+    logger.error(`Error stack: ${error.stack}`);
     
     if (req.file) {
       deleteUploadedFile(req.file.path);
@@ -179,6 +180,7 @@ export const submitAnswer = async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       message: "Failed to submit answer",
+      error: error.message,
     });
   }
 };
@@ -423,10 +425,15 @@ async function analyzeAndContinue(
         question.questionText
       );
 
-      const followUpAudio = await ttsService.synthesize(
-        followUpText,
-        session.language
-      );
+      let followUpAudio = null;
+      try {
+        followUpAudio = await ttsService.synthesize(
+          followUpText,
+          session.language
+        );
+      } catch (ttsError) {
+        logger.warn(`TTS failed for follow-up: ${ttsError}`);
+      }
 
       question.followUpQuestion = {
         questionText: followUpText,
@@ -438,10 +445,15 @@ async function analyzeAndContinue(
       const nextQuestionText = await mockInterviewService.generateInitialQuestion(
         session
       );
-      const nextAudio = await ttsService.synthesize(
-        nextQuestionText,
-        session.language
-      );
+      let nextAudio = null;
+      try {
+        nextAudio = await ttsService.synthesize(
+          nextQuestionText,
+          session.language
+        );
+      } catch (ttsError) {
+        logger.warn(`TTS failed for next question: ${ttsError}`);
+      }
 
       session.questions.push({
         questionIndex: session.currentQuestionIndex,
