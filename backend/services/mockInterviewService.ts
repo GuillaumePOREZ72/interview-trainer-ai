@@ -384,12 +384,20 @@ class MockInterviewService {
       return "Tell me about yourself";
     }
 
+    // Nettoyer le contenu - enlever les balises <think> et leur contenu
+    const cleanContent = content.replace(/<think>.*?<\/think>/gs, '').trim();
+    
+    if (!cleanContent) {
+      return "Tell me about yourself";
+    }
+
     // Parse JSON response using cleanAndParseJSON helper
     try {
-      const parsed = cleanAndParseJSON(content) as { question?: string };
-      return parsed.question || content;
+      const parsed = cleanAndParseJSON(cleanContent) as { question?: string };
+      return parsed.question || cleanContent;
     } catch {
-      return content;
+      // Si ce n'est pas du JSON, retourner le texte nettoyé
+      return cleanContent;
     }
   }
 

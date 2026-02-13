@@ -151,8 +151,8 @@ const MockInterviewSession = () => {
                   )}
                 </div>
 
-                <h2 className="text-2xl font-bold text-text-primary mb-8 leading-relaxed">
-                  {sessionData.questions[sessionData.currentQuestionIndex]?.questionText || currentQuestion?.text || t("mockInterview.session.loadingQuestion")}
+                <h2 className="text-xl md:text-2xl font-semibold text-text-primary mb-8 leading-relaxed">
+                  {(sessionData.questions[sessionData.currentQuestionIndex]?.questionText || currentQuestion?.text || t("mockInterview.session.loadingQuestion")).replace(/<think>.*?<\/think>/gs, '').trim()}
                 </h2>
 
                 <div className="flex justify-center">
