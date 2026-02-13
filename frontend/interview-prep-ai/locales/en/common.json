@@ -119,10 +119,7 @@
     "pinStatusUpdated": "Question pin status updated",
     "questionsAdded": "Added more Q&A!"
   },
-  "common": {
-    "cancel": "Cancel",
-    "back": "Back"
-  },
+
   "dashboard": {
     "title": "Your Interview",
     "sessions": "Sessions",
@@ -196,7 +193,8 @@
     "delete": "Delete",
     "edit": "Edit",
     "close": "Close",
-    "yesDelete": "Yes, Delete"
+    "yesDelete": "Yes, Delete",
+    "back": "Back"
   },
   "language": {
     "en": "EN",

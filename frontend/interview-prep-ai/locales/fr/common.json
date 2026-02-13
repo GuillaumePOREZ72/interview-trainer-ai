@@ -119,10 +119,6 @@
     "pinStatusUpdated": "Statut d'épingle de la question mis à jour",
     "questionsAdded": "Questions ajoutées !"
   },
-  "common": {
-    "cancel": "Annuler",
-    "back": "Retour"
-  },
   "dashboard": {
     "title": "Vos sessions",
     "sessions": "d'entretien",
@@ -196,7 +192,8 @@
     "delete": "Supprimer",
     "edit": "Modifier",
     "close": "Fermer",
-    "yesDelete": "Oui, supprimer"
+    "yesDelete": "Oui, supprimer",
+    "back": "Retour"
   },
   "language": {
     "en": "EN",
