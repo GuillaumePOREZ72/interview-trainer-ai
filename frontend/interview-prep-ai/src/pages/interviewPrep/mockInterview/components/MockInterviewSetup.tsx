@@ -9,35 +9,42 @@ import Input from "../../../../components/inputs/Input";
 import SpinnerLoader from "../../../../components/loader/SpinnerLoader";
 import axiosInstance from "../../../../utils/axiosInstance";
 import { API_PATHS } from "../../../../utils/apiPaths";
-import { StartInterviewRequest } from "../../../../types";
 
-const mockInterviewSchema = z.object({
-  role: z.string().min(1, "roleRequired").max(100, "roleTooLong"),
-  experience: z.number().min(0, "experienceMin").max(50, "experienceMax"),
-  topicsToFocus: z.array(z.string().min(1)).min(1, "topicsRequired").max(10, "topicsMax"),
+
+// Schéma de validation avec messages d'erreur
+const createMockInterviewSchema = (t: Function) => z.object({
+  role: z.string()
+    .min(1, t("validation.roleRequired"))
+    .max(100, t("validation.roleTooLong")),
+  experience: z.number()
+    .min(0, t("validation.experienceMin"))
+    .max(50, t("validation.experienceMax")),
+  topicsToFocus: z.array(z.string().min(1))
+    .min(1, t("validation.topicsRequired"))
+    .max(10, t("validation.topicsMax")),
   language: z.enum(["fr", "en"]),
 });
-
-type FormData = z.infer<typeof mockInterviewSchema>;
 
 const MockInterviewSetup = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { startInterview, state } = useMockInterview(t, i18n.language as "fr" | "en");
+  
+  // Créer le schéma avec les traductions
+  const mockInterviewSchema = createMockInterviewSchema(t);
 
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState({
     role: "",
     experience: 3,
-    topicsToFocus: [],
+    topicsToFocus: [] as string[],
     language: (i18n.language as "fr" | "en") || "en",
   });
 
   const [currentTopic, setCurrentTopic] = useState("");
-  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof typeof formData, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
 
-  const validateField = (field: keyof FormData, value: any) => {
+  const validateField = (field: keyof typeof formData, value: any) => {
     const result = mockInterviewSchema.safeParse({ ...formData, [field]: value });
     if (!result.success) {
       const fieldError = result.error.errors.find((e) => e.path[0] === field);
@@ -49,7 +56,7 @@ const MockInterviewSetup = () => {
     }
   };
 
-  const handleInputChange = (field: keyof FormData, value: any) => {
+  const handleInputChange = (field: keyof typeof formData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     validateField(field, value);
   };
@@ -79,9 +86,9 @@ const MockInterviewSetup = () => {
 
     const result = mockInterviewSchema.safeParse(formData);
     if (!result.success) {
-      const newErrors: Partial<Record<keyof FormData, string>> = {};
+      const newErrors: Partial<Record<keyof typeof formData, string>> = {};
       result.error.errors.forEach((error) => {
-        const field = error.path[0] as keyof FormData;
+        const field = error.path[0] as keyof typeof formData;
         newErrors[field] = error.message;
       });
       setErrors(newErrors);

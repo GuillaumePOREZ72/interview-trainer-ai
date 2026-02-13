@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { LuMic, LuMicOff, LuSkipForward, LuStopCircle, LuVolume2, LuLoader2 } from "react-icons/lu";
-import DashboardLayout from "../../../components/layouts/DashboardLayout";
-import VoiceWave from "../../../components/vocal/VoiceWave";
-import SpinnerLoader from "../../../components/loader/SpinnerLoader";
-import { useMockInterview } from "../../../hooks/useMockInterview";
-import axiosInstance from "../../../utils/axiosInstance";
-import { API_PATHS } from "../../../utils/apiPaths";
-import { MockInterviewSession as SessionType } from "../../../types";
+import { LuMic, LuMicOff, LuSkipForward, LuCircle, LuVolume2, LuLoader } from "react-icons/lu";
+import DashboardLayout from "../../../../components/layouts/DashboardLayout";
+import VoiceWave from "../../../../components/vocal/VoiceWave";
+import SpinnerLoader from "../../../../components/loader/SpinnerLoader";
+import axiosInstance from "../../../../utils/axiosInstance";
+import { API_PATHS } from "../../../../utils/apiPaths";
+import { MockInterviewSession as SessionType } from "../../../../types";
+import { useMockInterview } from "../../../../hooks/useMockInterview";
 
 const MockInterviewSession = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -196,7 +196,7 @@ const MockInterviewSession = () => {
                     onClick={stopRecording}
                     className="flex items-center gap-2 px-6 py-3 bg-danger text-white rounded-lg hover:bg-danger/90 transition-colors"
                   >
-                    <LuStopCircle className="w-5 h-5" />
+                    <LuCircle className="w-5 h-5" />
                     {t("mockInterview.session.stopButton")}
                   </button>
                 </div>
@@ -212,7 +212,7 @@ const MockInterviewSession = () => {
                 className="bg-bg-secondary rounded-2xl p-8 border border-border-primary mb-8 text-center"
               >
                 <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-secondary/10 flex items-center justify-center">
-                  <LuLoader2 className="w-10 h-10 text-secondary animate-spin" />
+                  <LuLoader className="w-10 h-10 text-secondary animate-spin" />
                 </div>
 
                 <h3 className="text-xl font-semibold text-text-primary mb-2">
