@@ -64,7 +64,11 @@ const MockInterviewSetup = () => {
 
   const handleInputChange = (field: keyof typeof formData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    validateField(field, value);
+    // Ne pas valider immédiatement - uniquement au blur
+  };
+
+  const handleBlur = (field: keyof typeof formData) => {
+    validateField(field, formData[field]);
   };
 
   const handleAddTopic = () => {
@@ -159,7 +163,8 @@ const MockInterviewSetup = () => {
                 icon={LuBriefcase}
                 value={formData.role}
                 onChange={(e) => handleInputChange("role", e.target.value)}
-                error={errors.role ? t(`validation.${errors.role}`) : ""}
+                onBlur={() => handleBlur("role")}
+                error={errors.role || ""}
               />
             </div>
 

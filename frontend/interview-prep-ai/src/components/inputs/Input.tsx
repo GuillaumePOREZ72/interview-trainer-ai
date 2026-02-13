@@ -7,6 +7,7 @@ type InputType = "text" | "password" | "email" | "number" | "tel" | "url";
 interface InputProps {
   value: string | number;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: () => void;
   placeholder?: string;
   type?: InputType;
   label?: string;
@@ -18,6 +19,7 @@ interface InputProps {
 const Input = ({
   value,
   onChange,
+  onBlur,
   placeholder = "",
   type = "text",
   label,
@@ -54,6 +56,7 @@ const Input = ({
           placeholder={placeholder}
           value={value}
           onChange={onChange}
+          onBlur={onBlur}
           className="w-full bg-transparent outline-none text-sm text-slate-900 placeholder:text-slate-400"
         />
         {type === "password" && (
