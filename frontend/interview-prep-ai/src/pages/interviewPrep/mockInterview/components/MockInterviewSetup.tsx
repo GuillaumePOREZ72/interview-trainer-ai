@@ -191,7 +191,7 @@ const MockInterviewSetup = () => {
               </div>
               {errors.experience && (
                 <p className="mt-1 text-sm text-danger">
-                  {t(`validation.${errors.experience}`)}
+                  {errors.experience}
                 </p>
               )}
             </div>
@@ -250,7 +250,7 @@ const MockInterviewSetup = () => {
               )}
               {errors.topicsToFocus && (
                 <p className="mt-1 text-sm text-danger">
-                  {t(`validation.${errors.topicsToFocus}`)}
+                  {errors.topicsToFocus}
                 </p>
               )}
               <p className="mt-1 text-xs text-text-tertiary">
