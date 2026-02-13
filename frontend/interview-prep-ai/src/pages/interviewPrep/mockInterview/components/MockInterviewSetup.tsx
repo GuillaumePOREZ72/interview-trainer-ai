@@ -7,7 +7,8 @@ import { LuBriefcase, LuCalendar, LuTags, LuLanguages, LuMic, LuArrowRight } fro
 import DashboardLayout from "../../../../components/layouts/DashboardLayout";
 import Input from "../../../../components/inputs/Input";
 import SpinnerLoader from "../../../../components/loader/SpinnerLoader";
-import { useMockInterview } from "../../../../hooks/useMockInterview";
+import axiosInstance from "../../../../utils/axiosInstance";
+import { API_PATHS } from "../../../../utils/apiPaths";
 import { StartInterviewRequest } from "../../../../types";
 
 const mockInterviewSchema = z.object({
@@ -34,6 +35,7 @@ const MockInterviewSetup = () => {
   const [currentTopic, setCurrentTopic] = useState("");
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
 
   const validateField = (field: keyof FormData, value: any) => {
     const result = mockInterviewSchema.safeParse({ ...formData, [field]: value });
@@ -87,18 +89,22 @@ const MockInterviewSetup = () => {
       return;
     }
 
-    setIsSubmitting(true);
+    setIsConnecting(true);
     try {
-      await startInterview(formData as StartInterviewRequest);
-      // Navigation handled in hook after successful start
+      const response = await axiosInstance.post(
+        API_PATHS.MOCK_INTERVIEW.START,
+        formData
+      );
+      const { sessionId } = response.data;
+      navigate(`/mock-interview/session/${sessionId}`);
     } catch (error) {
       console.error("Failed to start interview:", error);
-    } finally {
-      setIsSubmitting(false);
+      toast.error(t("mockInterview.errors.startFailed"));
+      setIsConnecting(false);
     }
   };
 
-  if (state === "connecting") {
+  if (isConnecting) {
     return (
       <DashboardLayout>
         <div className="min-h-screen bg-bg-primary flex items-center justify-center">

@@ -279,6 +279,22 @@
       "started": "Interview started!",
       "answerSubmitted": "Answer submitted",
       "completed": "Interview completed!"
+    },
+    "session": {
+      "progress": "Progress",
+      "question": "Question {{current}}/{{total}}",
+      "playAudio": "Listen to question",
+      "recordButton": "Start Recording",
+      "recording": "Recording in progress",
+      "stopButton": "Stop",
+      "analyzing": "Analyzing...",
+      "queuePosition": "Queue position: {{position}}",
+      "yourAnswer": "Your answer",
+      "completed": "Interview completed!",
+      "completedDescription": "You have answered all questions. View your report to see your results.",
+      "viewReport": "View Report",
+      "finishEarly": "Finish now",
+      "loadSession": "Error loading session"
     }
   },
   "validation": {

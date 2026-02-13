@@ -23,6 +23,9 @@ const VoiceStudio = lazy(() => import("./pages/vocal/VoiceStudio"));
 const MockInterviewSetup = lazy(
   () => import("./pages/interviewPrep/mockInterview/components/MockInterviewSetup"),
 );
+const MockInterviewSession = lazy(
+  () => import("./pages/interviewPrep/mockInterview/components/MockInterviewSession"),
+);
 
 interface ProtectedRoutesProps {
   children: ReactNode;
@@ -90,6 +93,14 @@ const App = () => {
                 element={
                   <ProtectedRoutes>
                     <MockInterviewSetup />
+                  </ProtectedRoutes>
+                }
+              />
+              <Route
+                path="/mock-interview/session/:sessionId"
+                element={
+                  <ProtectedRoutes>
+                    <MockInterviewSession />
                   </ProtectedRoutes>
                 }
               />

@@ -278,6 +278,22 @@
       "started": "Entretien démarré !",
       "answerSubmitted": "Réponse envoyée",
       "completed": "Entretien terminé !"
+    },
+    "session": {
+      "progress": "Progression",
+      "question": "Question {{current}}/{{total}}",
+      "playAudio": "Écouter la question",
+      "recordButton": "Commencer l'enregistrement",
+      "recording": "Enregistrement en cours",
+      "stopButton": "Arrêter",
+      "analyzing": "Analyse en cours...",
+      "queuePosition": "Position dans la file : {{position}}",
+      "yourAnswer": "Votre réponse",
+      "completed": "Entretien terminé !",
+      "completedDescription": "Vous avez répondu à toutes les questions. Consultez votre rapport pour voir vos résultats.",
+      "viewReport": "Voir le rapport",
+      "finishEarly": "Terminer maintenant",
+      "loadSession": "Erreur lors du chargement de la session"
     }
   },
   "validation": {
