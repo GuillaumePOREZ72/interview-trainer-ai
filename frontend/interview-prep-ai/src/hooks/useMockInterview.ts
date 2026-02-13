@@ -224,15 +224,13 @@ export const useMockInterview = (
       eventSourceRef.current.close();
     }
 
-    // Note: EventSource doesn't support custom headers natively
-    // For authenticated SSE, we might need to use a polyfill or query param
-    // For now, assuming the session ID is enough for security (backend validates user)
-    const sseUrl = `${API_PATHS.MOCK_INTERVIEW.STREAM(sessionId)}`;
+    // Get JWT token from localStorage or cookie
+    const token = localStorage.getItem('token') || '';
     
-    // Use axiosInstance base URL
-    const fullUrl = sseUrl.startsWith("http") 
-      ? sseUrl 
-      : `${import.meta.env.VITE_API_URL || "http://localhost:8000"}${sseUrl}`;
+    // Build SSE URL with token as query param (EventSource can't send headers)
+    const sseUrl = `${API_PATHS.MOCK_INTERVIEW.STREAM(sessionId)}`;
+    const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+    const fullUrl = `${baseUrl}${sseUrl}?token=${encodeURIComponent(token)}`;
 
     const eventSource = new EventSource(fullUrl);
     eventSourceRef.current = eventSource;

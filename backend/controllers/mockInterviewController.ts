@@ -4,6 +4,7 @@
  */
 
 import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import { logger } from "../config/logger";
 import MockInterviewSession from "../models/MockInterviewSession";
 import mockInterviewService from "../services/mockInterviewService";
@@ -206,7 +207,16 @@ export const submitAnswer = async (req: Request, res: Response) => {
 export const getAnalysisStream = async (req: Request, res: Response) => {
   try {
     const { sessionId } = req.params;
-    const userId = req.user?._id;
+    // Token can be in query param (for SSE) or in headers
+    const token = req.query.token as string || req.headers.authorization?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({ success: false, message: "No token provided" });
+    }
+    
+    // Verify token and get userId
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { id: string };
+    const userId = decoded.id;
 
     // Validate session
     const session = await MockInterviewSession.findOne({

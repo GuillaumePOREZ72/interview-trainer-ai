@@ -82,9 +82,10 @@ router.post(
 );
 
 // GET /api/mock-interview/:sessionId/stream
+// Note: No 'protect' middleware here because EventSource can't send headers
+// Authentication is handled in the controller via query param token
 router.get(
   "/:sessionId/stream",
-  protect,
   validateSessionId,
   getAnalysisStream
 );
