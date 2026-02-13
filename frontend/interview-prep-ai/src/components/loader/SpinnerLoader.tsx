@@ -1,9 +1,19 @@
-const SpinnerLoader = () => {
+interface SpinnerLoaderProps {
+  size?: "small" | "medium" | "large";
+}
+
+const SpinnerLoader = ({ size = "medium" }: SpinnerLoaderProps) => {
+  const sizeClasses = {
+    small: "w-4 h-4",
+    medium: "w-5 h-5",
+    large: "w-8 h-8",
+  };
+
   return (
     <div role="status">
       <svg
         aria-hidden="true"
-        className="inline w-5 h-5 text-gray-200 animate-spin dark:text-gray-600 fill-cyan-900"
+        className={`inline text-gray-200 animate-spin dark:text-gray-600 fill-cyan-900 ${sizeClasses[size]}`}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

@@ -1,5 +1,6 @@
 import { useState, ChangeEvent } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
+import { IconType } from "react-icons";
 
 type InputType = "text" | "password" | "email" | "number" | "tel" | "url";
 
@@ -10,6 +11,8 @@ interface InputProps {
   type?: InputType;
   label?: string;
   id?: string;
+  icon?: IconType;
+  error?: string;
 }
 
 const Input = ({
@@ -19,6 +22,8 @@ const Input = ({
   type = "text",
   label,
   id,
+  icon: Icon,
+  error,
 }: InputProps) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
@@ -36,7 +41,10 @@ const Input = ({
           {label}
         </label>
       )}
-      <div className="relative flex items-center w-full bg-white border border-slate-200 rounded-lg px-4 py-3 transition-all duration-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 hover:border-slate-300">
+      <div className={`relative flex items-center w-full bg-white border rounded-lg px-4 py-3 transition-all duration-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 hover:border-slate-300 ${error ? 'border-red-500' : 'border-slate-200'}`}>
+        {Icon && (
+          <Icon className="w-5 h-5 text-slate-400 mr-3 flex-shrink-0" />
+        )}
         <input
           id={id}
           name={id}
@@ -64,6 +72,9 @@ const Input = ({
           </button>
         )}
       </div>
+      {error && (
+        <p className="mt-1 text-sm text-red-500">{error}</p>
+      )}
     </div>
   );
 };
