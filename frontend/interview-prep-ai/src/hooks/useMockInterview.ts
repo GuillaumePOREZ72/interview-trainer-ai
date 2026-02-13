@@ -42,9 +42,10 @@ interface UseMockInterviewReturn {
   // Actions
   startInterview: (data: StartInterviewRequest) => Promise<void>;
   startRecording: () => Promise<void>;
-    stopRecording: (sessionId?: string) => Promise<void>;
+  stopRecording: (sessionId?: string) => Promise<void>;
   completeInterview: () => Promise<void>;
   reset: () => void;
+  connectToSSE: (sessionId: string) => void;
   
   // Utils
   getFrequencyData: () => Uint8Array;
@@ -537,5 +538,6 @@ export const useMockInterview = (
     completeInterview,
     reset,
     getFrequencyData,
+    connectToSSE,
   };
 };

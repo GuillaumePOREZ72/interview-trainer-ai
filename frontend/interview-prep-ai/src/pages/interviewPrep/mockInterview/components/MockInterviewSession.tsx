@@ -31,9 +31,10 @@ const MockInterviewSession = () => {
     stopRecording,
     completeInterview,
     getFrequencyData,
+    connectToSSE,
   } = useMockInterview(t, i18n.language as "fr" | "en");
 
-  // Fetch session data on mount
+  // Fetch session data and connect to SSE on mount
   useEffect(() => {
     const fetchSession = async () => {
       if (!sessionId) return;
@@ -43,6 +44,9 @@ const MockInterviewSession = () => {
           API_PATHS.MOCK_INTERVIEW.GET_SESSION(sessionId)
         );
         setSessionData(response.data.session);
+        
+        // Connect to SSE for real-time updates
+        connectToSSE(sessionId);
       } catch (err) {
         setError(t("mockInterview.errors.loadSession"));
       } finally {
@@ -51,7 +55,7 @@ const MockInterviewSession = () => {
     };
 
     fetchSession();
-  }, [sessionId, t]);
+  }, [sessionId, t, connectToSSE]);
 
   // Handle complete interview
   const handleComplete = async () => {

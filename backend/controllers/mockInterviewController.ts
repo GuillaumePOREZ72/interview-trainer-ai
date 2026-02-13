@@ -11,6 +11,20 @@ import ttsService from "../services/ttsService";
 import concurrencyService from "../services/concurrencyService";
 import { deleteUploadedFile } from "../middlewares/uploadMiddleware";
 
+// Store SSE clients for real-time notifications
+const sseClients = new Map<string, Response>();
+
+/**
+ * Send SSE event to a specific session
+ */
+export const sendSSEEvent = (sessionId: string, eventType: string, data: any) => {
+  const client = sseClients.get(sessionId);
+  if (client) {
+    client.write(`event: ${eventType}\n`);
+    client.write(`data: ${JSON.stringify(data)}\n\n`);
+  }
+};
+
 /**
  * Start a new mock interview session
  * POST /api/mock-interview/start
@@ -235,14 +249,19 @@ export const getAnalysisStream = async (req: Request, res: Response) => {
       }
     }
 
+    // Store client for notifications
+    sseClients.set(sessionId, res);
+    logger.info(`SSE client connected: ${sessionId}`);
+
     // Keep connection alive with heartbeat
     const heartbeat = setInterval(() => {
-      res.write(`data: ${JSON.stringify({ type: "heartbeat" })}\n\n`);
+      res.write(`event: heartbeat\ndata: ${JSON.stringify({ time: Date.now() })}\n\n`);
     }, 30000); // Every 30 seconds
 
     // Clean up on client disconnect
     req.on("close", () => {
       clearInterval(heartbeat);
+      sseClients.delete(sessionId);
       logger.info(`SSE client disconnected: ${sessionId}`);
     });
   } catch (error) {
@@ -468,6 +487,27 @@ async function analyzeAndContinue(
     // Release concurrency slot
     concurrencyService.releaseSlot(sessionId);
 
+    // Send SSE notifications
+    sendSSEEvent(sessionId, "analysis", {
+      questionIndex: question.questionIndex,
+      analysis: analysis,
+    });
+
+    // Send next question or completion
+    if (session.currentQuestionIndex < 4 || question.followUpQuestion) {
+      const nextQ = question.followUpQuestion || session.questions[session.currentQuestionIndex];
+      sendSSEEvent(sessionId, "nextQuestion", {
+        questionIndex: session.currentQuestionIndex,
+        questionText: nextQ.questionText,
+        audioUrl: nextQ.ttsAudioPath,
+      });
+    } else {
+      sendSSEEvent(sessionId, "complete", {
+        overallScore: session.overallScore,
+        completedAt: session.completedAt,
+      });
+    }
+
     logger.info(`Analysis completed for session ${sessionId}`);
   } catch (error) {
     logger.error(`Analysis error for ${sessionId}: ${error}`);
@@ -476,5 +516,10 @@ async function analyzeAndContinue(
     await session.save();
     
     concurrencyService.releaseSlot(sessionId);
+    
+    // Notify client of error
+    sendSSEEvent(sessionId, "error", {
+      message: "Analysis failed",
+    });
   }
 }
