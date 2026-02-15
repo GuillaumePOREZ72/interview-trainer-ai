@@ -43,7 +43,7 @@ const CreateSessionForm = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<
-    CreateSessionFormData & { topicsToFocus: string[] }
+    Omit<CreateSessionFormData, "topicsToFocus"> & { topicsToFocus: string[] }
   >({
     role: "",
     experience: 3,
