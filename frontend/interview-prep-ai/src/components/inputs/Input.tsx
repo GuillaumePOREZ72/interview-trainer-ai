@@ -38,14 +38,20 @@ const Input = ({
       {label && (
         <label
           htmlFor={id}
-          className="block text-sm font-medium text-slate-700 mb-2"
+          className="block text-sm font-medium mb-2 text-slate-700 dark:text-gray-300"
         >
           {label}
         </label>
       )}
-      <div className={`relative flex items-center w-full bg-white border rounded-lg px-4 py-3 transition-all duration-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 hover:border-slate-300 ${error ? 'border-red-500' : 'border-slate-200'}`}>
+      <div
+        className={`relative flex items-center w-full border rounded-lg px-4 py-3 transition-all duration-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 
+        !bg-white dark:!bg-gray-700 
+        border-slate-200 dark:border-gray-600 
+        hover:border-slate-300 dark:hover:border-gray-500
+        ${error ? "!border-red-500" : ""}`}
+      >
         {Icon && (
-          <Icon className="w-5 h-5 text-slate-400 mr-3 flex-shrink-0" />
+          <Icon className="w-5 h-5 mr-3 flex-shrink-0 text-slate-400 dark:text-gray-400" />
         )}
         <input
           id={id}
@@ -57,7 +63,7 @@ const Input = ({
           value={value}
           onChange={onChange}
           onBlur={onBlur}
-          className="w-full bg-transparent outline-none text-sm text-slate-900 placeholder:text-slate-400"
+          className="w-full bg-transparent outline-none text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-500"
         />
         {type === "password" && (
           <button
@@ -65,7 +71,7 @@ const Input = ({
             onClick={togglePassword}
             aria-label={showPassword ? "Hide password" : "Show password"}
             aria-pressed={showPassword}
-            className="ml-2 text-slate-400 hover:text-primary transition-colors cursor-pointer"
+            className="ml-2 hover:text-primary transition-colors cursor-pointer text-slate-400 dark:text-gray-400"
           >
             {showPassword ? (
               <FaRegEye size={20} />
@@ -75,9 +81,7 @@ const Input = ({
           </button>
         )}
       </div>
-      {error && (
-        <p className="mt-1 text-sm text-red-500">{error}</p>
-      )}
+      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
     </div>
   );
 };
