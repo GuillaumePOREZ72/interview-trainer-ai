@@ -161,10 +161,10 @@ const Dashboard = () => {
         <div className="p-2">
           {modalView === "choice" ? (
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-text-primary mb-2">
+              <h2 className="text-2xl font-bold bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent mb-3">
                 {t("dashboard.modal.choiceTitle")}
               </h2>
-              <p className="text-text-secondary mb-8">
+              <p className="text-text-secondary mb-8 max-w-md mx-auto">
                 {t("dashboard.modal.choiceSubtitle")}
               </p>
 
