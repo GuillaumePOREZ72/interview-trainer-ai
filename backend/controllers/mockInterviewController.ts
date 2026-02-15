@@ -207,8 +207,10 @@ export const submitAnswer = async (req: Request, res: Response) => {
 export const getAnalysisStream = async (req: Request, res: Response) => {
   try {
     const { sessionId } = req.params;
-    // Token can be in query param (for SSE) or in headers
-    const token = req.query.token as string || req.headers.authorization?.replace('Bearer ', '');
+    // Token can be in query param (for SSE), in headers, or in cookies
+    const token = req.query.token as string || 
+                  req.headers.authorization?.replace('Bearer ', '') ||
+                  req.cookies?.token;
     
     if (!token) {
       return res.status(401).json({ success: false, message: "No token provided" });
@@ -387,33 +389,46 @@ export const getHistory = async (req: Request, res: Response) => {
   try {
     const userId = req.user?._id;
     
+    logger.info(`Get history called for user: ${userId}`);
+    
     if (!userId) {
+      logger.error("Get history: No user ID found in request");
       return res.status(401).json({ success: false, message: "Not authorized" });
     }
     
     let limit = 10;
     const limitParam = req.query.limit;
+    
+    logger.info(`Get history: limit param = ${limitParam}`);
 
     if (limitParam !== undefined && limitParam !== "") {
       const parsed = parseInt(limitParam as string, 10);
+      logger.info(`Get history: parsed limit = ${parsed}`);
       if (isNaN(parsed) || parsed < 1 || parsed > 100) {
+        logger.error(`Get history: Invalid limit value: ${parsed}`);
         return res.status(400).json({ success: false, message: "Limit must be an integer between 1 and 100" });
       }
       limit = parsed;
     }
 
+    logger.info(`Get history: Querying database with limit ${limit}`);
+    
     const sessions = await MockInterviewSession.find({
       user: userId,
       status: "completed",
     })
       .sort({ completedAt: -1 })
       .limit(limit)
-      .select("role experience overallScore completedAt startedAt");
+      .select("role experience overallScore completedAt startedAt topicsToFocus status")
+      .lean();
+    
+    logger.info(`Get history: Found ${sessions.length} sessions`);
 
     res.status(200).json({ success: true, sessions });
-  } catch (error) {
+  } catch (error: any) {
     logger.error(`Get history error: ${error}`);
-    res.status(500).json({ success: false, message: "Failed to get history" });
+    logger.error(`Get history error stack: ${error.stack}`);
+    res.status(500).json({ success: false, message: "Failed to get history", error: error.message });
   }
 };
 

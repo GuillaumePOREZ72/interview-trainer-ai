@@ -28,6 +28,7 @@ describe("QuestionCard Component", () => {
     onLearnMore: jest.fn(),
     isPinned: false,
     onTogglePin: jest.fn(),
+    onVocalMode: jest.fn(),
   };
 
   beforeEach(() => {

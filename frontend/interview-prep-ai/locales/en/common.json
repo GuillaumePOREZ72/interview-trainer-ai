@@ -296,6 +296,37 @@
       "finishEarly": "Finish now",
       "loadSession": "Error loading session",
       "loadingQuestion": "Loading question..."
+    },
+    "report": {
+      "title": "Interview Report",
+      "questionsAnswered": "questions answered",
+      "overallScore": "Overall Score",
+      "basedOnAnswers": "Based on your {{count}} answers",
+      "strengths": "Strengths",
+      "noStrengths": "Complete the interview to see your strengths",
+      "improvements": "To Improve",
+      "noImprovements": "Complete the interview to see improvement areas",
+      "sessionDetails": "Session Details",
+      "started": "Started",
+      "completed": "Completed",
+      "language": "Language",
+      "questionAnalysis": "Question Analysis",
+      "question": "Question",
+      "yourAnswer": "Your Answer",
+      "sentiment": "Sentiment",
+      "confidence": "Confidence",
+      "fillerWords": "Filler Words",
+      "suggestions": "Suggestions",
+      "notAnswered": "Not answered",
+      "newInterview": "Start New Interview",
+      "backToDashboard": "Back to Dashboard"
+    },
+    "history": {
+      "title": "Mock Interview History",
+      "empty": "No mock interviews yet",
+      "startFirst": "Start your first interview",
+      "viewAll": "View All",
+      "viewReport": "View Report"
     }
   },
   "validation": {

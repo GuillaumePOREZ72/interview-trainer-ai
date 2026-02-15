@@ -108,20 +108,27 @@ export function mockErrorResponse(
 export function createMockAxios() {
   const responses: Map<string, { method: string; response: unknown; isError: boolean }> = new Map();
 
-  const instance = {
+  type MockAxiosInstance = typeof mockAxiosInstance & {
+    mockGet<T>(url: string, data: T): MockAxiosInstance;
+    mockPost<T>(url: string, data: T): MockAxiosInstance;
+    mockError(method: string, url: string, status: number, message: string): MockAxiosInstance;
+    apply(): void;
+  };
+
+  const instance: MockAxiosInstance = {
     ...mockAxiosInstance,
 
-    mockGet<T>(url: string, data: T): typeof instance {
+    mockGet<T>(url: string, data: T): MockAxiosInstance {
       responses.set(`GET:${url}`, { method: "get", response: { data }, isError: false });
       return instance;
     },
 
-    mockPost<T>(url: string, data: T): typeof instance {
+    mockPost<T>(url: string, data: T): MockAxiosInstance {
       responses.set(`POST:${url}`, { method: "post", response: { data }, isError: false });
       return instance;
     },
 
-    mockError(method: string, url: string, status: number, message: string): typeof instance {
+    mockError(method: string, url: string, status: number, message: string): MockAxiosInstance {
       responses.set(`${method.toUpperCase()}:${url}`, {
         method,
         response: { response: { status, data: { message } }, isAxiosError: true },

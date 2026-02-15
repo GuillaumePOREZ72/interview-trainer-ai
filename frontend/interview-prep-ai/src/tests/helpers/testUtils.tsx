@@ -109,7 +109,6 @@ export function createMockQuestion(
     question: "What is React?",
     answer: "React is a JavaScript library for building user interfaces.",
     isPinned: false,
-    note: "",
     ...overrides,
   };
 }
@@ -121,7 +120,7 @@ export function createMockSession(overrides: Partial<Session> = {}): Session {
   return {
     _id: `session-${Date.now()}`,
     role: "Frontend Developer",
-    experience: "3 years",
+    experience: 3,
     topicsToFocus: "React, TypeScript, Testing",
     description: "Technical interview preparation",
     questions: [

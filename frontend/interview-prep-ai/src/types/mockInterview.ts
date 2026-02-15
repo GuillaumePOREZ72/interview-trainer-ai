@@ -85,6 +85,9 @@ export interface MockInterviewSession {
   questions: QuestionResponse[];
   currentQuestionIndex: number;
   overallScore?: number; // 0-100, set when completed
+  strengths?: string[]; // Set when completed
+  improvementAreas?: string[]; // Set when completed
+  feedback?: string[]; // Set when completed
   startedAt: string;
   completedAt?: string;
   expiresAt: string;

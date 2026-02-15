@@ -1,3 +1,4 @@
+/// <reference types="../vite-env.d.ts" />
 const isProd = import.meta.env.PROD;
 export const BASE_URL = isProd
   ? ""

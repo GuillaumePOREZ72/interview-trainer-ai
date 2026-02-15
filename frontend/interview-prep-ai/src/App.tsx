@@ -26,6 +26,9 @@ const MockInterviewSetup = lazy(
 const MockInterviewSession = lazy(
   () => import("./pages/interviewPrep/mockInterview/components/MockInterviewSession"),
 );
+const MockInterviewReport = lazy(
+  () => import("./pages/interviewPrep/mockInterview/components/MockInterviewReport"),
+);
 
 interface ProtectedRoutesProps {
   children: ReactNode;
@@ -101,6 +104,14 @@ const App = () => {
                 element={
                   <ProtectedRoutes>
                     <MockInterviewSession />
+                  </ProtectedRoutes>
+                }
+              />
+              <Route
+                path="/mock-interview/report/:sessionId"
+                element={
+                  <ProtectedRoutes>
+                    <MockInterviewReport />
                   </ProtectedRoutes>
                 }
               />

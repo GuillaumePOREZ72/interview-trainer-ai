@@ -10,6 +10,7 @@ import SummaryCard from "../../components/cards/SummaryCard";
 import Modal from "../../components/Modal";
 import CreateSessionForm from "./CreateSessionForm";
 import DeleteAlertContent from "../../components/DeleteAlertContent";
+import MockInterviewHistory from "../interviewPrep/mockInterview/components/MockInterviewHistory";
 import { Session } from "../../types";
 
 interface DeleteAlertState {
@@ -116,21 +117,26 @@ const Dashboard = () => {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sessions?.map((data) => (
-                <SummaryCard
-                  key={data?._id}
-                  role={data.role}
-                  topicsToFocus={data.topicsToFocus}
-                  experience={data.experience}
-                  questions={data.questions.length}
-                  description={data.description}
-                  language={data.language}
-                  lastUpdated={data.updatedAt || null}
-                  onSelect={() => navigate(`/interview-prep/${data._id}`)}
-                  onDelete={() => setOpenDeleteAlert({ open: true, data })}
-                />
-              ))}
+            <div className="space-y-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {sessions?.map((data) => (
+                  <SummaryCard
+                    key={data?._id}
+                    role={data.role}
+                    topicsToFocus={data.topicsToFocus}
+                    experience={data.experience}
+                    questions={data.questions.length}
+                    description={data.description}
+                    language={data.language}
+                    lastUpdated={data.updatedAt || null}
+                    onSelect={() => navigate(`/interview-prep/${data._id}`)}
+                    onDelete={() => setOpenDeleteAlert({ open: true, data })}
+                  />
+                ))}
+              </div>
+
+              {/* Mock Interview History Section */}
+              <MockInterviewHistory limit={3} showViewAll={true} />
             </div>
           )}
         </div>

@@ -239,14 +239,14 @@ MockInterviewSessionSchema.index({ status: 1, completedAt: -1 });
 
 // Virtual to get duration of session
 MockInterviewSessionSchema.virtual("durationMinutes").get(function () {
-  if (!this.completedAt) return null;
+  if (!this.completedAt || !this.startedAt) return null;
   const diff = this.completedAt.getTime() - this.startedAt.getTime();
   return Math.round(diff / 1000 / 60); // Convert to minutes
 });
 
 // Virtual to check if session has follow-up questions
 MockInterviewSessionSchema.virtual("hasFollowUpQuestions").get(function () {
-  return this.questions.some((q) => q.followUpQuestion);
+  return this.questions?.some((q) => q.followUpQuestion) ?? false;
 });
 
 // ============================================================================

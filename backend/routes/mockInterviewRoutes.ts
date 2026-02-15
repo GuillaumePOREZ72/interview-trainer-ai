@@ -90,6 +90,21 @@ router.get(
   getAnalysisStream
 );
 
+// GET /api/mock-interview/history
+// MUST be defined BEFORE /:sessionId to avoid "history" being treated as a sessionId
+router.get(
+  "/history",
+  protect,
+  [
+    query("limit")
+      .optional()
+      .isInt({ min: 1, max: 100 })
+      .withMessage("Limit must be an integer between 1 and 100"),
+  ],
+  handleValidationErrors,
+  getHistory
+);
+
 // POST /api/mock-interview/:sessionId/complete
 router.post(
   "/:sessionId/complete",
@@ -104,13 +119,6 @@ router.get(
   protect,
   validateSessionId,
   getSession
-);
-
-// GET /api/mock-interview/history
-router.get(
-  "/history",
-  protect,
-  getHistory
 );
 
 export default router;

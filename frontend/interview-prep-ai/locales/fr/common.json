@@ -295,6 +295,37 @@
       "finishEarly": "Terminer maintenant",
       "loadSession": "Erreur lors du chargement de la session",
       "loadingQuestion": "Chargement de la question..."
+    },
+    "report": {
+      "title": "Rapport d'entretien",
+      "questionsAnswered": "questions répondues",
+      "overallScore": "Score global",
+      "basedOnAnswers": "Basé sur vos {{count}} réponses",
+      "strengths": "Points forts",
+      "noStrengths": "Terminez l'entretien pour voir vos points forts",
+      "improvements": "À améliorer",
+      "noImprovements": "Terminez l'entretien pour voir les axes d'amélioration",
+      "sessionDetails": "Détails de la session",
+      "started": "Commencé",
+      "completed": "Terminé",
+      "language": "Langue",
+      "questionAnalysis": "Analyse des questions",
+      "question": "Question",
+      "yourAnswer": "Votre réponse",
+      "sentiment": "Sentiment",
+      "confidence": "Confiance",
+      "fillerWords": "Mots de remplissage",
+      "suggestions": "Suggestions",
+      "notAnswered": "Non répondu",
+      "newInterview": "Nouvel entretien",
+      "backToDashboard": "Retour au tableau de bord"
+    },
+    "history": {
+      "title": "Historique des entretiens",
+      "empty": "Aucun entretien simulé",
+      "startFirst": "Commencez votre premier entretien",
+      "viewAll": "Voir tout",
+      "viewReport": "Voir le rapport"
     }
   },
   "validation": {

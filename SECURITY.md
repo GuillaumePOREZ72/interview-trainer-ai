@@ -1,8 +1,8 @@
 # 🔒 Security Implementation Guide
 
-> **Date :** 3 Février 2026  
-> **Version :** 1.0  
-> **Status :** Corrections implémentées, tests en attente
+> **Date :** 15 Février 2026  
+> **Version :** 1.1  
+> **Status :** Corrections implémentées, tests passants
 
 ---
 
@@ -10,36 +10,48 @@
 
 ### ✅ Phase 1 : Critique (IDOR - Broken Access Control)
 
-| Fichier | Correction | Statut |
-|---------|-----------|--------|
-| `backend/controllers/sessionController.ts` | `getSessionById` vérifie `user: req.user?._id` | ✅ |
-| `backend/controllers/questionController.ts` | `addQuestionsToSession` vérifie propriété session | ✅ |
-| `backend/controllers/questionController.ts` | `togglePinQuestion` vérifie propriété via populate | ✅ |
-| `backend/controllers/questionController.ts` | `updateQuestionNote` vérifie propriété via populate | ✅ |
-| `backend/middlewares/authMiddleware.ts` | Standardisé sur Bearer tokens uniquement | ✅ |
+| Fichier                                          | Correction                                          | Statut |
+| ------------------------------------------------ | --------------------------------------------------- | ------ |
+| `backend/controllers/sessionController.ts`       | `getSessionById` vérifie `user: req.user?._id`      | ✅     |
+| `backend/controllers/questionController.ts`      | `addQuestionsToSession` vérifie propriété session   | ✅     |
+| `backend/controllers/questionController.ts`      | `togglePinQuestion` vérifie propriété via populate  | ✅     |
+| `backend/controllers/questionController.ts`      | `updateQuestionNote` vérifie propriété via populate | ✅     |
+| `backend/controllers/mockInterviewController.ts` | Vérifie propriété des sessions mock interview       | ✅     |
+| `backend/middlewares/authMiddleware.ts`          | Standardisé sur Bearer tokens uniquement            | ✅     |
 
 ### ✅ Phase 2 : Haute Priorité
 
-| Fichier | Fonctionnalité | Statut |
-|---------|----------------|--------|
-| `backend/middlewares/ownershipMiddleware.ts` | Middleware réutilisable de vérification propriété | ✅ |
-| `backend/middlewares/aiValidationMiddleware.ts` | Validation & sanitization entrées AI | ✅ |
-| `backend/middlewares/auditMiddleware.ts` | Logging audit des opérations sensibles | ✅ |
-| `backend/middlewares/correlationMiddleware.ts` | Correlation IDs pour tracing | ✅ |
-| `backend/app.ts` | CSP renforcé, CORS strict, middlewares intégrés | ✅ |
+| Fichier                                         | Fonctionnalité                                    | Statut |
+| ----------------------------------------------- | ------------------------------------------------- | ------ |
+| `backend/middlewares/ownershipMiddleware.ts`    | Middleware réutilisable de vérification propriété | ✅     |
+| `backend/middlewares/aiValidationMiddleware.ts` | Validation & sanitization entrées AI              | ✅     |
+| `backend/middlewares/auditMiddleware.ts`        | Logging audit des opérations sensibles            | ✅     |
+| `backend/middlewares/correlationMiddleware.ts`  | Correlation IDs pour tracing                      | ✅     |
+| `backend/middlewares/uploadMiddleware.ts`       | Validation upload audio (mock interview)          | ✅     |
+| `backend/app.ts`                                | CSP renforcé, CORS strict, middlewares intégrés   | ✅     |
 
 ### ✅ Phase 3 : Tests de Sécurité
 
-| Fichier | Description | Statut |
-|---------|-------------|--------|
-| `backend/tests/security/idor.test.ts` | Tests IDOR (Broken Access Control) | ✅ |
-| `backend/tests/security/ai-input.test.ts` | Tests validation entrées AI | ✅ |
+| Fichier                                   | Description                        | Statut |
+| ----------------------------------------- | ---------------------------------- | ------ |
+| `backend/tests/security/idor.test.ts`     | Tests IDOR (Broken Access Control) | ✅     |
+| `backend/tests/security/ai-input.test.ts` | Tests validation entrées AI        | ✅     |
+
+### 📋 Phase 4 : Services ajoutés (Audit sécurité)
+
+| Service                                    | Fonction                                     | Risque                         |
+| ------------------------------------------ | -------------------------------------------- | ------------------------------ |
+| `backend/services/mockInterviewService.ts` | Orchestration d'entretiens simulés avec Groq | Injection prompt, audio upload |
+| `backend/services/ttsService.ts`           | Text-to-Speech via API externe               | Requêtes sortantes, quotas     |
+| `backend/services/vocalAnalysisService.ts` | Analyse vocale des réponses                  | Traitement données sensibles   |
+| `backend/services/concurrencyService.ts`   | Gestion de la concurrence                    | Race conditions                |
 
 ---
 
 ## 🔐 Procédure de Rotation des Secrets (CRITIQUE)
 
 ### ⚠️ AVERTISSEMENT
+
 Cette opération va **invalider toutes les sessions utilisateurs existantes**. Effectuer pendant une fenêtre de maintenance.
 
 ### Étape 1 : Générer les nouveaux secrets
@@ -174,6 +186,13 @@ cd backend
 npm test -- ai-input.test.ts
 ```
 
+### Tests Mock Interview
+
+```bash
+cd backend
+npm test -- tests/integration/routes/mockInterview/
+```
+
 ### Tous les tests
 
 ```bash
@@ -181,7 +200,7 @@ cd backend
 npm test
 ```
 
-**Attendu :** 140+ tests passants, y compris les nouveaux tests de sécurité
+**Attendu :** 23 fichiers de tests backend (unit + integration + security) + 7 fichiers de tests frontend, tous passants
 
 ---
 
@@ -209,7 +228,17 @@ curl -X POST \
 # Devrait retourner 400 (validation error)
 ```
 
-### 3. Vérifier les headers de sécurité
+### 3. Vérifier les routes Mock Interview
+
+```bash
+# Vérifier qu'un utilisateur ne peut pas accéder à la session d'un autre
+curl -H "Authorization: Bearer TOKEN_USER2" \
+  https://api.ton-domaine.com/api/mock-interview/SESSION_ID_USER1
+
+# Devrait retourner 403 ou 404
+```
+
+### 4. Vérifier les headers de sécurité
 
 ```bash
 curl -I https://api.ton-domaine.com/api/health
@@ -293,6 +322,7 @@ pm2 restart interview-trainer-ai
 ## 📞 Support
 
 En cas de problème :
+
 1. Vérifier les logs : `tail -f backend/logs/app-*.log`
 2. Tester localement : `cd backend && npm run dev`
 3. Vérifier les variables d'environnement
@@ -300,5 +330,5 @@ En cas de problème :
 
 ---
 
-**Dernière mise à jour :** 3 Février 2026  
-**Prochain audit recommandé :** Dans 3 mois
+**Dernière mise à jour :** 15 Février 2026  
+**Prochain audit recommandé :** Mai 2026

@@ -5,7 +5,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import axiosInstance from "../utils/axiosInstance";
-import { API_PATHS } from "../utils/apiPaths";
+import { API_PATHS, BASE_URL } from "../utils/apiPaths";
 import toast from "react-hot-toast";
 import { TFunction } from "i18next";
 import {
@@ -19,6 +19,7 @@ import {
   CompleteInterviewResponse,
   GetSessionResponse,
   SSEEventType,
+  SessionReport,
 } from "../types";
 
 export type { MockInterviewState, MockInterviewError };
@@ -43,7 +44,7 @@ interface UseMockInterviewReturn {
   startInterview: (data: StartInterviewRequest) => Promise<void>;
   startRecording: () => Promise<void>;
   stopRecording: (sessionId?: string) => Promise<void>;
-  completeInterview: () => Promise<void>;
+  completeInterview: () => Promise<SessionReport | undefined>;
   reset: () => void;
   connectToSSE: (sessionId: string) => void;
   
@@ -224,13 +225,11 @@ export const useMockInterview = (
       eventSourceRef.current.close();
     }
 
-    // Get JWT token from localStorage or cookie
-    const token = localStorage.getItem('token') || '';
-    
-    // Build SSE URL with token as query param (EventSource can't send headers)
+    // Build SSE URL
+    // Cookies are automatically sent with EventSource for same-origin requests
+    // The backend will validate via cookies (HTTP-only JWT token)
     const sseUrl = `${API_PATHS.MOCK_INTERVIEW.STREAM(sessionId)}`;
-    const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
-    const fullUrl = `${baseUrl}${sseUrl}?token=${encodeURIComponent(token)}`;
+    const fullUrl = `${BASE_URL}${sseUrl}`;
 
     const eventSource = new EventSource(fullUrl);
     eventSourceRef.current = eventSource;
@@ -283,7 +282,7 @@ export const useMockInterview = (
       setInterimTranscript("");
       setAnalysisProgress(0);
       setState("question");
-      toast.info(t("mockInterview.info.nextQuestion"));
+      toast.success(t("mockInterview.info.nextQuestion"));
     });
 
     eventSource.addEventListener("complete", (event) => {
@@ -514,7 +513,8 @@ export const useMockInterview = (
    */
   const getFrequencyData = useCallback(() => {
     if (analyserRef.current && dataArrayRef.current) {
-      analyserRef.current.getByteFrequencyData(dataArrayRef.current);
+      // Type assertion needed due to strict Uint8Array typing differences
+      analyserRef.current.getByteFrequencyData(dataArrayRef.current as any);
       return dataArrayRef.current;
     }
     return new Uint8Array(128).fill(0);
