@@ -66,7 +66,7 @@ export const startInterview = async (req: Request, res: Response) => {
 
     // Generate first question
     const questionText = await mockInterviewService.generateInitialQuestion(session);
-    
+
     // Generate TTS (or null if quota exceeded)
     const audioPath = await ttsService.synthesize(questionText, language);
 
@@ -143,12 +143,12 @@ export const submitAnswer = async (req: Request, res: Response) => {
       transcript: transcript || "",
       audioFile: audioFile
         ? {
-            filename: audioFile.filename,
-            path: audioFile.path,
-            duration: 0, // TODO: extract duration
-            size: audioFile.size,
-            mimeType: audioFile.mimetype,
-          }
+          filename: audioFile.filename,
+          path: audioFile.path,
+          duration: 0, // TODO: extract duration
+          size: audioFile.size,
+          mimeType: audioFile.mimetype,
+        }
         : undefined,
       answeredAt: new Date(),
     };
@@ -164,9 +164,9 @@ export const submitAnswer = async (req: Request, res: Response) => {
       // Timeout or error
       session.status = "active";
       await session.save();
-      
+
       if (audioFile) deleteUploadedFile(audioFile.path);
-      
+
       return res.status(503).json({
         success: false,
         message: "Analysis queue is full. Please try again.",
@@ -184,18 +184,20 @@ export const submitAnswer = async (req: Request, res: Response) => {
       message: "Answer received. Analyzing...",
       sessionId: session._id,
     });
-  } catch (error: any) {
-    logger.error(`Submit answer error: ${error}`);
-    logger.error(`Error stack: ${error.stack}`);
-    
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : '';
+    logger.error(`Submit answer error: ${errorMsg}`);
+    if (errorStack) logger.error(`Error stack: ${errorStack}`);
+
     if (req.file) {
       deleteUploadedFile(req.file.path);
     }
-    
+
     res.status(500).json({
       success: false,
       message: "Failed to submit answer",
-      error: error.message,
+      error: errorMsg,
     });
   }
 };
@@ -208,14 +210,14 @@ export const getAnalysisStream = async (req: Request, res: Response) => {
   try {
     const { sessionId } = req.params;
     // Token can be in query param (for SSE), in headers, or in cookies
-    const token = req.query.token as string || 
-                  req.headers.authorization?.replace('Bearer ', '') ||
-                  req.cookies?.token;
-    
+    const token = req.query.token as string ||
+      req.headers.authorization?.replace('Bearer ', '') ||
+      req.cookies?.token;
+
     if (!token) {
       return res.status(401).json({ success: false, message: "No token provided" });
     }
-    
+
     // Verify token and get userId
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { id: string };
     const userId = decoded.id;
@@ -388,17 +390,17 @@ export const getSession = async (req: Request, res: Response) => {
 export const getHistory = async (req: Request, res: Response) => {
   try {
     const userId = req.user?._id;
-    
+
     logger.info(`Get history called for user: ${userId}`);
-    
+
     if (!userId) {
       logger.error("Get history: No user ID found in request");
       return res.status(401).json({ success: false, message: "Not authorized" });
     }
-    
+
     let limit = 10;
     const limitParam = req.query.limit;
-    
+
     logger.info(`Get history: limit param = ${limitParam}`);
 
     if (limitParam !== undefined && limitParam !== "") {
@@ -412,7 +414,7 @@ export const getHistory = async (req: Request, res: Response) => {
     }
 
     logger.info(`Get history: Querying database with limit ${limit}`);
-    
+
     const sessions = await MockInterviewSession.find({
       user: userId,
       status: "completed",
@@ -421,14 +423,16 @@ export const getHistory = async (req: Request, res: Response) => {
       .limit(limit)
       .select("role experience overallScore completedAt startedAt topicsToFocus status")
       .lean();
-    
+
     logger.info(`Get history: Found ${sessions.length} sessions`);
 
     res.status(200).json({ success: true, sessions });
-  } catch (error: any) {
-    logger.error(`Get history error: ${error}`);
-    logger.error(`Get history error stack: ${error.stack}`);
-    res.status(500).json({ success: false, message: "Failed to get history", error: error.message });
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : '';
+    logger.error(`Get history error: ${errorMsg}`);
+    if (errorStack) logger.error(`Get history error stack: ${errorStack}`);
+    res.status(500).json({ success: false, message: "Failed to get history", error: errorMsg });
   }
 };
 
@@ -441,7 +445,7 @@ export const getHistory = async (req: Request, res: Response) => {
  * Runs asynchronously after submitAnswer returns
  */
 async function analyzeAndContinue(
-  session: any,
+  session: import('../models/MockInterviewSession').IMockInterviewSession & import('mongoose').Document,
   question: any,
   transcript: string
 ): Promise<void> {
@@ -473,7 +477,7 @@ async function analyzeAndContinue(
       try {
         followUpAudio = await ttsService.synthesize(
           followUpText,
-          session.language
+          session.language as "en" | "fr"
         );
       } catch (ttsError) {
         logger.warn(`TTS failed for follow-up: ${ttsError}`);
@@ -493,7 +497,7 @@ async function analyzeAndContinue(
       try {
         nextAudio = await ttsService.synthesize(
           nextQuestionText,
-          session.language
+          session.language as "en" | "fr"
         );
       } catch (ttsError) {
         logger.warn(`TTS failed for next question: ${ttsError}`);
@@ -536,12 +540,12 @@ async function analyzeAndContinue(
     logger.info(`Analysis completed for session ${sessionId}`);
   } catch (error) {
     logger.error(`Analysis error for ${sessionId}: ${error}`);
-    
+
     session.status = "active";
     await session.save();
-    
+
     concurrencyService.releaseSlot(sessionId);
-    
+
     // Notify client of error
     sendSSEEvent(sessionId, "error", {
       message: "Analysis failed",

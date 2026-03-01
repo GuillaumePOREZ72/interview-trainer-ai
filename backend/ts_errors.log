@@ -1,0 +1,50 @@
+controllers/mockInterviewController.ts(189,34): error TS18046: 'error' is of type 'unknown'.
+controllers/mockInterviewController.ts(198,14): error TS18046: 'error' is of type 'unknown'.
+controllers/mockInterviewController.ts(430,46): error TS18046: 'error' is of type 'unknown'.
+controllers/mockInterviewController.ts(431,85): error TS18046: 'error' is of type 'unknown'.
+controllers/mockInterviewController.ts(476,11): error TS2345: Argument of type 'string' is not assignable to parameter of type '"en" | "fr"'.
+controllers/mockInterviewController.ts(496,11): error TS2345: Argument of type 'string' is not assignable to parameter of type '"en" | "fr"'.
+middlewares/ownershipMiddleware.ts(41,5): error TS2322: Type 'Document<unknown, {}, ISession, {}, {}> & ISession & Required<{ _id: ObjectId; }> & { __v: number; }' is not assignable to type 'IMockInterviewSession | undefined'.
+  Type 'Document<unknown, {}, ISession, {}, {}> & ISession & Required<{ _id: ObjectId; }> & { __v: number; }' is missing the following properties from type 'IMockInterviewSession': status, currentQuestionIndex, ttsAudioCache, startedAt, and 9 more.
+middlewares/uploadMiddleware.ts(148,39): error TS2339: Property 'message' does not exist on type '{}'.
+middlewares/uploadMiddleware.ts(151,20): error TS2339: Property 'message' does not exist on type '{}'.
+tests/integration/routes/mockInterview/stream.test.ts(46,16): error TS2345: Argument of type '(err: Error | null, res: Record<string, unknown>) => void' is not assignable to parameter of type 'CBHandler'.
+  Types of parameters 'res' and 'res' are incompatible.
+    Type 'Response' is not assignable to type 'Record<string, unknown>'.
+      Index signature for type 'string' is missing in type 'Response'.
+tests/integration/routes/mockInterview/stream.test.ts(82,16): error TS2345: Argument of type '(err: Error | null, res: Record<string, unknown>) => void' is not assignable to parameter of type 'CBHandler'.
+  Types of parameters 'res' and 'res' are incompatible.
+    Type 'Response' is not assignable to type 'Record<string, unknown>'.
+      Index signature for type 'string' is missing in type 'Response'.
+tests/integration/routes/mockInterview/stream.test.ts(108,16): error TS2345: Argument of type '(err: Error | null, res: Record<string, unknown>) => void' is not assignable to parameter of type 'CBHandler'.
+  Types of parameters 'res' and 'res' are incompatible.
+    Type 'Response' is not assignable to type 'Record<string, unknown>'.
+      Index signature for type 'string' is missing in type 'Response'.
+tests/integration/routes/mockInterview/stream.test.ts(139,16): error TS2345: Argument of type '(res: Record<string, unknown>, callback: Function) => void' is not assignable to parameter of type '((str: string) => any) | ((res: Response, callback: (err: Error | null, body: any) => void) => void)'.
+  Type '(res: Record<string, unknown>, callback: Function) => void' is not assignable to type '(str: string) => any'.
+    Target signature provides too few arguments. Expected 2 or more, but got 1.
+tests/integration/routes/mockInterview/stream.test.ts(140,11): error TS18046: 'res.on' is of type 'unknown'.
+tests/integration/routes/mockInterview/stream.test.ts(143,11): error TS18046: 'res.on' is of type 'unknown'.
+tests/security/idor.test.ts(22,5): error TS2322: Type 'Document<unknown, {}, ISession, {}, {}> & ISession & Required<{ _id: ObjectId; }> & { __v: number; }' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'Document<unknown, {}, ISession, {}, {}> & ISession & Required<{ _id: ObjectId; }> & { __v: number; }'.
+tests/security/idor.test.ts(31,5): error TS2322: Type 'Document<unknown, {}, IQuestion, {}, {}> & IQuestion & Required<{ _id: ObjectId; }> & { __v: number; }' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'Document<unknown, {}, IQuestion, {}, {}> & IQuestion & Required<{ _id: ObjectId; }> & { __v: number; }'.
+tests/security/idor.test.ts(56,52): error TS18046: 'session1._id' is of type 'unknown'.
+tests/unit/services/mockInterviewService.test.ts(19,5): error TS2322: Type 'AuthenticatedUser' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'AuthenticatedUser'.
+tests/unit/services/mockInterviewService.test.ts(20,5): error TS2322: Type 'Document<unknown, {}, IMockInterviewSession, {}, {}> & IMockInterviewSession & Required<{ _id: ObjectId; }> & { ...; }' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'Document<unknown, {}, IMockInterviewSession, {}, {}> & IMockInterviewSession & Required<{ _id: ObjectId; }> & { ...; }'.
+tests/unit/services/mockInterviewService.test.ts(21,13): error TS18046: 'testUser.user' is of type 'unknown'.
+tests/unit/services/mockInterviewService.test.ts(52,75): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'IMockInterviewSession'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'IMockInterviewSession': user, role, experience, topicsToFocus, and 70 more.
+tests/unit/services/mockInterviewService.test.ts(71,58): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'IMockInterviewSession'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'IMockInterviewSession': user, role, experience, topicsToFocus, and 70 more.
+tests/unit/services/mockInterviewService.test.ts(92,9): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'IMockInterviewSession'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'IMockInterviewSession': user, role, experience, topicsToFocus, and 70 more.
+tests/unit/services/mockInterviewService.test.ts(106,9): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'IMockInterviewSession'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'IMockInterviewSession': user, role, experience, topicsToFocus, and 70 more.
+tests/unit/services/mockInterviewService.test.ts(176,7): error TS18046: 'testSession.questions' is of type 'unknown'.
+tests/unit/services/mockInterviewService.test.ts(188,13): error TS18046: 'testSession.save' is of type 'unknown'.
+tests/unit/services/mockInterviewService.test.ts(217,71): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'IMockInterviewSession'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'IMockInterviewSession': user, role, experience, topicsToFocus, and 70 more.
+tests/unit/services/mockInterviewService.test.ts(229,15): error TS18046: 'testUser.user' is of type 'unknown'.

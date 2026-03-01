@@ -57,7 +57,7 @@ export const auditMiddleware = (action: string) => {
         statusCode,
         timestamp: new Date().toISOString(),
         userAgent: req.headers["user-agent"],
-        correlationId: (req as any).correlationId,
+        correlationId: req.correlationId,
         duration,
       };
 
@@ -79,13 +79,13 @@ export const auditMiddleware = (action: string) => {
     };
 
     // Intercepter res.send
-    res.send = function(body: any) {
+    res.send = function(body: unknown) {
       logAudit(res.statusCode);
       return originalSend.call(this, body);
     };
 
     // Intercepter res.json
-    res.json = function(body: any) {
+    res.json = function(body: unknown) {
       logAudit(res.statusCode);
       return originalJson.call(this, body);
     };
@@ -109,7 +109,7 @@ export const auditAllRequests = (
     const startTime = Date.now();
     const originalSend = res.send;
 
-    res.send = function(body: any) {
+    res.send = function(body: unknown) {
       const duration = Date.now() - startTime;
       
       logger.info(`AUDIT: Request to ${req.path}`, {

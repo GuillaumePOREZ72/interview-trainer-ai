@@ -37,8 +37,8 @@ export const useVoiceStudio = (
   // Initialize Speech Recognition
   useEffect(() => {
     const SpeechRecognition =
-      (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
       setIsSupported(false);
@@ -50,7 +50,7 @@ export const useVoiceStudio = (
     recognition.interimResults = true;
     recognition.lang = language === "fr" ? "fr-FR" : "en-US";
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event: Event | any) => {
       let finalTranscript = "";
       let currentInterim = "";
 
@@ -68,13 +68,13 @@ export const useVoiceStudio = (
       setInterimTranscript(currentInterim);
     };
 
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (event: Event | any) => {
       console.error("Speech recognition error", event.error);
 
       if (event.error === "network") {
         setState("ERROR");
         // Special message for Brave or network issues
-        const isBrave = (navigator as any).brave !== undefined;
+        const isBrave = navigator.brave !== undefined;
         const msg = isBrave
           ? t("vocal.errors.brave")
           : t("vocal.errors.network");
@@ -103,7 +103,7 @@ export const useVoiceStudio = (
       // Initialize Web Audio API for visualization
       if (!audioContextRef.current) {
         audioContextRef.current = new (
-          window.AudioContext || (window as any).webkitAudioContext
+          window.AudioContext || window.webkitAudioContext
         )();
       }
 

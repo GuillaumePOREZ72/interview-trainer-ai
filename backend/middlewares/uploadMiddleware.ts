@@ -105,10 +105,10 @@ export const uploadAudio = upload.single("audio");
  * Catches and formats multer-specific errors
  */
 export const handleUploadError = (
-  err: any,
+  err: unknown,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (err instanceof multer.MulterError) {
     // Multer-specific errors
@@ -144,11 +144,17 @@ export const handleUploadError = (
   }
 
   // Other errors (including our custom fileFilter errors)
-  if (err) {
+  if (err instanceof Error) {
     logger.error(`Upload error: ${err.message}`);
     return res.status(400).json({
       success: false,
       message: err.message,
+    });
+  } else if (err) {
+    logger.error(`Upload error: ${String(err)}`);
+    return res.status(400).json({
+      success: false,
+      message: String(err),
     });
   }
 

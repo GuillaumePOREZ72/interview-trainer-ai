@@ -78,7 +78,7 @@ export const togglePinQuestion = async (
       match: { user: userId },
     });
 
-    if (!question || !(question.session as any)) {
+    if (!question || !question.session) {
       logger.warn(
         `Unauthorized attempt to toggle pin: User ${userId} tried to access question ${req.params.id}`,
       );
@@ -122,7 +122,7 @@ export const updateQuestionNote = async (
       match: { user: userId },
     });
 
-    if (!question || !(question.session as any)) {
+    if (!question || !question.session) {
       logger.warn(
         `Unauthorized attempt to update note: User ${userId} tried to access question ${req.params.id}`,
       );

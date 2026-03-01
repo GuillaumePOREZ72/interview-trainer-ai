@@ -34,7 +34,7 @@ const Login = ({ setCurrentPage }: LoginProps) => {
     if (!result.success) {
       const firstError = result.error.issues[0];
       const message = firstError.message.includes(".")
-        ? t(firstError.message as any)
+        ? t(firstError.message as string)
         : firstError.message;
       setError(message);
       return;

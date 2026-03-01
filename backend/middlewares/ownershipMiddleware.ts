@@ -38,7 +38,7 @@ export const verifySessionOwnership = async (
     }
 
     // Attacher la session à la requête pour usage ultérieur
-    (req as any).ownedSession = session;
+    req.ownedSession = session;
     next();
   } catch (error) {
     logger.error(`Ownership verification error: ${error}`);
@@ -70,7 +70,7 @@ export const verifyQuestionOwnership = async (
       match: { user: userId }
     });
 
-    if (!question || !(question.session as any)) {
+    if (!question || !question.session) {
       logger.warn(
         `Ownership check failed: User ${userId} attempted to access question ${questionId}`
       );
@@ -78,7 +78,7 @@ export const verifyQuestionOwnership = async (
       return;
     }
 
-    (req as any).ownedQuestion = question;
+    req.ownedQuestion = question;
     next();
   } catch (error) {
     logger.error(`Question ownership verification error: ${error}`);

@@ -39,7 +39,7 @@ interface UseMockInterviewReturn {
   error: MockInterviewError | null;
   queuePosition: number | null;
   analysisProgress: number;
-  
+
   // Actions
   startInterview: (data: StartInterviewRequest) => Promise<void>;
   startRecording: () => Promise<void>;
@@ -47,7 +47,7 @@ interface UseMockInterviewReturn {
   completeInterview: () => Promise<SessionReport | undefined>;
   reset: () => void;
   connectToSSE: (sessionId: string) => void;
-  
+
   // Utils
   getFrequencyData: () => Uint8Array;
 }
@@ -79,10 +79,10 @@ export const useMockInterview = (
   const dataArrayRef = useRef<Uint8Array | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  
+
   // Refs for speech recognition
   const recognitionRef = useRef<any>(null);
-  
+
   // Refs for SSE
   const eventSourceRef = useRef<EventSource | null>(null);
 
@@ -117,7 +117,7 @@ export const useMockInterview = (
   // Initialize Speech Recognition
   useEffect(() => {
     const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) return;
 
@@ -126,7 +126,7 @@ export const useMockInterview = (
     recognition.interimResults = true;
     recognition.lang = language === "fr" ? "fr-FR" : "en-US";
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event: Event | any) => {
       let finalTranscript = "";
       let currentInterim = "";
 
@@ -144,7 +144,7 @@ export const useMockInterview = (
       setInterimTranscript(currentInterim);
     };
 
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (event: Event | any) => {
       console.error("Speech recognition error:", event.error);
       if (event.error !== "no-speech" && event.error !== "aborted") {
         setError({
@@ -199,17 +199,18 @@ export const useMockInterview = (
       setSession(sessionResponse.data.session);
       setCurrentQuestion(question);
       setState("question");
-      
+
       toast.success(t("mockInterview.success.started"));
-      
+
       // Connect to SSE for real-time updates
       connectToSSE(sessionId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to start interview:", err);
       setState("setup");
+      const axiosErr = err as Record<string, any>;
       setError({
         type: "api",
-        message: err.response?.data?.message || t("mockInterview.errors.startFailed"),
+        message: axiosErr?.response?.data?.message || t("mockInterview.errors.startFailed"),
         recoverable: true,
       });
       toast.error(t("mockInterview.errors.startFailed"));
@@ -241,7 +242,7 @@ export const useMockInterview = (
     eventSource.addEventListener("status", (event) => {
       const data = JSON.parse(event.data);
       console.log("Status update:", data);
-      
+
       if (data.status === "analyzing") {
         setState("analyzing");
       } else if (data.status === "active") {
@@ -322,7 +323,7 @@ export const useMockInterview = (
       // Initialize Web Audio API for visualization
       if (!audioContextRef.current) {
         audioContextRef.current = new (window.AudioContext ||
-          (window as any).webkitAudioContext)();
+          window.webkitAudioContext)();
       }
 
       if (audioContextRef.current.state === "suspended") {
@@ -379,7 +380,7 @@ export const useMockInterview = (
    */
   const stopRecording = useCallback(async (sessionId?: string) => {
     if (state !== "recording") return;
-    
+
     const currentSessionId = sessionId || session?._id;
     if (!currentSessionId) {
       toast.error("No session available");
@@ -431,12 +432,12 @@ export const useMockInterview = (
 
       setState("analyzing");
       toast.success(t("mockInterview.success.answerSubmitted"));
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to submit answer:", err);
       setState("question");
       setError({
         type: "api",
-        message: err.response?.data?.message || t("mockInterview.errors.submitFailed"),
+        message: (err as any)?.response?.data?.message || t("mockInterview.errors.submitFailed"),
         recoverable: true,
       });
       toast.error(t("mockInterview.errors.submitFailed"));
@@ -455,25 +456,25 @@ export const useMockInterview = (
       );
 
       setState("completed");
-      
+
       // Update session with report
       setSession((prev) =>
         prev
           ? {
-              ...prev,
-              status: "completed",
-              overallScore: response.data.report.overallScore,
-            }
+            ...prev,
+            status: "completed",
+            overallScore: response.data.report.overallScore,
+          }
           : null
       );
 
       toast.success(t("mockInterview.success.completed"));
       return response.data.report;
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to complete interview:", err);
       setError({
         type: "api",
-        message: err.response?.data?.message || t("mockInterview.errors.completeFailed"),
+        message: (err as any)?.response?.data?.message || t("mockInterview.errors.completeFailed"),
         recoverable: true,
       });
       toast.error(t("mockInterview.errors.completeFailed"));
@@ -514,7 +515,7 @@ export const useMockInterview = (
   const getFrequencyData = useCallback(() => {
     if (analyserRef.current && dataArrayRef.current) {
       // Type assertion needed due to strict Uint8Array typing differences
-      analyserRef.current.getByteFrequencyData(dataArrayRef.current as any);
+      analyserRef.current.getByteFrequencyData(dataArrayRef.current as unknown as Uint8Array<ArrayBuffer>);
       return dataArrayRef.current;
     }
     return new Uint8Array(128).fill(0);

@@ -8,7 +8,7 @@ import { LuKeyRound } from "react-icons/lu";
 import { forgotPasswordSchema } from "../../utils/validationSchemas";
 
 interface ForgotPasswordProps {
-  setCurrentPage: (page: any) => void;
+  setCurrentPage: (page: "login" | "signup" | "forgotPassword") => void;
 }
 
 const ForgotPassword = ({ setCurrentPage }: ForgotPasswordProps) => {
@@ -28,7 +28,7 @@ const ForgotPassword = ({ setCurrentPage }: ForgotPasswordProps) => {
     if (!result.success) {
       const firstError = result.error.issues[0];
       const message = firstError.message.includes(".")
-        ? t(firstError.message as any)
+        ? t(firstError.message as string)
         : firstError.message;
       setError(message);
       return;

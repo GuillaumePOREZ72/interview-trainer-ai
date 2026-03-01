@@ -21,7 +21,7 @@ class AuthService {
   }
 
   // Business Logic: Registration
-  async registerUser(userData: { name: string; email: string; password: any }) {
+  async registerUser(userData: { name: string; email: string; password: string }) {
     const { name, email, password } = userData;
 
     const userExists = await User.findOne({ email });
@@ -42,7 +42,7 @@ class AuthService {
   }
 
   // Business Logic: Login
-  async loginUser(email: string, password: any) {
+  async loginUser(email: string, password: string) {
     const user = await User.findOne({ email });
     if (!user) {
       throw new Error("Invalid email or password");
@@ -119,7 +119,7 @@ class AuthService {
   }
 
   // Business Logic: Reset Password
-  async resetPassword(resetToken: string, password: any) {
+  async resetPassword(resetToken: string, password: string) {
     const resetPasswordToken = crypto
       .createHash("sha256")
       .update(resetToken)
@@ -141,6 +141,33 @@ class AuthService {
 
     await user.save();
     return user;
+  }
+
+  // Business Logic: Logout (Revoke Refresh Token)
+  async logoutUser(refreshToken: string) {
+    if (!refreshToken) return;
+
+    try {
+      // Decode to get exp if possible, otherwise use a default expiry
+      const decoded = jwt.decode(refreshToken) as { exp?: number } | null;
+      const expiry = decoded?.exp
+        ? new Date(decoded.exp * 1000)
+        : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // Default 7 days fallback
+
+      // Ensure it's not already revoked
+      const alreadyRevoked = await RevokedToken.findOne({ token: refreshToken });
+
+      if (!alreadyRevoked) {
+        // Add to RevokedToken collection
+        await RevokedToken.create({
+          token: refreshToken,
+          expiry,
+        });
+        logger.info("Token explicitly revoked during logout");
+      }
+    } catch (error) {
+      logger.error(`Error revoking token during logout: ${error}`);
+    }
   }
 }
 

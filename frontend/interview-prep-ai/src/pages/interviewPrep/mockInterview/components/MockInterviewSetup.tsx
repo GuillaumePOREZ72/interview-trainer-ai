@@ -44,17 +44,21 @@ const MockInterviewSetup = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
 
-  const validateField = (field: keyof typeof formData, value: any) => {
+  const validateField = (field: keyof typeof formData, value: string | number | boolean | string[]) => {
     try {
       const result = mockInterviewSchema.safeParse({ ...formData, [field]: value });
       if (!result.success) {
-        // Zod error issues are in result.error.issues
-        const fieldError = result.error.issues.find((e: any) => e.path[0] === field);
-        setErrors((prev) => ({ ...prev, [field]: fieldError?.message || t("validation.invalidField") }));
-        return false;
+        // Find error for this specific field
+        const fieldError = result.error.issues.find((e) => e.path[0] === field);
+        if (fieldError) {
+          setErrors((prev) => ({ ...prev, [field]: fieldError.message }));
+        } else {
+          setErrors((prev) => ({ ...prev, [field]: undefined }));
+        }
+        return false; // Indicate validation failed for the field
       } else {
         setErrors((prev) => ({ ...prev, [field]: "" }));
-        return true;
+        return true; // Indicate validation passed for the field
       }
     } catch (err) {
       console.error("Validation error:", err);
@@ -62,7 +66,7 @@ const MockInterviewSetup = () => {
     }
   };
 
-  const handleInputChange = (field: keyof typeof formData, value: any) => {
+  const handleInputChange = (field: keyof typeof formData, value: string | number | boolean | string[]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     // Ne pas valider immédiatement - uniquement au blur
   };
@@ -83,7 +87,6 @@ const MockInterviewSetup = () => {
     }
     const newTopics = [...formData.topicsToFocus, currentTopic.trim()];
     handleInputChange("topicsToFocus", newTopics);
-    setCurrentTopic("");
   };
 
   const handleRemoveTopic = (topic: string) => {
@@ -96,8 +99,9 @@ const MockInterviewSetup = () => {
 
     const result = mockInterviewSchema.safeParse(formData);
     if (!result.success) {
+      // Form is invalid, display errors
       const newErrors: Partial<Record<keyof typeof formData, string>> = {};
-      result.error.issues.forEach((error: any) => {
+      result.error.issues.forEach((error) => {
         const field = error.path[0] as keyof typeof formData;
         newErrors[field] = error.message;
       });

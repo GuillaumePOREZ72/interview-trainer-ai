@@ -41,7 +41,7 @@ const processQueue = (
 axiosInstance.interceptors.request.use(
   (config) => {
     const language = localStorage.getItem("i18nextLng") || "en";
-    (config.headers as any)["Accept-Language"] = language;
+    (config.headers as Record<string, string>)["Accept-Language"] = language;
 
     // Let the browser set Content-Type automatically for FormData (multipart/form-data with boundary)
     if (config.data instanceof FormData) {

@@ -50,7 +50,7 @@ export const createApp = (): Express => {
 
   // Trust proxy for rate limiting in production (o2switch/reverse proxies)
   if (NODE_ENV === "production") {
-    app.set("trust proxy", true);
+    app.set("trust proxy", 1); // 1 = trust first proxy (safer than true)
   }
 
   // Correlation ID middleware (doit être en premier pour tracer toutes les requêtes)
@@ -64,7 +64,7 @@ export const createApp = (): Express => {
         "http://localhost:3000",
         "http://localhost:8000",
       ];
-      
+
       if (!origin || whitelist.includes(origin)) {
         callback(null, true);
       } else {
@@ -81,8 +81,8 @@ export const createApp = (): Express => {
   app.use(cors(corsOptions));
 
   // Middlewares
-  app.use(express.json({ limit: "10mb" }));
-  app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+  app.use(express.json({ limit: "1mb" }));
+  app.use(express.urlencoded({ extended: true, limit: "1mb" }));
   app.use(cookieParser());
 
   // ✅ Audit middleware pour les requêtes sensibles
@@ -109,14 +109,14 @@ export const createApp = (): Express => {
     }),
   );
 
-  // ✅ Security headers avec CSP renforcé
+  // Security headers avec CSP renforcé
   app.use(
     helmet({
       crossOriginResourcePolicy: { policy: "cross-origin" },
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          scriptSrc: ["'self'", "'unsafe-inline'"], // ✅ Supprimé 'unsafe-inline'
+          scriptSrc: ["'self'", "'unsafe-inline'"],
           styleSrc: [
             "'self'",
             "'unsafe-inline'", // Nécessaire pour Tailwind mais à restreindre si possible
@@ -157,8 +157,8 @@ export const createApp = (): Express => {
     logger.info("🏓 PING received! Node.js is handling this request.", {
       correlationId: req.correlationId,
     });
-    res.json({ 
-      pong: true, 
+    res.json({
+      pong: true,
       timestamp: new Date().toISOString(),
       correlationId: req.correlationId,
     });
@@ -301,7 +301,7 @@ export const createApp = (): Express => {
       next: express.NextFunction,
     ) => {
       // Do not log request bodies or other potentially sensitive payloads in production
-      const meta: any = {
+      const meta: Record<string, unknown> = {
         url: req.url,
         method: req.method,
         correlationId: req.correlationId,
@@ -327,7 +327,7 @@ export const createApp = (): Express => {
       method: req.method,
       correlationId: req.correlationId,
     });
-    res.status(404).json({ 
+    res.status(404).json({
       message: "Route not found",
       correlationId: req.correlationId,
     });

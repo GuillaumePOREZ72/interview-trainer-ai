@@ -90,7 +90,7 @@ const startServer = async () => {
       initializeBackgroundServices();
     });
 
-    server.on("error", (error: any) => {
+    server.on("error", (error: { message: string; path: (string|number)[] }) => {
       logger.error("❌ Server listener error:", String(error));
     });
   } catch (error) {

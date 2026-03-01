@@ -47,7 +47,7 @@ const VoiceStudio = () => {
         );
         const session = response.data.session;
         const foundQuestion = session.questions.find(
-          (q: any) => q._id === questionId,
+          (q: { _id: string }) => q._id === questionId,
         );
         setQuestion(foundQuestion);
       } catch (err) {
@@ -67,8 +67,6 @@ const VoiceStudio = () => {
       try {
         await stopListening();
         // Redirect back to session view to see analysis in context
-        // Or show results here. The plan says "Redirect or show feedback".
-        // Let's redirect to seeing the original session with the new data.
         setTimeout(() => {
           navigate(`/interview-prep/${sessionId}`);
         }, 1500);

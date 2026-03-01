@@ -33,7 +33,7 @@ export const vocalAnalysisLimiter = rateLimit({
   keyGenerator: (req: Request) => {
     // Use user ID if authenticated, otherwise fallback to IP
     // Depending on how custom types are set up, we cast to any or check existing types
-    const user = (req as any).user as IUser | undefined;
+    const user = req.user as IUser | undefined;
     return user ? user._id.toString() : req.ip || "unknown";
   },
   message: {

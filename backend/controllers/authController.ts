@@ -211,7 +211,14 @@ const resetPassword = async (req: Request, res: Response): Promise<void> => {
 };
 
 // Logout User
-const logoutUser = (req: Request, res: Response): void => {
+const logoutUser = async (req: Request, res: Response): Promise<void> => {
+  const refreshToken = req.cookies?.refreshToken;
+
+  // Révocation explicite en BDD si on a un token
+  if (refreshToken) {
+    await AuthService.logoutUser(refreshToken);
+  }
+
   const options = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

@@ -57,7 +57,7 @@ const CreateSessionForm = () => {
 
   const schema = createQASessionSchema(t);
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string | number | boolean | string[]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -87,12 +87,12 @@ const CreateSessionForm = () => {
     const result = schema.safeParse(formData);
 
     if (!result.success) {
-      const newErrors: Partial<Record<string, string>> = {};
-      result.error.issues.forEach((error: any) => {
-        const field = error.path[0] as string;
-        newErrors[field] = error.message;
+      const fieldErrors: Partial<Record<keyof typeof formData, string>> = {};
+      result.error.issues.forEach((error) => {
+        const fieldName = error.path[0] as keyof typeof formData;
+        fieldErrors[fieldName] = error.message;
       });
-      setErrors(newErrors);
+      setErrors(fieldErrors);
       toast.error(t("mockInterview.setup.validationError"));
       return;
     }
@@ -129,9 +129,14 @@ const CreateSessionForm = () => {
       if (response.data?.session?._id) {
         navigate(`/interview-prep/${response.data.session._id}`);
       }
-    } catch (error: any) {
-      const message = error.response?.data?.message || t("errors.generic");
-      setErrors({ form: message });
+    } catch (error: unknown) {
+      console.error("Error creating session:", error);
+      const axiosErr = error as any;
+      setErrors({
+        form:
+          axiosErr.response?.data?.message ||
+          t("errors.generic"),
+      });
     } finally {
       setIsLoading(false);
     }

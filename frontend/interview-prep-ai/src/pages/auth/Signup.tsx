@@ -40,7 +40,7 @@ const Signup = ({ setCurrentPage }: SignupProps) => {
       // If the error message is a translation key (e.g. validation.invalidEmail), use t()
       // otherwise use the message directly (e.g. "Password must be...")
       const message = firstError.message.includes(".")
-        ? t(firstError.message as any)
+        ? t(firstError.message as string)
         : firstError.message;
       setError(message);
       return;
